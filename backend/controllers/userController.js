@@ -17,9 +17,6 @@ exports.getUsersById = (req, res) => {
 
 exports.createUser = (req, res) => {
   const { nom, prenom, date_naissance, genre, mail, password, telephone, actif } = req.body;
-
-  console.log("I PASS IN CREATE");
-
   // Exécuter la requête d'insertion
   db.query(
     'INSERT INTO user (`nom`, `prenom`, `date_naissance`, `genre`, `mail`, `password`, `telephone`, `actif`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 

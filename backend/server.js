@@ -1,19 +1,19 @@
-const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const db = require('./config/db');
-const userRoutes = require('./routes/userRoute');
 const setupSwagger = require('./config/swagger');
+const express = require('express');
+const app = express();
+const userRoutes = require('./routes/userRoute'); // Assurez-vous que le chemin est correct
+
+app.use(express.json());
+
+app.use('/api/user', userRoutes);
 
 dotenv.config();
 
-const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-
-// Routes
-app.use('/api/users', userRoutes);
 
 // Setup Swagger
 setupSwagger(app);

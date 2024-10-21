@@ -11,7 +11,9 @@ const config: Config = {
   	extend: {
   		colors: {
   			background: 'var(--background)',
-  			foreground: 'var(--foreground)'
+  			foreground: 'var(--foreground)',
+			primary_blue: '#30aee1',
+			secondary_blue: '#1b1336'
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

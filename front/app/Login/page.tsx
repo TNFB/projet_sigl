@@ -55,7 +55,7 @@ const Page = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-primary-dark-blue bg-cover bg-center">
+    <div className="flex justify-center items-center min-h-screen bg-cover bg-center bg-[url('/images/eseo_exterieur.png')]">
       <div
         className="w-[420px] bg-transparent border-0 md:border-2 border-white/20 backdrop-blur-[20px] shadow-lg text-white rounded-lg p-8"
         style={{
@@ -64,7 +64,7 @@ const Page = () => {
       >
         <div className="flex justify-center mt-5 mb-10">
           <Image
-            src="/images/Logo_ESEO_GROUPE.jpg"
+            src="/images/logo_eseo/ESEO-logo-couleur-positif.png"
             alt="Logo"
             width={300}
             height={200}
@@ -75,28 +75,24 @@ const Page = () => {
           <input
             type="text"
             placeholder="Identifiant"
-            className="w-full h-12 bg-transparent border border-white rounded-full text-base text-white px-5"
+            className="w-full h-12 bg-transparent border border-white rounded-full text-base text-white px-5 placeholder-white"
           />
         </div>
         <div className="relative w-full my-6">
           <input
             type="password"
             placeholder="Mot de passe"
-            className="w-full h-12 bg-transparent border border-white rounded-full text-base text-white px-5"
+            className="w-full h-12 bg-transparent border border-white rounded-full text-base text-white px-5 placeholder-white"
           />
         </div>
         <button
-          className="w-full h-11 bg-light-white border-none outline-none rounded-full shadow-sm cursor-pointer text-base text-gray-800 font-semibold mb-3.5"
+          className="w-full h-11 bg-white border-none outline-none rounded-full shadow-sm cursor-pointer text-base text-secondary_blue font-semibold mb-3.5 hover:bg-secondary_blue hover:text-white transition-transform duration-300 transform hover:scale-105"
           onClick={handleSubmit}
         >
           Connexion
         </button>
-        <div className="flex justify-between text-sm">
-          <label className="flex items-center">
-            <input type="checkbox" className="accent-white mr-1" />
-            Se souvenir de moi
-          </label>
-          <a href="#" className="text-white no-underline hover:underline">
+        <div className="flex justify-center underline text-sm">
+          <a href="#" className="text-white no-underline hover:text-primary_blue hover:underline decoration-primary_blue">
             Mot de passe oublié ?
           </a>
         </div>

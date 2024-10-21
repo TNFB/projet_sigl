@@ -3,10 +3,13 @@
 const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig = {
-    assetPrefix: isProd ? '/projet_sigl/' : '',
-    basePath: isProd ? '/projet_sigl' : '',
-    trailingSlash: true,
-    output: 'export',
+  assetPrefix: process.env.NEXT_PUBLIC_ASSET_PREFIX || '',
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
+  trailingSlash: true,
+  images: {
+    unoptimized: process.env.NEXT_PUBLIC_UNOPTIMIZED_IMAGES === 'true',
+  },
+  output: isProd ? 'export' : undefined,
 };
 
 export default nextConfig;

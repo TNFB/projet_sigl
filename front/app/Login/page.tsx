@@ -1,10 +1,13 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import Image from 'next/image';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const Page = () => {
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -54,6 +57,12 @@ const Page = () => {
     router.push('/');
   };
 
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [])
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-cover bg-center bg-[url('/images/eseo_exterieur.png')]">
       <div
@@ -72,25 +81,24 @@ const Page = () => {
           />
         </div>
         <div className="relative w-full my-6">
-          <input
+          <Input 
             type="text"
             placeholder="Identifiant"
-            className="w-full h-12 bg-transparent border border-white rounded-full text-base text-white px-5 placeholder-white"
+            ref={inputRef}
           />
         </div>
         <div className="relative w-full my-6">
-          <input
-            type="password"
-            placeholder="Mot de passe"
-            className="w-full h-12 bg-transparent border border-white rounded-full text-base text-white px-5 placeholder-white"
-          />
+        <Input 
+          type="password"
+          placeholder="Mot de passe"
+        />
         </div>
-        <button
+        <Button 
           className="w-full h-11 bg-white border-none outline-none rounded-full shadow-sm cursor-pointer text-base text-secondary_blue font-semibold mb-3.5 hover:bg-secondary_blue hover:text-white transition-transform duration-300 transform hover:scale-105"
           onClick={handleSubmit}
         >
           Connexion
-        </button>
+        </Button>
         <div className="flex justify-center underline text-sm">
           <a href="#" className="text-white no-underline hover:text-primary_blue hover:underline decoration-primary_blue">
             Mot de passe oublié ?

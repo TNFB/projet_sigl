@@ -54,7 +54,7 @@ const Page = () => {
           console.error("Erreur lors de la connexion :", error);
           setErrorMessage("Identifiants incorrects. Veuillez réessayer.");
         }*/
-    router.push('/');
+    router.push('/accueil');
   };
 
   useEffect(() => {

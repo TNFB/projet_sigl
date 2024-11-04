@@ -4,11 +4,12 @@ import { Home, CheckSquare, FileText, BookOpen, Clipboard } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader } from "@/components/ui/sidebar"
 import Image from 'next/image'
 import Link from 'next/link'
-import { SIDEBAR_ITEMS } from '@/utils/constants'
+import { SIDEBAR_ITEMS, SIDEBAR_ADMIN_ITEMS } from '@/utils/constants'
 import { ICONS } from '@/utils/iconMapping'
 
 const SideBar = () => {
   const [activeItem, setActiveItem] = useState("Accueil")
+  const [userType, setUserType] = useState('admin')
 
   useEffect(() => {
     let path = window.location.pathname
@@ -21,6 +22,8 @@ const SideBar = () => {
     }
   }, [])
 
+  const items = userType === 'admin' ? SIDEBAR_ADMIN_ITEMS : SIDEBAR_ITEMS
+
   return (
     <Sidebar className="bg-[#fafafa] ml-2 mt-2 rounded-lg shadow-lg">
       <SidebarHeader className='mb-12'>
@@ -31,7 +34,7 @@ const SideBar = () => {
           <SidebarGroupLabel>General</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className='p-2 border-b-2 border-gray-300'>
-              {SIDEBAR_ITEMS.map((item) => {
+              {items.map((item) => {
                 const Icon = ICONS[item.icon]
                 return(
                 <SidebarMenuItem key={item.title}>

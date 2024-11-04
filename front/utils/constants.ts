@@ -1,6 +1,6 @@
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Home, CheckSquare, FileText, BookOpen, Clipboard } from "lucide-react"
+import { Home, CheckSquare, FileText, BookOpen, Clipboard, UsersRound } from "lucide-react"
 
 export const SIDEBAR_ITEMS = [
     {
@@ -28,5 +28,24 @@ export const SIDEBAR_ITEMS = [
       url: "/evaluations",
       icon: "Clipboard",
     },
+]
+
+
+export const SIDEBAR_ADMIN_ITEMS = [
+  {
+    title: "Accueil",
+    url: "/accueil",
+    icon: "Home",
+  },
+  {
+    title: "Gestion des élèves",
+    url: "/taches",
+    icon: "UsersRound",
+  },
+  {
+    title: "Gestion des livrables",
+    url: "/documents",
+    icon: "BookOpen",
+  },
 ]
   

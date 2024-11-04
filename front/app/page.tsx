@@ -12,6 +12,7 @@ interface HomeProps {
 
 export default function Home({ children }: HomeProps) {
 
+
   return (
     <SidebarProvider className='bg-[#f2f2f2]'>
       <div className="flex w-screen h-screen">

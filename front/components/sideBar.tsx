@@ -5,6 +5,7 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGrou
 import Image from 'next/image'
 import Link from 'next/link'
 import { SIDEBAR_ITEMS } from '@/utils/constants'
+import { ICONS } from '@/utils/iconMapping'
 
 const SideBar = () => {
   const [activeItem, setActiveItem] = useState("Accueil")
@@ -30,7 +31,9 @@ const SideBar = () => {
           <SidebarGroupLabel>General</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className='p-2 border-b-2 border-gray-300'>
-              {SIDEBAR_ITEMS.map((item) => (
+              {SIDEBAR_ITEMS.map((item) => {
+                const Icon = ICONS[item.icon]
+                return(
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link 
@@ -38,12 +41,13 @@ const SideBar = () => {
                       className={`flex items-center space-x-2 p-2 rounded-lg ${activeItem === item.url ? 'bg-blue-500 text-white' : 'text-gray-700'}`}
                       onClick={() => setActiveItem(item.title)}
                     >
-                      <item.icon className="w-5 h-5" />
+                      <Icon className="w-5 h-5" />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ))}
+                )
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

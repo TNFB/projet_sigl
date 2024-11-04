@@ -1,3 +1,7 @@
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { Home, CheckSquare, FileText, BookOpen, Clipboard } from "lucide-react"
+
 export const SIDEBAR_ITEMS = [
     {
       title: "Accueil",

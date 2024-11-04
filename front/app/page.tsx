@@ -4,7 +4,13 @@ import { SidebarProvider } from "@/components/ui/sidebar"
 import SideBar from "@/components/sideBar"
 import Header from '@/components/Header'
 
-export default function Home({ children }) {
+import { ReactNode } from 'react';
+
+interface HomeProps {
+  children: ReactNode;
+}
+
+export default function Home({ children }: HomeProps) {
 
   return (
     <SidebarProvider className='bg-[#f2f2f2]'>

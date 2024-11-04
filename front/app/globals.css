@@ -4,7 +4,7 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background-color: #d30000;
+  background-color: #f2f2f2;
 }
 
 @layer utilities {
@@ -16,8 +16,8 @@ body {
 @layer base {
   :root {
     --radius: 0.5rem;
-    --sidebar-background: #1cdb2c;
-    --sidebar-foreground: #d30000;
+    --sidebar-background: #f2f2f2;
+    --sidebar-foreground: #f2f2f2;
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 240 4.8% 95.9%;

@@ -9,7 +9,7 @@ import { ICONS } from '@/utils/iconMapping'
 
 const SideBar = () => {
   const [activeItem, setActiveItem] = useState("Accueil")
-  const [userType, setUserType] = useState('admin')
+  const userType = 'user'
 
   useEffect(() => {
     let path = window.location.pathname

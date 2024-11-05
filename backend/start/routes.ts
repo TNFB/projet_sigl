@@ -16,4 +16,6 @@ Route.group(() => {
   Route.get('/', [ActeurController, 'getAllActeurs'])
   Route.get('/:id', [ActeurController, 'getActeurById'])
   Route.post('/', [ActeurController, 'createActeur'])
-}).prefix('/acteurs')
+}).prefix('/acteur')
+
+Route.get('connexion', [ActeurController, 'connexionActeur'])

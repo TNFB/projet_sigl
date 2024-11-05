@@ -1,14 +1,28 @@
 'use client'
 import React from 'react'
-import Link from 'next/link'
+import { SidebarProvider } from "@/components/ui/sidebar"
+import SideBar from "@/components/sideBar"
+import Header from '@/components/Header'
 
-export default function Home() {
+import { ReactNode } from 'react';
+
+interface HomeProps {
+  children: ReactNode;
+}
+
+export default function Home({ children }: HomeProps) {
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-[#f2f2f2]">
-      <p>Redirection vers la page de login...</p>
-      <Link href="/Login">
-        <p className="text-blue-500 underline">Cliquez ici pour aller à la page de login</p>
-      </Link>
-    </div>
+    <SidebarProvider className='bg-[#f2f2f2]'>
+      <div className="flex w-screen h-screen">
+        <SideBar />
+        <div className='flex-1 ml-4 mt-2'>
+          <Header />
+          <main className='p-4'>
+            {children}
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 }

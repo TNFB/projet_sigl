@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef } from 'react'
@@ -54,7 +55,7 @@ const Page = () => {
           console.error("Erreur lors de la connexion :", error);
           setErrorMessage("Identifiants incorrects. Veuillez réessayer.");
         }*/
-    router.push('/');
+    router.push('/accueil');
   };
 
   useEffect(() => {

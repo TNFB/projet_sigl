@@ -26,7 +26,7 @@ export default class Acteur extends BaseModel {
   declare genre: string
 
   @column()
-  declare mail: string
+  declare email: string
 
   @column()
   declare password: string

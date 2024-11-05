@@ -20,16 +20,16 @@ export default class UserController {
     return getAllUser
   }
 
-
   async createUser({ request }: HttpContext) {
     try {
-        const { full_name, email, password } = request.only(['full_name', 'email', 'password']);
-        const createUser = await db.table('users').insert({ full_name, email, password });
-        console.log(`User created: ${createUser}`);
-        return createUser;
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const { full_name, email, password } = request.only(['full_name', 'email', 'password'])
+      const createUser = await db.table('users').insert({ full_name, email, password })
+      console.log(`User created: ${createUser}`)
+      return createUser
     } catch (error) {
-        console.error(error);
-        return { error: 'Failed to create user' };
+      console.error(error)
+      return { error: 'Failed to create user' }
     }
   }
 }

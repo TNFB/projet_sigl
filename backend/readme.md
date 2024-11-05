@@ -1,4 +1,5 @@
 Set .ENV
+(copie .ENV.exemple => change APP_KEY & DB_DATABASE)
 
 cd .\backend\
 

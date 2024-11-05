@@ -11,7 +11,7 @@ import Admin from './admin.js'
 
 export default class Acteur extends BaseModel {
   @column({ isPrimary: true })
-  declare id_acteur: number
+  declare id: number
 
   @column()
   declare nom: string

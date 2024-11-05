@@ -9,12 +9,11 @@
 
 import Route from '@adonisjs/core/services/router'
 
-// Importer votre UserController
-const UserController = () => import('../app/controllers/user_controller.js')
+const ActeurController = () => import('../app/controllers/acteur_controller.js')
 
 // Définir les routes
 Route.group(() => {
-  Route.get('/', [UserController, 'getAllUser'])
-  Route.get('/:id', [UserController, 'getUserById'])
-  Route.post('/', [UserController, 'createUser'])
-}).prefix('/users')
+  Route.get('/', [ActeurController, 'getAllActeurs'])
+  Route.get('/:id', [ActeurController, 'getActeurById'])
+  Route.post('/', [ActeurController, 'createActeur'])
+}).prefix('/acteurs')

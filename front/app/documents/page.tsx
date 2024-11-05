@@ -7,18 +7,20 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function Documents() {
-  const [selectedFile, setSelectedFile] = useState(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [documentType, setDocumentType] = useState('')
 
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0])
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setSelectedFile(event.target.files[0])
+    }
   }
 
-  const handleTypeChange = (value) => {
+  const handleTypeChange = (value: string) => {
     setDocumentType(value)
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     // Logic to handle file upload and form submission
     console.log('File:', selectedFile)

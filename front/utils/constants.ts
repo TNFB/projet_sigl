@@ -5,7 +5,7 @@ import { Home, CheckSquare, FileText, BookOpen, Clipboard, UsersRound } from "lu
 export const SIDEBAR_ITEMS = [
     {
       title: "Accueil",
-      url: "/accueil",
+      url: "/",
       icon: "Home",
     },
     {

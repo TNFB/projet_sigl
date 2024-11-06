@@ -7,7 +7,7 @@ export default class Connexion {
     try {
       const { email, password } = request.only(['email', 'password'])
       const acteurDb = await db.from('acteur').where('email', email).select('*').first()
-      console.log(acteurDb)
+      console.log(acteurDb.id)
       const roleDb = await db.from('admin').where('acteur_key', acteurDb.id).select('*').first()
       console.log(roleDb)
       if (acteurDb.password === password) return { password: true, role: roleDb }

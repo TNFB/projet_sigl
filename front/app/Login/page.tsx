@@ -23,11 +23,9 @@ const Page = () => {
   }, [router]);
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    /*e.preventDefault();
+    e.preventDefault();
         try {
-          const url = isSignup
-            ? "http://localhost:3001/signup"
-            : "http://localhost:3001/login";
+          const url = "http://localhost:3001/login";
           const body = JSON.stringify({ email, password });
           const response = await fetch(url, {
             method: "POST",
@@ -42,19 +40,11 @@ const Page = () => {
             throw new Error(errorMessage);
           }
           const data = await response.json();
-          const token = data.token;
-          localStorage.setItem('token', token);
-          const userId = data.userId;
-          localStorage.setItem("userId", userId);
-          const userEmail = data.email;
-          localStorage.setItem("userEmail", userEmail);
-          const role = data.is_admin;
-          localStorage.setItem("role", role);
-          window.location.href = "/profile";
+          window.location.href = "/accueil";
         } catch (error) {
           console.error("Erreur lors de la connexion :", error);
           setErrorMessage("Identifiants incorrects. Veuillez réessayer.");
-        }*/
+        }
     router.push('/accueil');
   };
 

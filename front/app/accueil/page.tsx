@@ -18,7 +18,15 @@ const initialLayout = [
 export default function Accueil() {
   const [layout, setLayout] = useState(initialLayout)
 
-  const handleLayoutChange = (newLayout) => {
+  interface LayoutItem {
+    i: string;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  }
+
+  const handleLayoutChange = (newLayout: LayoutItem[]) => {
     setLayout(newLayout)
   }
 
@@ -32,7 +40,7 @@ export default function Accueil() {
 
   return (
     <Home>
-      <div className="p-4">
+      <div className="p-4 h-[calc(100vh-64px)] overflow-auto">
         <Button onClick={() => setLayout(initialLayout)}>Réinitialiser la grille</Button>
         <ResponsiveGridLayout
           className="layout"
@@ -44,22 +52,24 @@ export default function Accueil() {
           onLayoutChange={handleLayoutChange}
           onDragStart={handleDragStart}
           onDragStop={handleDragEnd}
+          isDraggable={true}
+          draggableHandle=".draggable-handle"
         >
-          <div key="1">
+          <div key="1" data-grid={{ x: 0, y: 0, w: 2, h: 1 }}>
             <Card className="h-full">
-              <CardHeader>
+              <CardHeader className="draggable-handle cursor-move">
                 <CardTitle>Evenements à venir</CardTitle>
               </CardHeader>
               <CardContent className="relative h-full">
-                <p>Mardi 31 Mars 2025 </p>
+                <p>Mardi 31 Mars 2025</p>
                 <br />
                 <p>Rendu rapport intermédiaire</p>
               </CardContent>
             </Card>
           </div>
-          <div key="2">
+          <div key="2" data-grid={{ x: 2, y: 0, w: 1, h: 2 }}>
             <Card className="h-full">
-              <CardHeader>
+              <CardHeader className="draggable-handle cursor-move">
                 <CardTitle>Notes importantes</CardTitle>
               </CardHeader>
               <CardContent className="relative h-full">
@@ -69,9 +79,9 @@ export default function Accueil() {
               </CardContent>
             </Card>
           </div>
-          <div key="3">
+          <div key="3" data-grid={{ x: 3, y: 0, w: 1, h: 2 }}>
             <Card className="h-full">
-              <CardHeader>
+              <CardHeader className="draggable-handle cursor-move">
                 <CardTitle>Rappels</CardTitle>
               </CardHeader>
               <CardContent className="relative h-full">
@@ -80,9 +90,9 @@ export default function Accueil() {
               </CardContent>
             </Card>
           </div>
-          <div key="4">
+          <div key="4" data-grid={{ x: 0, y: 1, w: 2, h: 2 }}>
             <Card className="h-full">
-              <CardHeader>
+              <CardHeader className="draggable-handle cursor-move">
                 <CardTitle>Documents récents</CardTitle>
               </CardHeader>
               <CardContent className="relative h-full">
@@ -91,9 +101,9 @@ export default function Accueil() {
               </CardContent>
             </Card>
           </div>
-          <div key="5">
+          <div key="5" data-grid={{ x: 2, y: 2, w: 3, h: 3 }}>
             <Card className="h-full">
-              <CardHeader>
+              <CardHeader className="draggable-handle cursor-move">
                 <CardTitle>Projets en cours</CardTitle>
               </CardHeader>
               <CardContent className="relative h-full">

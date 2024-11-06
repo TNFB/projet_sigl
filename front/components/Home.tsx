@@ -1,10 +1,14 @@
 'use client'
-import React from 'react'
+import React, { ReactNode } from 'react'
 import { SidebarProvider } from "@/components/ui/sidebar"
 import SideBar from "@/components/sideBar"
 import Header from '@/components/Header'
 
-const Home = ({ children }) => {
+interface HomeProps {
+  children: ReactNode;
+}
+
+const Home = ({ children }: HomeProps) => {
   return (
     <SidebarProvider className='bg-[#f2f2f2]'>
       <div className="flex w-screen h-screen">

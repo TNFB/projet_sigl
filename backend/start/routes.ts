@@ -10,6 +10,7 @@
 import Route from '@adonisjs/core/services/router'
 
 const ActeurController = () => import('../app/controllers/acteur_controller.js')
+const Connexion = () => import('../app/controllers/connexion.js')
 
 // Définir les routes
 Route.group(() => {
@@ -18,4 +19,4 @@ Route.group(() => {
   Route.post('/', [ActeurController, 'createActeur'])
 }).prefix('/acteur')
 
-Route.get('connexion', [ActeurController, 'connexionActeur'])
+Route.get('connexion', [Connexion, 'connexionActeur'])

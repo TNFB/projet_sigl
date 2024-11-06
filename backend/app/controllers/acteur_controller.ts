@@ -45,18 +45,4 @@ export default class UserController {
       return { error: 'Failed to create acteur' }
     }
   }
-
-  async connexionActeur({ request }: HttpContext) {
-    console.log('connexion acteur')
-    try {
-      const { email, password } = request.only(['email', 'password'])
-      const dbPassword = await db.from('acteur').where('email', email).select('*').first()
-      console.log(dbPassword)
-      if (dbPassword.password === password) return true
-      else return false
-    } catch (error) {
-      console.log(error)
-      return 'error in connexionActeur'
-    }
-  }
 }

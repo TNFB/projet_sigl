@@ -50,19 +50,14 @@ export default function GestionEleves() {
     telephone: string;
   }) => {
     try {
-      // Convertir la date de naissance en chaîne de caractères au format ISO 8601
-      const formattedData = {
-        ...data,
-        date_naissance: new Date(data.date_naissance).toISOString()
-      };
 
-      const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/acteur/`
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/acteur/`
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formattedData),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
@@ -92,7 +87,7 @@ export default function GestionEleves() {
                   <FormItem>
                     <FormLabel className="block text-sm font-medium text-gray-700">Nom</FormLabel>
                     <FormControl>
-                      <Input className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Nom" {...field} />
+                      <Input className="mt-1 block w-full text-black rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Nom" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -105,7 +100,7 @@ export default function GestionEleves() {
                   <FormItem>
                     <FormLabel className="block text-sm font-medium text-gray-700">Prénom</FormLabel>
                     <FormControl>
-                      <Input className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Prénom" {...field} />
+                      <Input className="mt-1 block w-full text-black rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Prénom" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -118,7 +113,7 @@ export default function GestionEleves() {
                   <FormItem>
                     <FormLabel className="block text-sm font-medium text-gray-700">Date de Naissance</FormLabel>
                     <FormControl>
-                      <Input type="date" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" {...field} />
+                      <Input type="date" className="mt-1 block w-full text-black rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -131,7 +126,7 @@ export default function GestionEleves() {
                   <FormItem>
                     <FormLabel className="block text-sm font-medium text-gray-700">Genre</FormLabel>
                     <FormControl>
-                      <Input className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Genre" {...field} />
+                      <Input className="mt-1 block w-full text-black rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Genre" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -144,7 +139,7 @@ export default function GestionEleves() {
                   <FormItem>
                     <FormLabel className="block text-sm font-medium text-gray-700">Email</FormLabel>
                     <FormControl>
-                      <Input type="email" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Email" {...field} />
+                      <Input type="email" className="mt-1 block w-full text-black rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -157,7 +152,7 @@ export default function GestionEleves() {
                   <FormItem>
                     <FormLabel className="block text-sm font-medium text-gray-700">Mot de passe</FormLabel>
                     <FormControl>
-                      <Input type="password" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Mot de passe" {...field} />
+                      <Input type="password" className="mt-1 block w-full text-black rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Mot de passe" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -170,7 +165,7 @@ export default function GestionEleves() {
                   <FormItem>
                     <FormLabel className="block text-sm font-medium text-gray-700">Téléphone</FormLabel>
                     <FormControl>
-                      <Input className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Téléphone" {...field} />
+                      <Input className="mt-1 block w-full text-black rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Téléphone" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

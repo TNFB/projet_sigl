@@ -66,10 +66,8 @@ export default function GestionEleves() {
 
       const result = await response.json();
       console.log('Success:', result);
-      // Vous pouvez ajouter ici la logique pour gérer la réponse du backend
     } catch (error) {
       console.error('Error:', error);
-      // Vous pouvez ajouter ici la logique pour gérer les erreurs
     }
   }
 

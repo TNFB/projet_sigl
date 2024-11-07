@@ -8,7 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
       table.string('nom')
       table.string('prenom')
-      table.timestamp('date_naissance')
+      table.timestamp('dateNaissance')
       table.string('genre')
       table.string('email')
       table.string('password')

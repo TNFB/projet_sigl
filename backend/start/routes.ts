@@ -15,8 +15,8 @@ const Connexion = () => import('../app/controllers/connexion.js')
 // Définir les routes
 Route.group(() => {
   Route.get('/', [ActeurController, 'getAllActeurs'])
-  Route.get('/:id', [ActeurController, 'getActeurById'])
+  Route.post('/:id', [ActeurController, 'getActeurById'])
   Route.post('/', [ActeurController, 'createActeur'])
 }).prefix('/acteur')
 
-Route.get('connexion', [Connexion, 'connexionActeur'])
+Route.post('connexion', [Connexion, 'connexionActeur'])

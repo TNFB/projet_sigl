@@ -5,7 +5,7 @@ import { Home, CheckSquare, FileText, BookOpen, Clipboard, UsersRound } from "lu
 export const SIDEBAR_ITEMS = [
     {
       title: "Accueil",
-      url: "/accueil",
+      url: "/",
       icon: "Home",
     },
     {
@@ -34,18 +34,17 @@ export const SIDEBAR_ITEMS = [
 export const SIDEBAR_ADMIN_ITEMS = [
   {
     title: "Accueil",
-    url: "/accueil",
+    url: "/",
     icon: "Home",
   },
   {
     title: "Gestion des élèves",
-    url: "/taches",
+    url: "/gestionEleves",
     icon: "UsersRound",
   },
   {
     title: "Gestion des livrables",
-    url: "/documents",
+    url: "/gestionLivrables",
     icon: "BookOpen",
   },
 ]
-  

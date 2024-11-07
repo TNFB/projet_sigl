@@ -25,7 +25,7 @@ const Page = () => {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
         try {
-          const url = "https://back-jf-eseo.tomherault.fr/connexion";
+          const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/connexion`
           const body = JSON.stringify({ email, password });
           console.log(body);
           const response = await fetch(url, {
@@ -35,15 +35,14 @@ const Page = () => {
             },
             body: body,
           });
-          console.log(response);
           if (!response.ok) {
             const errorMessage = await response.text();
             setErrorMessage(errorMessage);
             throw new Error(errorMessage);
           } else {
             const contentType = response.headers.get("content-type");
-            console.log(contentType)
-            //const data = await response.json();
+            
+            const data = await response.json();
             window.location.href = "/";
           }
         } catch (error) {

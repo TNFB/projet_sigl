@@ -25,7 +25,7 @@ const Page = () => {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
         try {
-          const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/connexion`
+          const url = `${process.env.NEXT_PUBLIC_API_URL }/connexion`
           const body = JSON.stringify({ email, password });
           console.log(body);
           const response = await fetch(url, {

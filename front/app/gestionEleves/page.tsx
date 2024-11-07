@@ -32,7 +32,7 @@ export default function GestionEleves() {
     defaultValues: {
       nom: '',
       prenom: '',
-      date_naissance: '',
+      dateNaissance: '',
       genre: '',
       email: '',
       password: '',
@@ -43,7 +43,7 @@ export default function GestionEleves() {
   const onSubmit = async (data: {
     nom: string;
     prenom: string;
-    date_naissance: string;
+    dateNaissance: string;
     genre: string;
     email: string;
     password: string;
@@ -108,7 +108,7 @@ export default function GestionEleves() {
               />
               <FormField
                 control={form.control}
-                name="date_naissance"
+                name="dateNaissance"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="block text-sm font-medium text-gray-700">Date de Naissance</FormLabel>

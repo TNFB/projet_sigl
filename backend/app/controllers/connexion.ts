@@ -12,11 +12,21 @@ export default class Connexion {
         console.log('Acteur table empty')
         return response.status(404).json({
           status: 'error',
-          message: 'No acteur table found/acteur table empty',
+          message: 'No Acteur table found/Acteur table empty',
         })
       }
 
-      // Table not empty
+      // check if table 'admin' empty
+      const adminCount = await db.from('acteur').count('* as total')
+      if (acteurCount[0].total === 0) {
+        console.log('Acteur table empty')
+        return response.status(404).json({
+          status: 'error',
+          message: 'No Admin table found/Admin table empty',
+        })
+      }
+
+      // Table acteur not empty
       const acteurDb = await db.from('acteur').where('email', email).select('*').first()
       if (!acteurDb) {
         return response.status(404).json({
@@ -25,11 +35,14 @@ export default class Connexion {
         })
       }
 
-      var roleDb = await db.from('admin').where('acteur_key', acteurDb.id).select('*').first()
-      console.log(roleDb)
-      if (!roleDb) {
-        roleDb = 'admin'
-      } else roleDb = 'user'
+      var roleDb = 'user'
+      if (adminCount[0] !== 0) {
+        var role = await db.from('admin').where('acteur_key', acteurDb.id).select('*').first()
+        console.log(role)
+        if (role) {
+          roleDb = 'admin'
+        }
+      }
 
       if (acteurDb.password === password) {
         return response.status(200).json({
@@ -41,7 +54,6 @@ export default class Connexion {
         return response.status(401).json({
           status: 'error',
           password: false,
-          role: roleDb,
           message: 'password incorrect',
         })
       }

@@ -19,4 +19,4 @@ Route.group(() => {
   Route.post('/', [ActeurController, 'createActeur'])
 }).prefix('/acteur')
 
-Route.get('connexion', [Connexion, 'connexionActeur'])
+Route.post('connexion', [Connexion, 'connexionActeur'])

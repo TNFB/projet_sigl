@@ -43,6 +43,7 @@ const Page = () => {
             const contentType = response.headers.get("content-type");
             
             const data = await response.json();
+            console.log(data.role);
             window.location.href = "/";
           }
         } catch (error) {

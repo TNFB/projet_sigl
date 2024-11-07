@@ -12,7 +12,7 @@ const SideBar = () => {
   const [userType, setUserType] = useState<'user' | 'admin'>('user')
 
   useEffect(() => {
-    setUserType('user')
+    setUserType('admin')
     let path = window.location.pathname
     if (path.endsWith('/')) {
       path = path.slice(0, -1)

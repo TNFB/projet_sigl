@@ -25,7 +25,7 @@ const Page = () => {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
         try {
-          const url = "http://localhost:3333/connexion";
+          const url = "https://back-jf-eseo.tomherault.fr/connexion";
           const body = JSON.stringify({ email, password });
           console.log(body);
           const response = await fetch(url, {
@@ -40,9 +40,12 @@ const Page = () => {
             const errorMessage = await response.text();
             setErrorMessage(errorMessage);
             throw new Error(errorMessage);
+          } else {
+            const contentType = response.headers.get("content-type");
+            console.log(contentType)
+            //const data = await response.json();
+            window.location.href = "/";
           }
-          const data = await response.json();
-          window.location.href = "/accueil";
         } catch (error) {
           console.error("Erreur lors de la connexion :", error);
           setErrorMessage("Identifiants incorrects. Veuillez réessayer.");

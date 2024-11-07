@@ -43,7 +43,8 @@ const Page = () => {
             const contentType = response.headers.get("content-type");
             
             const data = await response.json();
-            console.log(data.role);
+            console.log(data);
+            localStorage.setItem('userRole', data.role);
             window.location.href = "/";
           }
         } catch (error) {

@@ -32,7 +32,7 @@ export default function GestionEleves() {
     defaultValues: {
       nom: '',
       prenom: '',
-      dateNaissance: '',
+      date_naissance: '',
       genre: '',
       email: '',
       password: '',
@@ -43,7 +43,7 @@ export default function GestionEleves() {
   const onSubmit = async (data: {
     nom: string;
     prenom: string;
-    dateNaissance: string;
+    date_naissance: string;
     genre: string;
     email: string;
     password: string;
@@ -65,8 +65,10 @@ export default function GestionEleves() {
       }
 
       const result = await response.json();
+      alert('Utilisateur créé avec succès !');
       console.log('Success:', result);
     } catch (error) {
+      alert('Erreur lors de la création de l\'utilisateur.');
       console.error('Error:', error);
     }
   }
@@ -75,7 +77,7 @@ export default function GestionEleves() {
     <Home>
       <div className="flex justify-center items-center min-h-screen">
         <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold mb-4">Ajout d un user</h1>
+          <h1 className="text-2xl font-bold mb-4">Ajout d un utilisateur</h1>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
@@ -106,7 +108,7 @@ export default function GestionEleves() {
               />
               <FormField
                 control={form.control}
-                name="dateNaissance"
+                name="date_naissance"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="block text-sm font-medium text-gray-700">Date de Naissance</FormLabel>
@@ -169,7 +171,7 @@ export default function GestionEleves() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="mt-4 w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Soumettre</Button>
+              <Button type="submit" className="mt-4 w-full  inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Soumettre</Button>
             </form>
           </Form>
         </div>

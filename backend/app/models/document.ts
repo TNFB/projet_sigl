@@ -5,13 +5,13 @@ export default class Document extends BaseModel {
   declare idDocument: number
 
   @column()
-  declare nom: string
+  declare name: string
 
   @column()
   declare type: string
 
   @column()
-  declare semestre: string
+  declare semester: string
 
   @column()
   declare status: string

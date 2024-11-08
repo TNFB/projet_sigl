@@ -25,11 +25,10 @@ export default class UserController {
 
   async createActeur({ request }: HttpContext) {
     try {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      const { nom, prenom, date_naissance, genre, email, password, telephone } = request.only([
+      const { nom, prenom, dateNaissance, genre, email, password, telephone } = request.only([
         'nom',
         'prenom',
-        'date_naissance',
+        'dateNaissance',
         'genre',
         'email',
         'password',
@@ -37,7 +36,7 @@ export default class UserController {
       ])
       const createActeur = await db
         .table('acteur')
-        .insert({ nom, prenom, date_naissance, genre, email, password, telephone })
+        .insert({ nom, prenom, dateNaissance, genre, email, password, telephone })
       console.log(`Acteur created: ${createActeur}`)
       return createActeur
     } catch (error) {

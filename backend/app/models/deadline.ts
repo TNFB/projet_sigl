@@ -1,19 +1,19 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 
-export default class Event extends BaseModel {
+export default class Deadline extends BaseModel {
   @column({ isPrimary: true })
-  declare idEvent: number
+  declare idDeadline: number
 
   @column()
   declare name: string
 
   @column()
-  declare startDate: DateTime
+  declare semester: string
 
   @column()
-  declare endDate: DateTime
+  declare deadlineDate: DateTime
 
   @column()
-  declare type: string
+  declare statusDeadline: string
 }

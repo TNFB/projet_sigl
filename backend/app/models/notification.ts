@@ -6,7 +6,7 @@ export default class Notification extends BaseModel {
   declare idNotification: number
 
   @column()
-  declare acteurKey: number
+  declare userKey: number
 
   @column()
   declare type: string

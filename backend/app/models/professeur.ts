@@ -3,13 +3,13 @@ import { DateTime } from 'luxon'
 
 export default class Professeur extends BaseModel {
   @column({ isPrimary: true })
-  declare id_prof: number
+  declare idProf: number
 
   @column()
-  declare acteur_key: number
+  declare acteurKey: number
 
   @column()
-  declare centre_formation_key: number
+  declare centreFormationKey: number
 
   @column()
   declare specialite: string
@@ -18,8 +18,8 @@ export default class Professeur extends BaseModel {
   declare isEnseignantChercheur: boolean
 
   @column.date()
-  declare date_debut: DateTime
+  declare dateDebut: DateTime
 
   @column.date()
-  declare date_fin: DateTime
+  declare dateFin: DateTime
 }

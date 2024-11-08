@@ -5,9 +5,14 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('idApprenti')
-      table.integer('acteyrKey')
-      table.integer('entrepriseActuelleKey')
+      table.increments('idApprenti').primary()
+      table.integer('acteurKey').unsigned().references('id').inTable('acteur').onDelete('CASCADE')
+      table
+        .integer('entrepriseActuelleKey')
+        .unsigned()
+        .references('idEntreprise')
+        .inTable('entreprises')
+        .onDelete('CASCADE')
       table.string('specialite')
     })
   }

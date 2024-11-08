@@ -5,7 +5,12 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.integer('promoKey')
+      table
+        .integer('promoKey')
+        .unsigned()
+        .references('idPromo')
+        .inTable('promos')
+        .onDelete('CASCADE')
       table.integer('coordinateurApprentissageKey')
     })
   }

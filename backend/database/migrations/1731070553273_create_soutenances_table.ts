@@ -5,8 +5,8 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('idSoutenance')
-      table.integer('juryKey')
+      table.increments('idSoutenance').primary()
+      table.integer('juryKey').unsigned().references('idJury').inTable('juries').onDelete('CASCADE')
       table.dateTime('soutenanceDate')
       table.dateTime('soutenanceHeure')
     })

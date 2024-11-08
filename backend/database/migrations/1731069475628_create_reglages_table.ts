@@ -5,10 +5,10 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('idReglage')
+      table.increments('idReglage').primary()
       table.boolean('isNotificationActive')
       table.boolean('isRappelActive')
-      table.integer('acteurKey')
+      table.integer('acteurKey').unsigned().references('id').inTable('acteur').onDelete('CASCADE')
     })
   }
 

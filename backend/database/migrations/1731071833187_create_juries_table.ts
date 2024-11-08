@@ -1,12 +1,17 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'tuteur_pedagogiques'
+  protected tableName = 'juries'
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.integer('idTuteur').primary()
-      table.integer('acteurKey').unsigned().references('id').inTable('acteur').onDelete('CASCADE')
+      table.increments('idJury').primary()
+      table
+        .integer('presidentKey')
+        .unsigned()
+        .references('idProf')
+        .inTable('professeurs')
+        .onDelete('CASCADE')
     })
   }
 

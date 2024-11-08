@@ -5,10 +5,12 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id')
-
-      table.timestamp('created_at')
-      table.timestamp('updated_at')
+      table.increments('idDateEntretien').primary()
+      table.dateTime('entretienDate')
+      table.boolean('acceptMA')
+      table.boolean('acceptTuteur')
+      table.boolean('acceptApprenti')
+      table.string('statusDateEntretien')
     })
   }
 

@@ -6,8 +6,13 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.integer('idMaitre')
-      table.integer('acteurKey')
-      table.integer('entrepriseActuelleKey')
+      table.integer('acteurKey').unsigned().references('id').inTable('acteur').onDelete('CASCADE')
+      table
+        .integer('entrepriseActuelleKey')
+        .unsigned()
+        .references('idEntreprise')
+        .inTable('entreprises')
+        .onDelete('CASCADE')
       table.string('poste')
     })
   }

@@ -5,8 +5,13 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('idEntretien')
-      table.integer('dateEntretienKey')
+      table.increments('idEntretien').primary()
+      table
+        .integer('dateEntretienKey')
+        .unsigned()
+        .references('idDateEntretien')
+        .inTable('date_entretiens')
+        .onDelete('CASCADE')
       table.string('semestre')
     })
   }

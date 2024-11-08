@@ -9,8 +9,8 @@ export default class extends BaseSchema {
       table
         .integer('interveiwDateKey')
         .unsigned()
-        .references('idDateEntretien')
-        .inTable('date_entretiens')
+        .references('idMaintenanceDate')
+        .inTable('interview_dates')
         .onDelete('CASCADE')
       table.string('semester')
     })

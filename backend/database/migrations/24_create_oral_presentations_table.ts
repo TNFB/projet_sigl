@@ -1,14 +1,13 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'soutenances'
+  protected tableName = 'oral_presentations'
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('idSoutenance').primary()
+      table.increments('idOralPresentation').primary()
       table.integer('juryKey').unsigned().references('idJury').inTable('juries').onDelete('CASCADE')
-      table.dateTime('soutenanceDate')
-      table.dateTime('soutenanceHeure')
+      table.dateTime('oralPresentationDate')
     })
   }
 

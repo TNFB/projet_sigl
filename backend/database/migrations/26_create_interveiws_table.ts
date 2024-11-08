@@ -1,18 +1,18 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'coordonnees'
+  protected tableName = 'interveiws'
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
+      table.increments('idInterveiw').primary()
       table
-        .integer('promoKey')
-        .primary()
+        .integer('interveiwDateKey')
         .unsigned()
-        .references('idPromo')
-        .inTable('promos')
+        .references('idDateEntretien')
+        .inTable('date_entretiens')
         .onDelete('CASCADE')
-      table.integer('coordinateurApprentissageKey').primary()
+      table.string('semester')
     })
   }
 

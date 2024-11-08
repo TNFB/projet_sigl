@@ -1,13 +1,14 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'document_notes'
+  protected tableName = 'evaluation_documents'
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('idDocumentNote').primary()
-      table.integer('note')
-      table.string('commentaire')
+      table.increments('idEvaluationDocument').primary()
+      table.string('name')
+      table.integer('rating')
+      table.string('comment')
     })
   }
 

@@ -12,7 +12,7 @@ export default class Acteur extends BaseModel {
   declare prenom: string
 
   @column.date()
-  declare date_naissance: DateTime
+  declare dateNaissance: DateTime
 
   @column()
   declare genre: string

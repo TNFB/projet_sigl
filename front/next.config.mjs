@@ -9,7 +9,6 @@ const nextConfig = {
   images: {
     unoptimized: process.env.NEXT_PUBLIC_UNOPTIMIZED_IMAGES === 'true',
   },
-  output: isProd ? 'export' : undefined,
 };
 
 export default nextConfig;

@@ -9,9 +9,11 @@ import { ICONS } from '@/utils/iconMapping'
 
 const SideBar = () => {
   const [activeItem, setActiveItem] = useState("Accueil")
-  const userType = 'user'
+  const [userType, setUserType] = useState<'user' | 'admin'>('user')
 
   useEffect(() => {
+    const userRole = localStorage.getItem('userRole') as 'user' | 'admin' | null
+    setUserType(userRole ?? 'user')
     let path = window.location.pathname
     if (path.endsWith('/')) {
       path = path.slice(0, -1)
@@ -35,7 +37,7 @@ const SideBar = () => {
           <SidebarGroupContent>
             <SidebarMenu className='p-2 border-b-2 border-gray-300'>
               {items.map((item) => {
-                const Icon = ICONS[item.icon]
+                const Icon = ICONS[item.icon as keyof typeof ICONS]
                 return(
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>

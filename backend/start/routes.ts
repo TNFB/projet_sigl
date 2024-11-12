@@ -15,8 +15,8 @@ const Connexion = () => import('../app/controllers/connexions_controller.js')
 // Définir les routes
 Route.group(() => {
   Route.get('/', [UserController, 'getAllUsers'])
-  Route.get('/:id', [UserController, 'getUserById'])
-  Route.post('/', [UserController, 'createUser'])
+  Route.post('/getUser/:id', [UserController, 'getUserById'])
+  Route.post('/createUser', [UserController, 'createUser'])
 }).prefix('/user')
 
-Route.get('connexion', [Connexion, 'connexionUser'])
+Route.post('connexion', [Connexion, 'connexionUser'])

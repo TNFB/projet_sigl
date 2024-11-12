@@ -3,6 +3,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 export default class ConnexionsController {
   async connexionUser({ request, response }: HttpContext) {
+    console.log('Connexion')
     try {
       const { email, password } = request.only(['email', 'password'])
 

@@ -5,6 +5,7 @@ export default class UsersController {
   async index() {}
 
   async getUserById({ params, response }: HttpContext) {
+    console.log('getUserById')
     try {
       // check if table 'users' empty
       const acteurCount = await db.from('users').count('* as total')
@@ -17,10 +18,19 @@ export default class UsersController {
       }
       //Table Not Empty
       const getUserById = await db.from('users').where('id', params.id).select('*').first()
-      return response.status(200).json({
-        status: 'success',
-        users: getUserById,
-      })
+      if (getUserById !== null){
+        return response.status(200).json({
+          status: 'success',
+          users: getUserById,
+        })
+      }
+      else {
+        return response.status(404).json({
+          status: 'error',
+          message: 'No users table found',
+        })
+      }
+      
     } catch (error) {
       console.log(error)
       return response.status(500).json({
@@ -31,6 +41,7 @@ export default class UsersController {
   }
 
   async getAllUsers({ response }: HttpContext) {
+    console.log('getAllUsers')
     try {
       // check if table 'users' empty
       const acteurCount = await db.from('users').count('* as total')
@@ -57,11 +68,12 @@ export default class UsersController {
   }
 
   async createUser({ request, response }: HttpContext) {
+    console.log('createUser')
     try {
-      const { nom, prenom, dateNaissance, genre, email, password, telephone } = request.only([
-        'nom',
-        'prenom',
-        'dateNaissance',
+      const { name, firstName, dateBirth, genre, email, password, telephone } = request.only([
+        'name',
+        'firstName',
+        'dateBirth',
         'genre',
         'email',
         'password',
@@ -78,7 +90,7 @@ export default class UsersController {
       }
       const createUser = await db
         .table('users')
-        .insert({ nom, prenom, dateNaissance, genre, email, password, telephone })
+        .insert({ name, firstName, dateBirth, genre, email, password, telephone })
       console.log(`User created: ${createUser}`)
       return response.status(200).json({
         status: 'success',

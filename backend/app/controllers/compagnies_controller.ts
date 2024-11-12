@@ -1,5 +1,3 @@
 // import type { HttpContext } from '@adonisjs/core/http'
 
-export default class CoordonneesController {
-  //here
-}
+export default class CompagniesController {}

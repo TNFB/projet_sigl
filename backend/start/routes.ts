@@ -9,14 +9,14 @@
 
 import Route from '@adonisjs/core/services/router'
 
-const ActeurController = () => import('../app/controllers/user_controller.js')
-const Connexion = () => import('../app/controllers/connexion_controller.js')
+const UserController = () => import('../app/controllers/users_controller.js')
+const Connexion = () => import('../app/controllers/connexions_controller.js')
 
 // Définir les routes
 Route.group(() => {
-  Route.get('/', [ActeurController, 'getAllUsers'])
-  Route.get('/:id', [ActeurController, 'getUserById'])
-  Route.post('/', [ActeurController, 'createUser'])
-}).prefix('/acteur')
+  Route.get('/', [UserController, 'getAllUsers'])
+  Route.get('/:id', [UserController, 'getUserById'])
+  Route.post('/', [UserController, 'createUser'])
+}).prefix('/user')
 
 Route.get('connexion', [Connexion, 'connexionUser'])

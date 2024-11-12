@@ -1,12 +1,11 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'admin'
+  protected tableName = 'document_types'
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id_admin')
-      table.integer('acteur_key').unsigned().references('id').inTable('acteur').onDelete('CASCADE')
+      table.string('typeDocument').primary()
     })
   }
 

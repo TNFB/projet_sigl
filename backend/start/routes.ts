@@ -9,14 +9,31 @@
 
 import Route from '@adonisjs/core/services/router'
 
-const ActeurController = () => import('../app/controllers/acteur_controller.js')
-const Connexion = () => import('../app/controllers/connexion.js')
+//Auto-Swagger
+import AutoSwagger from "adonis-autoswagger";
+import swagger from "#config/swagger";
+
+
+const UserController = () => import('../app/controllers/users_controller.js')
+const Connexion = () => import('../app/controllers/connexions_controller.js')
 
 // Définir les routes
 Route.group(() => {
-  Route.get('/', [ActeurController, 'getAllActeurs'])
-  Route.post('/:id', [ActeurController, 'getActeurById'])
-  Route.post('/', [ActeurController, 'createActeur'])
-}).prefix('/acteur')
+  Route.get('/', [UserController, 'getAllUsers'])
+  Route.post('/getUser/:id', [UserController, 'getUserById'])
+  Route.post('/createUser', [UserController, 'createUser'])
+}).prefix('/user')
 
-Route.post('connexion', [Connexion, 'connexionActeur'])
+Route.post('connexion', [Connexion, 'connexionUser'])
+
+
+
+// Swagger
+
+Route.get("/swagger", async () => {
+  return AutoSwagger.default.docs(Route.toJSON(), swagger);
+});
+
+Route.get("/docs", async () => {
+  return AutoSwagger.default.ui("/swagger", swagger);
+});

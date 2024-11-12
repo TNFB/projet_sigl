@@ -4,6 +4,38 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class UsersController {
   async index() {}
 
+  /**
+   * @swagger
+   * /users/{id}:
+   *   get:
+   *     summary: Get user by ID
+   *     description: Retrieve a user by their unique ID.
+   *     tags:
+   *       - Users
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: integer
+   *         required: true
+   *         description: The ID of the user to retrieve.
+   *     responses:
+   *       200:
+   *         description: User details
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 status:
+   *                   type: string
+   *                 users:
+   *                   type: object
+   *       404:
+   *         description: User not found
+   *       500:
+   *         description: Server error
+   */
   async getUserById({ params, response }: HttpContext) {
     console.log('getUserById')
     try {
@@ -40,6 +72,33 @@ export default class UsersController {
     }
   }
 
+  /**
+   * @swagger
+   * /users:
+   *   get:
+   *     summary: Get all users
+   *     description: Retrieve a list of all users.
+   *     tags:
+   *       - Users
+   *     responses:
+   *       200:
+   *         description: List of users
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 status:
+   *                   type: string
+   *                 users:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *       404:
+   *         description: No users found
+   *       500:
+   *         description: Server error
+   */
   async getAllUsers({ response }: HttpContext) {
     console.log('getAllUsers')
     try {
@@ -67,6 +126,56 @@ export default class UsersController {
     }
   }
 
+  /**
+   * @swagger
+   * /users:
+   *   post:
+   *     summary: Create a new user
+   *     description: Add a new user to the database.
+   *     tags:
+   *       - Users
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               name:
+   *                 type: string
+   *               firstName:
+   *                 type: string
+   *               dateBirth:
+   *                 type: string
+   *                 format: date
+   *               genre:
+   *                 type: string
+   *               email:
+   *                 type: string
+   *                 format: email
+   *               password:
+   *                 type: string
+   *               telephone:
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: User created successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 status:
+   *                   type: string
+   *                 message:
+   *                   type: string
+   *                 users:
+   *                   type: object
+   *       404:
+   *         description: Users table not found or empty
+   *       500:
+   *         description: Server error
+   */
   async createUser({ request, response }: HttpContext) {
     console.log('createUser')
     try {

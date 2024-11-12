@@ -1,0 +1,161 @@
+openapi: "3.0.0"
+info:
+  title: "API Documentation"
+  version: "1.0.0"
+  description: "Documentation de l'API"
+paths: {
+  '/user': {
+    get: {
+      summary: 'Get all users',
+      tags: ['User'],
+      responses: {
+        200: {
+          description: 'List of all users',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  status: { type: 'string' },
+                  users: { type: 'array', items: { type: 'object' } },
+                },
+              },
+            },
+          },
+        },
+        404: {
+          description: 'No users found',
+        },
+      },
+    },
+  },
+  '/user/getUser/{id}': {
+    post: {
+      summary: 'Get user by ID',
+      tags: ['User'],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: {
+            type: 'integer',
+          },
+          description: 'User ID',
+        },
+      ],
+      responses: {
+        200: {
+          description: 'User found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  status: { type: 'string' },
+                  users: { type: 'object' },
+                },
+              },
+            },
+          },
+        },
+        404: {
+          description: 'User not found',
+        },
+      },
+    },
+  },
+  '/user/createUser': {
+    post: {
+      summary: 'Create a new user',
+      tags: ['User'],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                name: { type: 'string' },
+                firstName: { type: 'string' },
+                dateBirth: { type: 'string', format: 'date' },
+                genre: { type: 'string' },
+                email: { type: 'string', format: 'email' },
+                password: { type: 'string' },
+                telephone: { type: 'string' },
+              },
+              required: ['name', 'firstName', 'email', 'password'],
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'User created successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  status: { type: 'string' },
+                  message: { type: 'string' },
+                  users: { type: 'object' },
+                },
+              },
+            },
+          },
+        },
+        500: {
+          description: 'Error creating user',
+        },
+      },
+    },
+  },
+  '/connexion': {
+    post: {
+      summary: 'User login',
+      tags: ['Connexion'],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                email: { type: 'string', format: 'email' },
+                password: { type: 'string' },
+              },
+              required: ['email', 'password'],
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'Login successful',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  status: { type: 'string' },
+                  password: { type: 'boolean' },
+                  role: { type: 'string', description: 'Role of the user (user or admin)' },
+                },
+              },
+            },
+          },
+        },
+        401: {
+          description: 'Incorrect password',
+        },
+        404: {
+          description: 'User or Admin table not found, or email not found',
+        },
+        500: {
+          description: 'Server error',
+        },
+      },
+    },
+  },
+}

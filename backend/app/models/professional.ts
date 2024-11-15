@@ -1,6 +1,6 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 
-export default class Professor extends BaseModel {
+export default class Professional extends BaseModel {
   @column({ isPrimary: true })
-  declare idProfessor: number
+  declare idProfessional: number
 }

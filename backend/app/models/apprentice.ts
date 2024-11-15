@@ -5,11 +5,14 @@ export default class Apprentice extends BaseModel {
   declare idApprentice: number
 
   @column()
-  declare userKey: number
+  declare idEducationalTutor: number
 
   @column()
-  declare currentCompagnyKey: number
+  declare idApprenticeMaster: number
 
   @column()
-  declare specialty: string
+  declare idCursus: number
+
+  @column()
+  declare idTrainingDiary: number
 }

@@ -1,3 +1,4 @@
 // import type { HttpContext } from '@adonisjs/core/http'
 
-export default class JuriesController {}
+export default class JuriesController {
+}

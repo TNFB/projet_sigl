@@ -175,14 +175,13 @@ export default class UsersController {
   async createUser({ request, response }: HttpContext) {
     console.log('createUser')
     try {
-      const { name, firstName, dateBirth, genre, email, password, telephone } = request.only([
-        'name',
-        'firstName',
-        'dateBirth',
-        'genre',
+      const { email, password, name, lastName, telephone, role } = request.only([
         'email',
         'password',
+        'name',
+        'lastName',
         'telephone',
+        'role',
       ])
       // check if table 'users' empty
       const acteurCount = await db.from('users').count('* as total')
@@ -195,8 +194,14 @@ export default class UsersController {
       }
       const createUser = await db
         .table('users')
-        .insert({ name, firstName, dateBirth, genre, email, password, telephone })
+        .insert({ email, password, name, lastName, telephone })
       console.log(`User created: ${createUser}`)
+      //assigne Role
+      var assigneRole = []
+      if (role) {
+        assigneRole = await db.table(role).insert({ createUser })
+      }
+      console.log(`User Role created ${assigneRole}`)
       return response.status(200).json({
         status: 'success',
         message: 'users created',

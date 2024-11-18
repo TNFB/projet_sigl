@@ -11,6 +11,7 @@ export default class extends BaseSchema {
       table.string('name')
       table.string('lastName')
       table.string('telephone')
+      table.string('role')
     })
   }
 

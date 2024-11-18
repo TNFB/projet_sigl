@@ -18,4 +18,7 @@ export default class User extends BaseModel {
 
   @column()
   declare telephone: string
+
+  @column()
+  declare role: string
 }

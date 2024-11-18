@@ -117,7 +117,7 @@ export default class UsersController {
       console.log(error)
       return response.status(500).json({
         status: 'error',
-        message: 'Erreur in getUserByID',
+        message: 'Erreur in getAllUser',
       })
     }
   }
@@ -127,7 +127,7 @@ export default class UsersController {
    * /users:
    *   post:
    *     summary: Create a new user
-   *     description: Add a new user to the database.
+   *     description: Add a new user to the database with optional role assignment.
    *     tags:
    *       - Users
    *     requestBody:
@@ -137,22 +137,26 @@ export default class UsersController {
    *           schema:
    *             type: object
    *             properties:
-   *               name:
-   *                 type: string
-   *               firstName:
-   *                 type: string
-   *               dateBirth:
-   *                 type: string
-   *                 format: date
-   *               genre:
-   *                 type: string
    *               email:
    *                 type: string
    *                 format: email
+   *                 example: user@example.com
    *               password:
    *                 type: string
+   *                 example: secret123
+   *               name:
+   *                 type: string
+   *                 example: John
+   *               lastName:
+   *                 type: string
+   *                 example: Doe
    *               telephone:
    *                 type: string
+   *                 example: "+1234567890"
+   *               role:
+   *                 type: string
+   *                 description: Optional role for the user (e.g., 'admin', 'user').
+   *                 example: admin
    *     responses:
    *       200:
    *         description: User created successfully
@@ -163,8 +167,10 @@ export default class UsersController {
    *               properties:
    *                 status:
    *                   type: string
+   *                   example: success
    *                 message:
    *                   type: string
+   *                   example: users created
    *                 users:
    *                   type: object
    *       404:
@@ -183,35 +189,43 @@ export default class UsersController {
         'telephone',
         'role',
       ])
-      // check if table 'users' empty
-      const acteurCount = await db.from('users').count('* as total')
-      if (acteurCount[0].total === 0) {
-        console.log('User table empty')
-        return response.status(404).json({
+
+      const getEmail = await db.from('users').where('email', email).count('* as total')
+      if (getEmail[0].total > 0) {
+        return response.status(400).json({
           status: 'error',
-          message: 'No users table found/users table empty',
+          message: `email: ${email} already existe in DB`,
         })
       }
+
       const createUser = await db
         .table('users')
-        .insert({ email, password, name, lastName, telephone })
+        .insert({ email, password, name, lastName, telephone, role })
       console.log(`User created: ${createUser}`)
+
       //assigne Role
       var assigneRole = []
-      if (role) {
-        assigneRole = await db.table(role).insert({ createUser })
+      let id = createUser
+      if (role !== 'admins' && role !== null) {
+        assigneRole = await db.table(role).insert({ id })
+      } else {
+        return response.status(400).json({
+          status: 'error',
+          message: 'bad request, role is null or admin',
+        })
       }
       console.log(`User Role created ${assigneRole}`)
       return response.status(200).json({
         status: 'success',
         message: 'users created',
         users: createUser,
+        role: role,
       })
     } catch (error) {
       console.log(error)
       return response.status(500).json({
         status: 'error',
-        message: 'Erreur in getUserByID',
+        message: 'Erreur in createUser',
       })
     }
   }

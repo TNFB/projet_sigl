@@ -2,7 +2,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 export default class Apprentice extends BaseModel {
   @column({ isPrimary: true })
-  declare idApprentice: number
+  declare id: number
 
   @column()
   declare idEducationalTutor: number

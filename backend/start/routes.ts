@@ -13,17 +13,16 @@ import Route from '@adonisjs/core/services/router'
 import AutoSwagger from 'adonis-autoswagger'
 import swagger from '#config/swagger'
 
-const UserController = () => import('../app/controllers/Old/users_controller.js')
-const Connexion = () => import('../app/controllers/Old/connexions_controller.js')
+const UserController = () => import('../app/controllers/users_controller.js')
 
 // Définir les routes
 Route.group(() => {
-  Route.get('/', [UserController, 'getAllUsers'])
-  Route.post('/getUser/:id', [UserController, 'getUserById'])
-  Route.post('/createUser', [UserController, 'createUser'])
+  Route.get('/', [UserController, 'getAllUsers']).as('GetAllUser')
+  Route.post('/getUser/:id', [UserController, 'getUserById']).as('getUserById')
+  Route.post('/createUser', [UserController, 'createUser']).as('createUser')
 }).prefix('/user')
 
-Route.post('connexion', [Connexion, 'connexionUser'])
+Route.post('connection', [UserController, 'connectionUser']).as('connectionUser')
 
 // Swagger
 

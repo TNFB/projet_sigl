@@ -211,7 +211,7 @@ export default class UsersController {
       } else {
         return response.status(400).json({
           status: 'error',
-          message: 'bad request, role is null or admin',
+          message: 'bad request,User created but role is null or admin',
         })
       }
       console.log(`User Role created ${assigneRole}`)

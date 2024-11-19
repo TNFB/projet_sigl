@@ -6,8 +6,9 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('idDocument').primary()
-      table.string('documentLink')
-      table.dateTime('dropDate')
+      table.string('name')
+      table.string('documentPath')
+      table.timestamp('uploadedAt', { useTz: true })
     })
   }
 

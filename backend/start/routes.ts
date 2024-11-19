@@ -14,6 +14,8 @@ import AutoSwagger from 'adonis-autoswagger'
 import swagger from '#config/swagger'
 
 const UserController = () => import('../app/controllers/users_controller.js')
+const DocumentsController = () => import('../app/controllers/documents_controller.js')
+const TraningDiaryController = () => import('../app/controllers/training_diaries_controller.js')
 
 // Définir les routes
 Route.group(() => {
@@ -23,6 +25,12 @@ Route.group(() => {
 }).prefix('/user')
 
 Route.post('connection', [UserController, 'connectionUser']).as('connectionUser')
+
+Route.post('dropDocument', [DocumentsController, 'dropDocument']).as('dropDocument')
+
+Route.post('createTraningDiary', [TraningDiaryController, 'createTraningDiary']).as(
+  'createTraningDiary'
+)
 
 // Swagger
 

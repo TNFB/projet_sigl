@@ -12,6 +12,7 @@ export default class extends BaseSchema {
       table.json('listInterview')
       table.json('listReport')
       table.json('listPresentation')
+      table.timestamp('createdAt', { useTz: true })
     })
   }
 

@@ -1,5 +1,5 @@
 import db from '@adonisjs/lucid/services/db'
-import type { HttpContext } from '@adonisjs/core/http'
+import { HttpContext } from '@adonisjs/core/http'
 
 export default class UsersController {
   /**
@@ -285,21 +285,11 @@ export default class UsersController {
         console.log('User table empty')
         return response.status(404).json({
           status: 'error',
-          message: 'No User table found/User table empty',
+          message: 'No User table found/table users empty',
         })
       }
 
-      // check if table 'admin' empty
-      const adminCount = await db.from('users').count('* as total')
-      if (userCount[0].total === 0) {
-        console.log('User table empty')
-        return response.status(404).json({
-          status: 'error',
-          message: 'No Admin table found/Admin table empty',
-        })
-      }
-
-      // Table users not empty
+      // Found User by Email
       const userDb = await db.from('users').where('email', email).select('*').first()
       if (!userDb) {
         return response.status(404).json({
@@ -308,20 +298,19 @@ export default class UsersController {
         })
       }
 
-      var roleDb = 'user'
-      if (adminCount[0] !== 0) {
-        var role = await db.from('admin').where('user_key', userDb.id).select('*').first()
-        console.log(role)
-        if (role) {
-          roleDb = 'admin'
-        }
-      }
-
       if (userDb.password === password) {
+        // Creation Token
+        const token = `${userDb.idUser}_${Date.now()}`
+        response.cookie('access_token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production', // Utilisez true en production avec HTTPS
+          maxAge: 2 * 60 * 60 * 1000, // 2 heures en millisecondes
+        })
         return response.status(200).json({
           status: 'success',
           password: true,
-          role: roleDb,
+          role: userDb.role,
+          cookieToken: token,
         })
       } else {
         return response.status(401).json({
@@ -339,5 +328,11 @@ export default class UsersController {
     }
   }
 
-  //async deconexionUser({ request, response }: HttpContext) {}
+  async logoutUser({ response }: HttpContext) {
+    response.clearCookie('access_token')
+    return response.status(200).json({
+      status: 'success',
+      message: 'Logout succesfull',
+    })
+  }
 }

@@ -25,6 +25,7 @@ Route.group(() => {
 }).prefix('/user')
 
 Route.post('connection', [UserController, 'connectionUser']).as('connectionUser')
+Route.get('logout', [UserController, 'logoutUser']).as('logoutUser')
 
 Route.post('dropDocument', [DocumentsController, 'dropDocument']).as('dropDocument')
 

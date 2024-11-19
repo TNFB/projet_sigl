@@ -335,4 +335,49 @@ export default class UsersController {
       message: 'Logout succesfull',
     })
   }
+
+  async changePassword({ request, response }: HttpContext) {
+    try {
+      const { email, newPassword } = request.only(['email', 'newPassword'])
+
+      const userCount = await db.from('users').count('* as total')
+      if (userCount[0].total === 0) {
+        console.log('User table empty')
+        return response.status(404).json({
+          status: 'error',
+          message: 'No User table found/table users empty',
+        })
+      }
+
+      // Found User by Email
+      const userDb = await db.from('users').where('email', email).select('*').first()
+      if (!userDb) {
+        return response.status(404).json({
+          status: 'error',
+          message: 'Email not found',
+        })
+      }
+
+      const oldPassword = userDb.password
+      console.log(`Oldpassword : ${oldPassword}`)
+      if (oldPassword === newPassword) {
+        return response.status(422).json({
+          status: 'error',
+          Message: 'The new password is the same the old one',
+        })
+      } else {
+        await db.from('users').where('email', email).update({ password: newPassword })
+        return response.status(200).json({
+          status: 'succes',
+          message: 'password changed succesfully',
+        })
+      }
+    } catch (error) {
+      console.log(error)
+      return response.status(500).json({
+        status: 'error',
+        message: 'Erreur in users changePassword',
+      })
+    }
+  }
 }

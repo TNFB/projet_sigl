@@ -30,9 +30,6 @@ export default class TrainingDiariesController {
           createdAt: new Date(),
         })
 
-        const updateData = newTrainingDiary
-        console.log('Données de mise à jour:', updateData)
-
         await db
           .from('apprentices')
           .where('id', idUser)
@@ -40,7 +37,6 @@ export default class TrainingDiariesController {
 
         return response.status(200).json({
           message: 'Training Diary created',
-          //user: affectedRows,
           trainingDiaryId: newTrainingDiary,
         })
       } else {

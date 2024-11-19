@@ -1,38 +1,27 @@
 import db from '@adonisjs/lucid/services/db'
 import { HttpContext } from '@adonisjs/core/http'
 
+/**
+ * @class UsersController
+ * @brief Contrôleur pour gérer les utilisateurs.
+ *
+ * Ce contrôleur fournit des méthodes pour créer, récupérer et gérer les utilisateurs dans l'application.
+ */
 export default class UsersController {
   /**
-   * @swagger
-   * /users/{id}:
-   *   get:
-   *     summary: Get user by ID
-   *     description: Retrieve a user by their unique ID.
-   *     tags:
-   *       - Users
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         schema:
-   *           type: integer
-   *         required: true
-   *         description: The ID of the user to retrieve.
-   *     responses:
-   *       200:
-   *         description: User details
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 status:
-   *                   type: string
-   *                 users:
-   *                   type: object
-   *       404:
-   *         description: User not found
-   *       500:
-   *         description: Server error
+   * @brief Récupère un utilisateur par son identifiant.
+   *
+   * Cette méthode vérifie si la table des utilisateurs est vide, puis tente de récupérer un utilisateur
+   * en fonction de l'identifiant fourni dans les paramètres. Si l'utilisateur est trouvé, il renvoie ses détails.
+   *
+   * @param {HttpContext} context - Le contexte HTTP contenant les paramètres et la réponse.
+   * @param {Object} context.params - Les paramètres de la requête, y compris l'identifiant de l'utilisateur.
+   * @param {Object} context.response - L'objet de réponse HTTP utilisé pour renvoyer des réponses au client.
+   *
+   * @throws {NotFound} Si la table des utilisateurs est vide ou si l'utilisateur n'est pas trouvé.
+   * @throws {InternalServerError} En cas d'erreur lors du traitement de la récupération de l'utilisateur.
+   *
+   * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et les détails de l'utilisateur.
    */
   async getUserById({ params, response }: HttpContext) {
     console.log('getUserById')
@@ -69,31 +58,18 @@ export default class UsersController {
   }
 
   /**
-   * @swagger
-   * /users:
-   *   get:
-   *     summary: Get all users
-   *     description: Retrieve a list of all users.
-   *     tags:
-   *       - Users
-   *     responses:
-   *       200:
-   *         description: List of users
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 status:
-   *                   type: string
-   *                 users:
-   *                   type: array
-   *                   items:
-   *                     type: object
-   *       404:
-   *         description: No users found
-   *       500:
-   *         description: Server error
+   * @brief Récupère tous les utilisateurs.
+   *
+   * Cette méthode vérifie si la table des utilisateurs est vide, puis récupère tous les utilisateurs
+   * et renvoie leurs détails.
+   *
+   * @param {HttpContext} context - Le contexte HTTP contenant la réponse.
+   * @param {Object} context.response - L'objet de réponse HTTP utilisé pour renvoyer des réponses au client.
+   *
+   * @throws {NotFound} Si la table des utilisateurs est vide.
+   * @throws {InternalServerError} En cas d'erreur lors du traitement de la récupération des utilisateurs.
+   *
+   * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et la liste des utilisateurs.
    */
   async getAllUsers({ response }: HttpContext) {
     console.log('getAllUsers')
@@ -123,60 +99,19 @@ export default class UsersController {
   }
 
   /**
-   * @swagger
-   * /users:
-   *   post:
-   *     summary: Create a new user
-   *     description: Add a new user to the database with optional role assignment.
-   *     tags:
-   *       - Users
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               email:
-   *                 type: string
-   *                 format: email
-   *                 example: user@example.com
-   *               password:
-   *                 type: string
-   *                 example: secret123
-   *               name:
-   *                 type: string
-   *                 example: John
-   *               lastName:
-   *                 type: string
-   *                 example: Doe
-   *               telephone:
-   *                 type: string
-   *                 example: "+1234567890"
-   *               role:
-   *                 type: string
-   *                 description: Optional role for the user (e.g., 'admin', 'user').
-   *                 example: admin
-   *     responses:
-   *       200:
-   *         description: User created successfully
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 status:
-   *                   type: string
-   *                   example: success
-   *                 message:
-   *                   type: string
-   *                   example: users created
-   *                 users:
-   *                   type: object
-   *       404:
-   *         description: Users table not found or empty
-   *       500:
-   *         description: Server error
+   * @brief Crée un nouvel utilisateur.
+   *
+   * Cette méthode vérifie si l'email de l'utilisateur existe déjà dans la base de données avant de créer
+   * un nouvel utilisateur. Elle assigne également le rôle à l'utilisateur créé si celui-ci est valide.
+   *
+   * @param {HttpContext} context - Le contexte HTTP contenant la requête et la réponse.
+   * @param {Object} context.request - L'objet de requête HTTP contenant les données nécessaires à la création de l'utilisateur.
+   * @param {Object} context.response - L'objet de réponse HTTP utilisé pour renvoyer des réponses au client.
+   *
+   * @throws {BadRequest} Si l'email existe déjà ou si le rôle est invalide.
+   * @throws {InternalServerError} En cas d'erreur lors du traitement de la création de l'utilisateur.
+   *
+   * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut, un message et les détails de l'utilisateur créé.
    */
   async createUser({ request, response }: HttpContext) {
     console.log('createUser')
@@ -231,48 +166,21 @@ export default class UsersController {
   }
 
   /**
-   * @swagger
-   * /connexion:
-   *   post:
-   *     summary: User login
-   *     description: Authenticates a user by email and password, and returns their role.
-   *     tags:
-   *       - Connexion
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               email:
-   *                 type: string
-   *                 format: email
-   *                 description: User's email address
-   *               password:
-   *                 type: string
-   *                 description: User's password
-   *     responses:
-   *       200:
-   *         description: Login successful
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 status:
-   *                   type: string
-   *                 password:
-   *                   type: boolean
-   *                 role:
-   *                   type: string
-   *                   description: Role of the user (user or admin)
-   *       401:
-   *         description: Incorrect password
-   *       404:
-   *         description: User or Admin table not found, or user email not found
-   *       500:
-   *         description: Server error
+   * @brief Connecte un utilisateur et crée un token d'accès.
+   *
+   * Cette méthode vérifie si l'email et le mot de passe fournis correspondent à un utilisateur existant
+   * dans la base de données. Si c'est le cas, elle crée un token d'accès et le renvoie au client via un cookie.
+   *
+   * @param {HttpContext} context - Le contexte HTTP contenant la requête et la réponse.
+   * @param {Object} context.request - L'objet de requête HTTP contenant les informations d'identification de l'utilisateur.
+   * @param {Object} context.response - L'objet de réponse HTTP utilisé pour renvoyer des réponses au client.
+   *
+   * @throws {NotFound} Si aucun utilisateur n'est trouvé avec l'email fourni ou si la table est vide.
+   * @throws {Unauthorized} Si le mot de passe fourni est incorrect.
+   * @throws {InternalServerError} En cas d'erreur lors du traitement de la connexion.
+   *
+   * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et le token d'accès en cas de succès,
+   *                             ou une erreur en cas d'échec.
    */
   async connectionUser({ request, response }: HttpContext) {
     console.log('Connexion')
@@ -328,6 +236,18 @@ export default class UsersController {
     }
   }
 
+  /**
+   * @brief Déconnecte l'utilisateur en supprimant le cookie d'accès.
+   *
+   * Cette méthode efface le cookie d'accès pour déconnecter l'utilisateur et renvoie une réponse indiquant que
+   * la déconnexion a été effectuée avec succès.
+   *
+   * @param {HttpContext} context - Le contexte HTTP contenant la réponse.
+   * @param {Object} context.response - L'objet de réponse HTTP utilisé pour renvoyer des réponses au client.
+   *
+   * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et un message indiquant que 
+                               la déconnexion a réussi.
+   */
   async logoutUser({ response }: HttpContext) {
     response.clearCookie('access_token')
     return response.status(200).json({
@@ -336,6 +256,23 @@ export default class UsersController {
     })
   }
 
+  /**
+   * @brief Change le mot de passe d'un utilisateur existant.
+   *
+   * Cette méthode vérifie si l'utilisateur existe dans la base de données en fonction de son email,
+   * puis met à jour son mot de passe si le nouveau mot de passe est différent de l'ancien.
+   * Si le nouveau mot de passe est identique à l'ancien, une erreur est renvoyée.
+   *
+   * @param {HttpContext} context - Le contexte HTTP contenant la requête et la réponse.
+   * @param {Object} context.request - L'objet de requête HTTP contenant les informations nécessaires pour changer le mot de passe.
+   * @param {Object} context.response - L'objet de réponse HTTP utilisé pour renvoyer des réponses au client.
+   *
+   * @throws {NotFound} Si aucun utilisateur n'est trouvé avec l'email fourni.
+   * @throws {UnprocessableEntity} Si le nouveau mot de passe est identique à l'ancien.
+   * @throws {InternalServerError} En cas d'erreur lors du traitement du changement du mot de passe.
+   *
+   * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et un message indiquant que le mot de passe a été changé avec succès ou une erreur en cas d'échec.
+   */
   async changePassword({ request, response }: HttpContext) {
     try {
       const { email, newPassword } = request.only(['email', 'newPassword'])

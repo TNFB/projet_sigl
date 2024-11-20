@@ -259,23 +259,28 @@ export default class UsersController {
   /**
    * @brief Change le mot de passe d'un utilisateur existant.
    *
-   * Cette méthode vérifie si l'utilisateur existe dans la base de données en fonction de son email,
-   * puis met à jour son mot de passe si le nouveau mot de passe est différent de l'ancien.
-   * Si le nouveau mot de passe est identique à l'ancien, une erreur est renvoyée.
+   * Cette méthode vérifie l'existence de l'utilisateur dans la base de données en fonction de son email,
+   * puis met à jour son mot de passe si les conditions sont remplies.
    *
    * @param {HttpContext} context - Le contexte HTTP contenant la requête et la réponse.
-   * @param {Object} context.request - L'objet de requête HTTP contenant les informations nécessaires pour changer le mot de passe.
+   * @param {Object} context.request - L'objet de requête HTTP contenant les informations pour changer le mot de passe.
    * @param {Object} context.response - L'objet de réponse HTTP utilisé pour renvoyer des réponses au client.
    *
-   * @throws {NotFound} Si aucun utilisateur n'est trouvé avec l'email fourni.
+   * @throws {NotFound} Si la table des utilisateurs est vide ou si aucun utilisateur n'est trouvé avec l'email fourni.
    * @throws {UnprocessableEntity} Si le nouveau mot de passe est identique à l'ancien.
+   * @throws {Unauthorized} Si l'ancien mot de passe fourni est incorrect.
    * @throws {InternalServerError} En cas d'erreur lors du traitement du changement du mot de passe.
    *
-   * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et un message indiquant que le mot de passe a été changé avec succès ou une erreur en cas d'échec.
+   * @return {Promise<Object>} Une promesse qui résout un objet JSON contenant le statut et un message
+   *                           indiquant le résultat de l'opération (succès ou type d'erreur).
    */
   async changePassword({ request, response }: HttpContext) {
     try {
-      const { email, newPassword } = request.only(['email', 'newPassword'])
+      const { email, oldPassword, newPassword } = request.only([
+        'email',
+        'oldPassword',
+        'newPassword',
+      ])
 
       const userCount = await db.from('users').count('* as total')
       if (userCount[0].total === 0) {
@@ -295,12 +300,18 @@ export default class UsersController {
         })
       }
 
-      const oldPassword = userDb.password
+      const bddPassword = userDb.password
       console.log(`Oldpassword : ${oldPassword}`)
-      if (oldPassword === newPassword) {
+      if (bddPassword === newPassword) {
         return response.status(422).json({
           status: 'error',
           Message: 'The new password is the same the old one',
+        })
+      } else if (bddPassword !== oldPassword) {
+        // Not same user (wrong password)
+        return response.status(401).json({
+          status: 'Unauthorized',
+          messsage: 'Identification with password is wrong',
         })
       } else {
         await db.from('users').where('email', email).update({ password: newPassword })

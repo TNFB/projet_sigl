@@ -16,6 +16,7 @@ import swagger from '#config/swagger'
 const UserController = () => import('../app/controllers/users_controller.js')
 const DocumentsController = () => import('../app/controllers/documents_controller.js')
 const TraningDiaryController = () => import('../app/controllers/training_diaries_controller.js')
+const AdminController = () => import('../app/controllers/admin_controller.js')
 
 // Définir les routes
 Route.group(() => {
@@ -24,6 +25,10 @@ Route.group(() => {
   Route.post('/createUser', [UserController, 'createUser']).as('createUser')
   Route.post('/changePassword', [UserController, 'changePassword']).as('changePassword')
 }).prefix('/user')
+
+Route.group(() => {
+  Route.get('/overritePassword', [AdminController, 'overritePassword']).as('overritePassword')
+}).prefix('/admin')
 
 Route.post('connection', [UserController, 'connectionUser']).as('connectionUser')
 Route.get('logout', [UserController, 'logoutUser']).as('logoutUser')

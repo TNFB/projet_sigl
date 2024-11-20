@@ -36,6 +36,7 @@ export default class ApprenticeMastersController {
    * }
    */
   async addApprentices({ request, response }: HttpContext) {
+    console.log('addApprentices')
     try {
       const { masterId, apprenticeIds } = request.only(['masterId', 'apprenticeIds'])
 

@@ -43,6 +43,7 @@ export default class CompanyRepresentativesController {
    * }
    */
   public async addMissionToApprentice({ request, response }: HttpContext) {
+    console.log('addMissionToApprentice')
     try {
       const { apprenticeId, mission } = request.only(['apprenticeId', 'mission'])
 

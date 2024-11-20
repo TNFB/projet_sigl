@@ -149,7 +149,7 @@ export default class UsersController {
           message: 'bad request,User created but role is null or admin',
         })
       }
-      console.log(`User Role created ${assigneRole}`)
+      console.log(`User Role created ${createUser[0].role}`)
       return response.status(200).json({
         status: 'success',
         message: 'users created',

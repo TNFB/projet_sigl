@@ -27,6 +27,7 @@ export default class AdminController {
    *                           indiquant le résultat de l'opération (succès ou type d'erreur).
    */
   async overritePassword({ request, response }: HttpContext) {
+    console.log('overritePassword')
     try {
       const { email, newPassword } = request.only(['email', 'newPassword'])
 
@@ -85,6 +86,7 @@ export default class AdminController {
    * @throws {InternalServerError} En cas d'erreur lors du traitement de la requête.
    */
   async deleteUser({ request, response }: HttpContext) {
+    console.log('deleteUser')
     try {
       const { email } = request.only(['email'])
 

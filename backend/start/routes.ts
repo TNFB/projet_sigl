@@ -38,14 +38,14 @@ Route.group(() => {
 }).prefix('/admin')
 
 Route.group(() => {
-  Route.post('/addApprentices', [ApprenticeMastersController, 'addApprentices']).as(
-    'addApprentices'
+  Route.post('/addApprenticesApprenticeMaster', [ApprenticeMastersController, 'addApprentices']).as(
+    'addApprenticesApprenticeMaster'
   )
 }).prefix('/apprenticeMaster')
 
 Route.group(() => {
-  Route.post('/addApprentices', [EducationalTutorsController, 'addApprentices']).as(
-    'addApprentices'
+  Route.post('/addApprenticesEducationalTutor', [EducationalTutorsController, 'addApprentices']).as(
+    'addApprenticesEducationalTutor'
   )
 }).prefix('/educationalTutor')
 

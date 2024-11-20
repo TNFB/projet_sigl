@@ -24,5 +24,4 @@ yarn-error.log
 # Platform specific
 .DS_Store
 
-#Pnpm lock
-pnpm-lock.yaml
+/storage

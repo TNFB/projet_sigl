@@ -1,12 +1,19 @@
+import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 
-export default class Interveiw extends BaseModel {
+export default class Interview extends BaseModel {
   @column({ isPrimary: true })
-  declare idInterveiw: number
+  declare idInterview: number
 
   @column()
-  declare interveiwDateKey: number
+  declare semester: number
 
   @column()
-  declare semester: string
+  declare date: DateTime
+
+  @column()
+  declare startPeriod: DateTime
+
+  @column()
+  declare endPeriod: DateTime
 }

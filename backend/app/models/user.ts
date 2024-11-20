@@ -1,21 +1,8 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
-import { DateTime } from 'luxon'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
-  declare id: number
-
-  @column()
-  declare name: string
-
-  @column()
-  declare firstName: string
-
-  @column.date()
-  declare dateBirth: DateTime
-
-  @column()
-  declare genre: string
+  declare idUser: number
 
   @column()
   declare email: string
@@ -24,8 +11,14 @@ export default class User extends BaseModel {
   declare password: string
 
   @column()
+  declare name: string
+
+  @column()
+  declare lastName: string
+
+  @column()
   declare telephone: string
 
   @column()
-  declare asset: boolean
+  declare role: string
 }

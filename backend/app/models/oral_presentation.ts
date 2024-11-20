@@ -6,8 +6,20 @@ export default class OralPresentation extends BaseModel {
   declare idOralPresentation: number
 
   @column()
-  declare juryKey: number
+  declare linkOralPresentation: string
 
   @column()
-  declare oralPresentationDate: DateTime
+  declare deadline: DateTime
+
+  @column()
+  declare idJury: number
+
+  @column()
+  declare idPresident: number
+
+  @column()
+  declare presentationDate: DateTime
+
+  @column()
+  declare grade: number
 }

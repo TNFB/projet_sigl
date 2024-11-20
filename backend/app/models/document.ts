@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 export default class Document extends BaseModel {
@@ -5,14 +6,8 @@ export default class Document extends BaseModel {
   declare idDocument: number
 
   @column()
-  declare name: string
+  declare documentLink: string
 
   @column()
-  declare type: string
-
-  @column()
-  declare semester: string
-
-  @column()
-  declare status: string
+  declare dropDate: DateTime
 }

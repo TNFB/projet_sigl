@@ -5,5 +5,5 @@ export default class Jury extends BaseModel {
   declare idJury: number
 
   @column()
-  declare presidentKey: number
+  declare listeIdJury: JSON
 }

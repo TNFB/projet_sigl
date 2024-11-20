@@ -17,6 +17,10 @@ const UserController = () => import('../app/controllers/users_controller.js')
 const DocumentsController = () => import('../app/controllers/documents_controller.js')
 const TraningDiaryController = () => import('../app/controllers/training_diaries_controller.js')
 const AdminController = () => import('../app/controllers/admin_controller.js')
+const ApprenticeMastersController = () =>
+  import('../app/controllers/apprentice_masters_controller.js')
+const EducationalTutorsController = () =>
+  import('../app/controllers/educational_tutors_controller.js')
 
 // Définir les routes
 Route.group(() => {
@@ -27,9 +31,21 @@ Route.group(() => {
 }).prefix('/user')
 
 Route.group(() => {
-  Route.get('/overritePassword', [AdminController, 'overritePassword']).as('overritePassword')
-  Route.get('/deleteUser', [AdminController, 'deleteUser']).as('deleteUser')
+  Route.post('/overritePassword', [AdminController, 'overritePassword']).as('overritePassword')
+  Route.post('/deleteUser', [AdminController, 'deleteUser']).as('deleteUser')
 }).prefix('/admin')
+
+Route.group(() => {
+  Route.post('/addApprentices', [ApprenticeMastersController, 'addApprentices']).as(
+    'addApprentices'
+  )
+}).prefix('/apprenticeMaster')
+
+Route.group(() => {
+  Route.post('/addApprentices', [EducationalTutorsController, 'addApprentices']).as(
+    'addApprentices'
+  )
+}).prefix('/educationalTutor')
 
 Route.post('connection', [UserController, 'connectionUser']).as('connectionUser')
 Route.get('logout', [UserController, 'logoutUser']).as('logoutUser')

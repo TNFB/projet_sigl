@@ -15,4 +15,10 @@ export default class Apprentice extends BaseModel {
 
   @column()
   declare idTrainingDiary: number
+
+  @column()
+  declare idCompagny: number
+
+  @column()
+  declare listMissions: JSON
 }

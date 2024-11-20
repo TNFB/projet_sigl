@@ -10,6 +10,8 @@ export default class extends BaseSchema {
       table.integer('idApprenticeMaster')
       table.integer('idCursus')
       table.integer('idTrainingDiary')
+      table.integer('idCompagny')
+      table.json('listMissions')
     })
   }
 

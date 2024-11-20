@@ -21,6 +21,8 @@ const ApprenticeMastersController = () =>
   import('../app/controllers/apprentice_masters_controller.js')
 const EducationalTutorsController = () =>
   import('../app/controllers/educational_tutors_controller.js')
+const CompanyRepresentativesController = () =>
+  import('../app/controllers/compagny_representatives_controller.js')
 
 // Définir les routes
 Route.group(() => {
@@ -46,6 +48,13 @@ Route.group(() => {
     'addApprentices'
   )
 }).prefix('/educationalTutor')
+
+Route.group(() => {
+  Route.post('/addMissionToApprentice', [
+    CompanyRepresentativesController,
+    'addMissionToApprentice',
+  ]).as('addMissionToApprentice')
+}).prefix('/CompanyRepresentatives')
 
 Route.post('connection', [UserController, 'connectionUser']).as('connectionUser')
 Route.get('logout', [UserController, 'logoutUser']).as('logoutUser')

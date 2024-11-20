@@ -28,6 +28,7 @@ Route.group(() => {
 
 Route.group(() => {
   Route.get('/overritePassword', [AdminController, 'overritePassword']).as('overritePassword')
+  Route.get('/deleteUser', [AdminController, 'deleteUser']).as('deleteUser')
 }).prefix('/admin')
 
 Route.post('connection', [UserController, 'connectionUser']).as('connectionUser')

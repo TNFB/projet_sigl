@@ -69,4 +69,55 @@ export default class AdminController {
       })
     }
   }
+
+  /**
+   * @method deleteUserByEmail
+   * @description Supprime un utilisateur de la base de données en fonction de son email.
+   *
+   * Cette méthode permet à un administrateur de supprimer un compte utilisateur
+   * en utilisant l'adresse email comme identifiant unique. Elle vérifie l'existence
+   * de l'utilisateur avant de procéder à la suppression.
+   *
+   * @param {HttpContext} context - Le contexte HTTP de la requête.
+   * @returns {Promise<Object>} Une réponse JSON indiquant le résultat de l'opération.
+   *
+   * @throws {NotFound} Si l'utilisateur n'existe pas ou si la table des utilisateurs est vide.
+   * @throws {InternalServerError} En cas d'erreur lors du traitement de la requête.
+   */
+  async deleteUser({ request, response }: HttpContext) {
+    try {
+      const { email } = request.only(['email'])
+
+      const userCount = await db.from('users').count('* as total')
+      if (userCount[0].total === 0) {
+        console.log('User table empty')
+        return response.status(404).json({
+          status: 'error',
+          message: 'No User table found/table users empty',
+        })
+      }
+
+      // Found User by Email
+      const userDb = await db.from('users').where('email', email).select('*').first()
+      if (!userDb) {
+        return response.status(404).json({
+          status: 'error',
+          message: 'Email not found',
+        })
+      }
+
+      await db.from('users').where('email', email).delete()
+
+      return response.status(200).json({
+        status: 'success',
+        message: 'User deleted successfully',
+      })
+    } catch (error) {
+      console.log(error)
+      return response.status(500).json({
+        status: 'error',
+        message: 'Erreur in users deleteUser',
+      })
+    }
+  }
 }

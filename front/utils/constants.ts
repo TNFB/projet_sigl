@@ -44,7 +44,7 @@ export const SIDEBAR_ADMIN_ITEMS = [
   },
   {
     title: "Gestion des livrables",
-    url: "/gestionLivrables",
+    url: "/blocNote",
     icon: "BookOpen",
   },
 ]

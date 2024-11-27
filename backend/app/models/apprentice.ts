@@ -2,14 +2,23 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 export default class Apprentice extends BaseModel {
   @column({ isPrimary: true })
-  declare idApprentice: number
+  declare id: number
 
   @column()
-  declare userKey: number
+  declare idEducationalTutor: number
 
   @column()
-  declare currentCompagnyKey: number
+  declare idApprenticeMaster: number
 
   @column()
-  declare specialty: string
+  declare idCursus: number
+
+  @column()
+  declare idTrainingDiary: number
+
+  @column()
+  declare idCompagny: number
+
+  @column()
+  declare listMissions: JSON
 }

@@ -1,32 +1,37 @@
-// for AdonisJS v6
-import path from "node:path";
-import url from "node:url";
-// ---
+import path from 'node:path'
+import url from 'node:url'
 
 export default {
-  // path: __dirname + "/../", for AdonisJS v5
-  path: path.dirname(url.fileURLToPath(import.meta.url)) + "/../", // for AdonisJS v6
-  title: "Foo", // use info instead
-  version: "1.0.0", // use info instead
-  description: "", // use info instead
+  path: path.dirname(url.fileURLToPath(import.meta.url)) + '/../', // pour AdonisJS v6
+  title: 'Foo', // Nom du projet
+  version: '1.0.0',
+  description: 'API Documentation for Foo',
   tagIndex: 2,
   info: {
-    title: "title",
-    version: "1.0.0",
-    description: "",
+    title: 'Foo API',
+    version: '1.0.0',
+    description: 'This is the API documentation for Foo application.',
   },
   snakeCase: true,
 
-  debug: true, // set to true, to get some useful debug output
-  ignore: ["/swagger", "/docs"],
-  preferredPutPatch: "PUT", // if PUT/PATCH are provided for the same route, prefer PUT
+  debug: true, // Activer les logs pour déboguer si nécessaire
+  ignore: ['/swagger', '/docs'], // Ignorer les routes Swagger
+  preferredPutPatch: 'PUT',
   common: {
-    parameters: {}, // OpenAPI conform parameters that are commonly used
-    headers: {}, // OpenAPI conform headers that are commonly used
+    parameters: {},
+    headers: {},
   },
-  securitySchemes: {}, // optional
-  authMiddlewares: ["auth", "auth:api"], // optional
-  defaultSecurityScheme: "BearerAuth", // optional
-  persistAuthorization: true, // persist authorization between reloads on the swagger page
-  showFullPath: false, // the path displayed after endpoint summary
-};
+  securitySchemes: {}, // Ajouter si vous utilisez un schéma d'authentification
+  authMiddlewares: ['auth', 'auth:api'],
+  defaultSecurityScheme: 'BearerAuth',
+  persistAuthorization: true,
+  showFullPath: false,
+
+  // Ajoutez le chemin de vos fichiers où Swagger doit chercher les annotations
+  options: {
+    apis: [
+      'app/**/*.ts', // Incluez vos contrôleurs et fichiers associés
+      'start/routes.ts', // Si vous utilisez des annotations directement dans vos routes
+    ],
+  },
+}

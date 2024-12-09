@@ -4,26 +4,16 @@ import BaseForm from '@/components/BaseForm';
 
 interface FormData {
   utilisateur: string;
-  password: string;
 }
 
-interface InputField {
-    type: 'input';
-    label: string;
-    inputType: string;
-    name: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  }
-  
-  interface SelectField {
-    type: 'select';
-    label: string;
-    name: string;
-    value: string;
-    options: { value: string; label: string }[];
-    onChange: (value: string) => void;
-  }
+interface SelectField {
+  type: 'select';
+  label: string;
+  name: string;
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (value: string) => void;
+}
 
 function DeleteAccount() {
   const [formData, setFormData] = useState<FormData>({
@@ -48,7 +38,7 @@ function DeleteAccount() {
     console.log(formData);
   };
 
-  type Field = InputField | SelectField;
+  type Field = SelectField;
   const fields: Field[] = [
     {
       type: 'select',

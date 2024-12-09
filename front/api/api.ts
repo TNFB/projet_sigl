@@ -14,3 +14,20 @@ export const uploadFile = async (file: File, documentType: string) => {
 
   return response.json();
 };
+
+export const postRequest = async (url: string, body?: string) => {
+  console.log(body);
+  const response = await fetch( `${process.env.NEXT_PUBLIC_API_URL }/${url}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: body,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to post to ${url}`);
+  }
+
+  return response.json();
+};

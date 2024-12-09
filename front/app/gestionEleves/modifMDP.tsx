@@ -1,9 +1,10 @@
 'use client'
-import React, { useState } from 'react';
-import BaseForm from '@/components/BaseForm';
+import React, { useState } from 'react'
+import BaseForm from '@/components/BaseForm'
+import { postRequest } from '@/api/api'
 
 interface FormData {
-  utilisateur: string;
+  user: string;
   password: string;
 }
 
@@ -27,7 +28,7 @@ interface InputField {
 
 function ModifMDP() {
   const [formData, setFormData] = useState<FormData>({
-    utilisateur: '',
+    user: '',
     password: '',
   });
 
@@ -42,7 +43,7 @@ function ModifMDP() {
   const handleUserChange = (value: string) => {
     setFormData({
       ...formData,
-      utilisateur: value,
+      user: value,
     });
   };
 
@@ -67,7 +68,14 @@ function ModifMDP() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+    const url = 'user/changePassword';
+    postRequest(url, JSON.stringify({ user: formData.user, password: formData.password }))
+      .then(response => {
+       console.log('Success:', response);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
   };
 
   type Field = InputField | SelectField;
@@ -76,7 +84,7 @@ function ModifMDP() {
       type: 'select',
       label: 'Utilisateur',
       name: 'utilisateur',
-      value: formData.utilisateur,
+      value: formData.user,
       options: utilisateurs,
       onChange: handleUserChange,
     },

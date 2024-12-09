@@ -6,6 +6,7 @@ import ModifMDP from './modifMDP';
 import DeleteAccount from './deleteAccount';
 import NewLivrable from './newLivrable';
 import AddDoc from './addDoc';
+import CreationJF from './creationJF';
 
 function GestionEleves() {
   return (
@@ -19,6 +20,9 @@ function GestionEleves() {
         <div className="flex flex-col space-y-2">
           <NewLivrable />
           <AddDoc />
+        </div>
+         <div className="flex flex-col space-y-5">
+          <CreationJF />
         </div>
       </div>
     </Home>

@@ -3,8 +3,7 @@ import React, { useState } from 'react';
 import BaseForm from '@/components/BaseForm';
 
 interface FormData {
-  utilisateur: string;
-  password: string;
+  livrable: string;
 }
 
 interface InputField {

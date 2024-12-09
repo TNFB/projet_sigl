@@ -1,81 +1,32 @@
 'use client'
-import React, { useState } from 'react'
-import Home from '@/components/Home'
-import BaseForm from '@/components/BaseForm'
-
-interface FormData {
-  nom: string;
-  prenom: string;
-  email: string;
-  password: string;
-  telephone: string;
-}
+import React from 'react';
+import Home from '@/components/Home';
+import AjoutEleve from './ajoutEleve';
+import ModifMDP from './modifMDP';
+import DeleteAccount from './deleteAccount';
+import NewLivrable from './newLivrable';
+import AddDoc from './addDoc';
+import CreationJF from './creationJF';
 
 function GestionEleves() {
-  const [formData, setFormData] = useState<FormData>({
-    nom: '',
-    prenom: '',
-    email: '',
-    password: '',
-    telephone: '',
-  })
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData({
-      ...formData,
-      [name]: value,
-    })
-  }
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    console.log(formData)
-  }
-
-  const inputFields = [
-    {
-      label: 'Nom',
-      type: 'text',
-      name: 'nom',
-      value: formData.nom,
-      onChange: handleChange,
-    },
-    {
-      label: 'Prénom',
-      type: 'text',
-      name: 'prenom',
-      value: formData.prenom,
-      onChange: handleChange,
-    },
-    {
-      label: 'Email',
-      type: 'email',
-      name: 'email',
-      value: formData.email,
-      onChange: handleChange,
-    },
-    {
-      label: 'Mot de passe',
-      type: 'password',
-      name: 'password',
-      value: formData.password,
-      onChange: handleChange,
-    },
-    {
-      label: 'Téléphone',
-      type: 'text',
-      name: 'telephone',
-      value: formData.telephone,
-      onChange: handleChange,
-    },
-  ]
-
   return (
     <Home>
-      <BaseForm title="Gestion des Élèves" onSubmit={handleSubmit} inputFields={inputFields} className="max-w-md mx-auto mt-8" />
+      <div className="flex space-x-4 p-4 w-fit">
+        <AjoutEleve />
+        <div className="flex flex-col space-y-5">
+          <ModifMDP />
+          <DeleteAccount />
+        </div>
+        <div className="flex flex-col space-y-2">
+          <NewLivrable />
+          <AddDoc />
+        </div>
+         <div className="flex flex-col space-y-5">
+          <CreationJF />
+        </div>
+      </div>
     </Home>
-  )
+  );
 }
 
-export default GestionEleves
+export default GestionEleves;

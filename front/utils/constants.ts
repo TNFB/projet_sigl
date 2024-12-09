@@ -48,3 +48,31 @@ export const SIDEBAR_ADMIN_ITEMS = [
     icon: "BookOpen",
   },
 ]
+
+export const SIDEBAR_CA_ITEMS = [
+  {
+    title: "Accueil",
+    url: "/",
+    icon: "Home",
+  },
+  {
+    title: "Maîtres d'apprentissage",
+    url: "/gestionMaitresApp",
+    icon: "UsersRound",
+  },
+  {
+    title: "Tuteurs pédagogiques",
+    url: "/gestionTuteurs",
+    icon: "UsersRound",
+  },
+  {
+    title: "Intervenants extérieurs",
+    url: "/gestionIntervenants",
+    icon: "UsersRound",
+  },
+  {
+    title: "Entreprises partenaires",
+    url: "/gestionEntreprises",
+    icon: "UsersRound",
+  },
+]

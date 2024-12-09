@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Search, Bell, LogOut, ChevronDown  } from "lucide-react"
-import { SIDEBAR_ITEMS, SIDEBAR_ADMIN_ITEMS } from '@/utils/constants'
+import { SIDEBAR_ITEMS, SIDEBAR_ADMIN_ITEMS, SIDEBAR_CA_ITEMS } from '@/utils/constants'
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -44,7 +44,7 @@ const Header = () => {
               <Breadcrumb>
                 <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/accueil">Journal de formation</BreadcrumbLink>
+                  <BreadcrumbLink href="/">Journal de formation</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
@@ -53,6 +53,9 @@ const Header = () => {
                     url === item.url ? item.title : null
                   ))}
                   {SIDEBAR_ITEMS.map((item) => (
+                    url === item.url ? item.title : null
+                  ))}
+                  {SIDEBAR_CA_ITEMS.map((item) => (
                     url === item.url ? item.title : null
                   ))}
                   

@@ -69,8 +69,7 @@ function ModifMDP() {
   // Here
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const url = 'admin/overritePassword';
-    postRequest(url, JSON.stringify({ email: formData.email, newPassword: formData.password }))
+    postRequest('admin/overritePassword', JSON.stringify({ email: formData.email, newPassword: formData.password }))
       .then(response => {
        console.log('Success:', response);
     })

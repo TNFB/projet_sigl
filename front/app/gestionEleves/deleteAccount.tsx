@@ -37,7 +37,7 @@ function DeleteAccount() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await postRequest('admin/deleteUser', formData);
+      const response = await postRequest('admin/deleteUser', JSON.stringify(formData));
       console.log('User deleted successfully:', response);
     } catch (error) {
       console.error('Error delete user:', error);

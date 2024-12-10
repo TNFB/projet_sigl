@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import BaseForm from '@/components/BaseForm';
-import { postRequest, postRequestDropDocument } from '@/api/api';
+import { postRequestDropDocument } from '@/api/api';
 
 interface FormData {
   livrable: string;
@@ -43,12 +43,14 @@ function AddDoc() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const url = 'dropDocument';
-    
-    const formData = new FormData(e.currentTarget);
+    const formDataToSend = new FormData();
+    formDataToSend.append('livrable', formData.livrable);
+    if (formData.file) {
+      formDataToSend.append('file', formData.file);
+    }
   
     try {
-      const response = await postRequestDropDocument(url, formData);
+      const response = await postRequestDropDocument('dropDocument', formDataToSend);
       console.log('Success:', response);
     } catch (error) {
       console.error('Error:', error);

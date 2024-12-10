@@ -60,7 +60,10 @@ Route.group(() => {
 Route.post('connection', [UserController, 'connectionUser']).as('connectionUser')
 Route.get('logout', [UserController, 'logoutUser']).as('logoutUser')
 
-Route.post('dropDocument', [DocumentsController, 'dropDocument']).as('dropDocument')
+Route.group(() => {
+  Route.post('dropDocument', [DocumentsController, 'dropDocument']).as('dropDocument')
+  Route.post('importUsers', [DocumentsController, 'importUsers']).as('importUsers')
+}).prefix('/document')
 
 Route.post('createTraningDiary', [TraningDiaryController, 'createTraningDiary']).as(
   'createTraningDiary'

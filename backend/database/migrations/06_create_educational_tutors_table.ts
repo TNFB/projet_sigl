@@ -12,7 +12,6 @@ export default class extends BaseSchema {
         .references('idUser')
         .inTable('users')
         .onDelete('CASCADE')
-      table.json('listeIdApprentice')
     })
   }
 

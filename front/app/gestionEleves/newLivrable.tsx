@@ -1,9 +1,10 @@
 'use client'
 import React, { useState } from 'react';
 import BaseForm from '@/components/BaseForm';
+import { postRequest } from '@/api/api';
 
 interface FormData {
-  livrable: string;
+  deposit: string;
 }
 
 interface InputField {
@@ -26,7 +27,7 @@ interface InputField {
 
 function NewLivrable() {
   const [formData, setFormData] = useState<FormData>({
-    livrable: ''
+    deposit: ''
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,9 +39,14 @@ function NewLivrable() {
   };
 
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+    try {
+      const response = await postRequest('deposit/addDeposit', formData.deposit);
+      console.log('deposit created successfully:', response);
+    } catch (error) {
+      console.error('Error create deposit:', error);
+    }
   };
 
   type Field = InputField | SelectField;
@@ -50,7 +56,7 @@ function NewLivrable() {
         label: 'Nom du livrable',
         inputType: 'text',
         name: 'livrable',
-        value: formData.livrable,
+        value: formData.deposit,
         onChange: handleChange,
       },
   ];

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import BaseForm from '@/components/BaseForm';
+import { postRequestCreateUser } from '@/api/api';
 
 interface FormData {
   nom: string;
@@ -32,8 +33,8 @@ interface SelectField {
 
 function AjoutEleve() {
   const [formData, setFormData] = useState<FormData>({
-    nom: '',
-    prenom: '',
+    name: '',
+    lastName: '',
     email: '',
     password: '',
     telephone: '',
@@ -55,9 +56,14 @@ function AjoutEleve() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+    try {
+      const response = await postRequestCreateUser('user/createUser', formData);
+      console.log('User created successfully:', response);
+    } catch (error) {
+      console.error('Error creating user:', error);
+    }
   };
 
   type Field = InputField | SelectField;
@@ -67,7 +73,7 @@ function AjoutEleve() {
         label: 'Nom',
         inputType: 'text',
         name: 'nom',
-        value: formData.nom,
+        value: formData.name,
         onChange: handleChange,
       },
       {
@@ -75,7 +81,7 @@ function AjoutEleve() {
         label: 'Prénom',
         inputType: 'text',
         name: 'prenom',
-        value: formData.prenom,
+        value: formData.lastName,
         onChange: handleChange,
       },
       {
@@ -108,16 +114,16 @@ function AjoutEleve() {
         name: 'role',
         value: formData.role,
         options: [
-          { value: 'admin', label: 'Administrateur' },
-          { value: 'apprenti', label: 'Apprenti' },
-          { value: 'maitre_apprentissage', label: 'Maitre d\'apprentissage' },
-          { value: 'tuteur_pedagogique', label: 'Tuteur pédagogique' },
+          { value: 'admins', label: 'Administrateur' },
+          { value: 'apprentices', label: 'Apprenti' },
+          { value: 'apprentice_masters', label: 'Maitre d\'apprentissage' },
+          { value: 'educational_tutors', label: 'Tuteur pédagogique' },
         ],
         onChange: handleRoleChange,
       },
     ];
 
-  const fieldsOrder = ['role', 'nom', 'prenom', 'email', 'telephone', 'password'];
+  const fieldsOrder = ['email', 'password', 'name', 'lastName', 'telephone', 'role'];
 
   return (
       <BaseForm title="Ajout d'un utilisateur" submitLabel="Ajouter" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="min-w-80" />

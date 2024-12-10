@@ -139,10 +139,9 @@ export default class UsersController {
       console.log(`User created: ${createUser}`)
 
       //assigne Role
-      var assigneRole = []
       let id = createUser
       if (role !== 'admins' && role !== null) {
-        assigneRole = await db.table(role).insert({ id })
+        await db.table(role).insert({ id })
       } else {
         return response.status(400).json({
           status: 'error',

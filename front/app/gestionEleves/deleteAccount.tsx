@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import BaseForm from '@/components/BaseForm';
+import { postRequest } from '@/api/api';
 
 interface FormData {
   utilisateur: string;
@@ -20,10 +21,10 @@ function DeleteAccount() {
     utilisateur: ''
   });
 
-  const [utilisateurs] = useState([
-    { value: 'user1', label: 'User 1' },
-    { value: 'user2', label: 'User 2' },
-    { value: 'user3', label: 'User 3' },
+  const [email] = useState([
+    { value: 'email1', label: 'email1@test.com' },
+    { value: 'email2', label: 'email2@test.com' },
+    { value: 'email3', label: 'email3@test.com' },
   ]);
 
   const handleUserChange = (value: string) => {
@@ -33,19 +34,24 @@ function DeleteAccount() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+    try {
+      const response = await postRequest('admin/deleteUser', formData);
+      console.log('User deleted successfully:', response);
+    } catch (error) {
+      console.error('Error delete user:', error);
+    }
   };
 
   type Field = SelectField;
   const fields: Field[] = [
     {
       type: 'select',
-      label: 'Utilisateur',
-      name: 'utilisateur',
+      label: 'Email',
+      name: 'email',
       value: formData.utilisateur,
-      options: utilisateurs,
+      options: email,
       onChange: handleUserChange,
     },
   ];

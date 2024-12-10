@@ -23,6 +23,7 @@ const EducationalTutorsController = () =>
   import('../app/controllers/educational_tutors_controller.js')
 const CompanyRepresentativesController = () =>
   import('../app/controllers/compagny_representatives_controller.js')
+const DepositsController = () => import('../app/controllers/deposits_controller.js')
 
 // Définir les routes
 Route.group(() => {
@@ -64,6 +65,12 @@ Route.post('dropDocument', [DocumentsController, 'dropDocument']).as('dropDocume
 Route.post('createTraningDiary', [TraningDiaryController, 'createTraningDiary']).as(
   'createTraningDiary'
 )
+
+Route.group(() => {
+  Route.post('getAllDeposits', [DepositsController, 'getAllDeposits']).as('getAllDeposits')
+  Route.post('addDeposit', [DepositsController, 'addDeposit']).as('addDeposit')
+  Route.post('deleteDeposit', [DepositsController, 'deleteDeposit']).as('deleteDeposit')
+}).prefix('/deposit')
 
 // Swagger
 

@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import BaseForm from '@/components/BaseForm';
+import { postRequest, postRequestDropDocument } from '@/api/api';
 
 interface FormData {
   livrable: string;
@@ -40,9 +41,18 @@ function AddDoc() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+    const url = 'dropDocument';
+    
+    const formData = new FormData(e.currentTarget);
+  
+    try {
+      const response = await postRequestDropDocument(url, formData);
+      console.log('Success:', response);
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   const fields: Field[] = [
@@ -61,20 +71,21 @@ function AddDoc() {
   return (
     <BaseForm title="Ajouter un Document" submitLabel="Ajouter" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="max-w-md mx-auto mt-8">
       <div className="mb-4">
-        <label htmlFor="file" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="document" className="block text-sm font-medium text-gray-700">
           Charger un fichier
         </label>
         <input
           type="file"
-          id="file"
-          name="file"
-          accept=".pdf,.docx"
+          id="document"
+          name="document"
+          accept=".docx,.doc,.odt,.xlsx,.xls,.pdf,.txt,.mdj"
           onChange={handleFileChange}
           className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />
       </div>
     </BaseForm>
   );
+
 }
 
 export default AddDoc;

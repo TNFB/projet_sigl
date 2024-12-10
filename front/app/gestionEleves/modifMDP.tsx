@@ -32,10 +32,10 @@ function ModifMDP() {
     password: '',
   });
 
-  const [utilisateurs] = useState([
-    { value: 'user1', label: 'User 1' },
-    { value: 'user2', label: 'User 2' },
-    { value: 'user3', label: 'User 3' },
+  const [email] = useState([
+    { value: 'email1', label: 'email1@test.com' },
+    { value: 'email2', label: 'email2@test.com' },
+    { value: 'email3', label: 'email3@test.com' },
   ]);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -66,10 +66,10 @@ function ModifMDP() {
     });
   };
 
+  // Here
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const url = 'user/changePassword';
-    postRequest(url, JSON.stringify({ user: formData.user, password: formData.password }))
+    postRequest('admin/overritePassword', JSON.stringify({ email: formData.email, newPassword: formData.password }))
       .then(response => {
        console.log('Success:', response);
     })
@@ -82,10 +82,10 @@ function ModifMDP() {
   const fields: Field[] = [
     {
       type: 'select',
-      label: 'Utilisateur',
-      name: 'utilisateur',
-      value: formData.user,
-      options: utilisateurs,
+      label: 'Email',
+      name: 'email',
+      value: formData.email,
+      options: email,
       onChange: handleUserChange,
     },
   ];

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import BaseForm from '@/components/BaseForm';
-import { postRequest } from '@/api/api';
+import { postRequest, postRequestDropDocument } from '@/api/api';
 
 interface FormData {
   livrable: string;
@@ -41,23 +41,18 @@ function AddDoc() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const url = 'dropDocument';
     
     const formData = new FormData(e.currentTarget);
   
-    fetch(url, {
-      method: 'POST',
-      body: formData,
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Success:', data);
-    })
-    .catch(error => {
+    try {
+      const response = await postRequestDropDocument(url, formData);
+      console.log('Success:', response);
+    } catch (error) {
       console.error('Error:', error);
-    });
+    }
   };
 
   const fields: Field[] = [

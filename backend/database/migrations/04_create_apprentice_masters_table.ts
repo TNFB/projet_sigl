@@ -5,9 +5,20 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.integer('id').primary().references('idUser').inTable('users').onDelete('CASCADE')
+      table
+        .integer('id')
+        .primary()
+        .unsigned()
+        .references('idUser')
+        .inTable('users')
+        .onDelete('CASCADE')
       table.json('listeIdApprentice')
-      table.integer('idCompagny').references('idCompagny').inTable('compagies').onDelete('CASCADE')
+      table
+        .integer('idCompagny')
+        .unsigned()
+        .references('idCompagny')
+        .inTable('compagies')
+        .onDelete('CASCADE')
     })
   }
 

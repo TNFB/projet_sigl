@@ -55,3 +55,29 @@ export const postRequestDropDocument = async (url: string, data?: FormData | obj
 
   return response.json();
 };
+
+export const postRequestCreateUser = async (url: string, userData: {
+  email: string;
+  password: string;
+  name: string;
+  lastName: string;
+  telephone: string;
+  role: string;
+}) => {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json'
+  };
+
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(userData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || `Failed to create user: ${response.statusText}`);
+  }
+
+  return response.json();
+};

@@ -5,6 +5,8 @@ import React, { useEffect, useRef } from 'react'
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { postRequest } from '@/api/api';
+import bcrypt from 'bcryptjs';
 
 const Page = () => {
   const router = useRouter();
@@ -24,33 +26,15 @@ const Page = () => {
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-        try {
-          const url = `${process.env.NEXT_PUBLIC_API_URL }/connexion`
-          const body = JSON.stringify({ email, password });
-          console.log(body);
-          const response = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: body,
-          });
-          if (!response.ok) {
-            const errorMessage = await response.text();
-            setErrorMessage(errorMessage);
-            throw new Error(errorMessage);
-          } else {
-            const contentType = response.headers.get("content-type");
-            
-            const data = await response.json();
-            console.log(data);
-            localStorage.setItem('userRole', data.role);
-            window.location.href = "/";
-          }
-        } catch (error) {
-          console.error("Erreur lors de la connexion :", error);
-          setErrorMessage("Identifiants incorrects. Veuillez réessayer.");
-        }
+    // Hached password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    postRequest('connection', JSON.stringify({ email: email, newPassword: hashedPassword }))
+      .then(response => {
+        console.log('Success:', response);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
   };
 
   useEffect(() => {

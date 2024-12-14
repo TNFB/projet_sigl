@@ -32,11 +32,18 @@ interface SelectField {
 
 
 function AjoutEleve() {
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    lastName: '',
+  const [formData, setFormData] = useState<{
+    email: string;
+    password: string;
+    name: string;
+    lastName: string;
+    telephone: string;
+    role: string;
+  }>({
     email: '',
     password: '',
+    name: '',
+    lastName: '',
     telephone: '',
     role: '',
   });
@@ -58,6 +65,13 @@ function AjoutEleve() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // Validation simple (Potentiellement a delete)
+    const { email, password, name, lastName, telephone, role } = formData;
+    if (!email || !password || !name || !lastName || !telephone || !role) {
+      console.error('All fields are required');
+      return;
+    }
+
     try {
       const response = await postRequestCreateUser('user/createUser', formData);
       console.log('User created successfully:', response);

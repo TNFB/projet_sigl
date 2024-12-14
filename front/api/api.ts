@@ -16,7 +16,6 @@ export const uploadFile = async (file: File, documentType: string) => {
 };
 
 export const postRequest = async (url: string, body?: string) => {
-  console.log(body);
   const response = await fetch( `${process.env.NEXT_PUBLIC_API_URL }/${url}`, {
     method: 'POST',
     headers: {
@@ -32,29 +31,49 @@ export const postRequest = async (url: string, body?: string) => {
   return response.json();
 };
 
-export const postRequestDropDocument = async (url: string, data?: FormData | object) => {
-  let headers: HeadersInit = {};
+export const postRequestDropDocument = async (url: string, data: FormData | { [key: string]: any }) => {
   let body: BodyInit;
 
   if (data instanceof FormData) {
     body = data;
   } else {
-    headers['Content-Type'] = 'application/json';
-    body = JSON.stringify(data);
+    // Si les données ne sont pas déjà un FormData, les convertir
+    const formData = new FormData();
+    for (const key in data) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) {
+        formData.append(key, data[key]);
+      }
+    }
+    body = formData;
   }
 
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {
     method: 'POST',
-    headers,
     body,
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to post to ${url}`);
+    const errorData = await response.json();
+    throw new Error(errorData.message || `Failed to post to ${url}`);
   }
 
   return response.json();
 };
+
+export const postRequestImportUser = async (url: string, formData: FormData) => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || `Failed to post to ${url}`);
+  }
+
+  return response.json();
+};
+
 
 export const postRequestCreateUser = async (url: string, userData: {
   email: string;

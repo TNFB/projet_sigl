@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import BaseForm from '@/components/BaseForm';
 import Home from '@/components/Home';
+import { postRequestDropDocument } from '@/api/api';
 
 interface FormData {
   document: string;
@@ -54,10 +55,37 @@ function Documents() {
     { value: 'doc_11', label: 'Rapport final PING' },
   ]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [file, setFile] = useState<File | null>(null);
+  const [documentName, setDocumentName] = useState('');
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+  
+    if (!file) {
+      console.error('No file selected');
+      setError('Veuillez sélectionner un fichier à télécharger.');
+      return;
+    }
+
+    setError(null);
+
+    // Construire un FormData avec le fichier et les métadonnées
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('email', email);
+    formData.append('documentName', documentName);
+  
+    try {
+      const response = await postRequestDropDocument('document/dropDocument', formData);
+      console.log('Document uploaded successfully:', response);
+    } catch (error) {
+      console.error('Error uploading document:', error);
+    }
   };
+
+  
 
   const fields: Field[] = [
     {
@@ -78,16 +106,46 @@ function Documents() {
         <div className="mb-4">
           <label htmlFor="file" className="block text-sm font-medium text-gray-700">
             Charger un fichier
+            {error && <p className="text-red-500 text-sm">{error}</p>}
           </label>
           <input
             type="file"
             id="file"
             name="file"
-            accept=".pdf,.docx"
-            onChange={handleFileChange}
+            accept=".pdf,.docx,.xlsx,.xls,.odt,.txt,.mdj" // Extensions autorisées
+            onChange={(e) => {
+              const selectedFile = e.target.files?.[0];
+              if (selectedFile) {
+                setFile(selectedFile);
+              }
+            }}
             className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
         </div>
+        <div className="mb-4">
+        <label htmlFor="documentName" className="block text-sm font-medium text-gray-700">
+          Nom du document
+        </label>
+        <input
+          type="text"
+          id="documentName"
+          name="documentName"
+          onChange={(e) => setDocumentName(e.target.value)}
+          className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
+      <div className="mb-4">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          Email
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          onChange={(e) => setEmail(e.target.value)}
+          className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
       </BaseForm>
     </Home>
   );

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import BaseForm from '@/components/BaseForm';
-import { postRequest, postRequestDropDocument } from '@/api/api';
+import { postRequestImportUser } from '@/api/api';
 
 interface FormData {
   livrable: string;
@@ -43,12 +43,24 @@ function AddDoc() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const url = 'dropDocument';
-    
+  
     const formData = new FormData(e.currentTarget);
   
+    // Vérification pour s'assurer qu'un fichier est présent
+    const file = formData.get('file') as File | null;
+    if (!file) {
+      console.error('Aucun fichier sélectionné.');
+      return;
+    }
+  
+    if (!file.name.endsWith('.xlsx')) {
+      console.error('Le fichier doit être au format .xlsx');
+      return;
+    }
+  
+    const url = 'document/importUsers';
     try {
-      const response = await postRequestDropDocument(url, formData);
+      const response = await postRequestImportUser(url, formData);
       console.log('Success:', response);
     } catch (error) {
       console.error('Error:', error);
@@ -78,7 +90,7 @@ function AddDoc() {
           type="file"
           id="document"
           name="document"
-          accept=".docx,.doc,.odt,.xlsx,.xls,.pdf,.txt,.mdj"
+          accept=".xlsx"
           onChange={handleFileChange}
           className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />

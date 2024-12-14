@@ -1,5 +1,6 @@
 import db from '@adonisjs/lucid/services/db'
 import { HttpContext } from '@adonisjs/core/http'
+const bcrypt = require('bcrypt');
 
 /**
  * @class UsersController
@@ -205,7 +206,8 @@ export default class UsersController {
         })
       }
 
-      if (userDb.password === password) {
+      const isPasswordValid = await bcrypt.compare(password, userDb.password);
+      if (isPasswordValid) {
         // Creation Token
         const token = `${userDb.idUser}_${Date.now()}`
         response.cookie('access_token', token, {

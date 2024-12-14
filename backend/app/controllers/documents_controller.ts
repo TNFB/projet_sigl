@@ -32,6 +32,18 @@ export default class DocumentsController {
         extnames: ['docx', 'doc', 'odt', 'xlsx', 'xls', 'pdf', 'txt', 'mdj'], // Extensions autorisées
         size: '10mb', // Taille maximale autorisée
       })
+
+      const { email, documentName } = request.only(['email', 'documentName'])
+
+       // Found User by Email
+       const userDb = await db.from('users').where('email', email).select('*').first()
+       if (!userDb) {
+         return response.status(404).json({
+           status: 'error',
+           message: 'Email not found',
+         })
+       }
+
       if (!file) {
         return response.badRequest({ message: 'No document provided' })
       }
@@ -41,14 +53,12 @@ export default class DocumentsController {
           errors: file.errors,
         })
       }
-      //Name Doc
-      const fileName = `${Date.now()}-${file.clientName}`
       //Path
-      const basePath = '/hereIdOfUser' // Here Path (add path to unique folder)
-      const fileUrl = `${basePath}/${fileName}`
+      const basePath = `/${userDb.email}`
+      const fileUrl = `${basePath}/${documentName}`
       // Save to disk
       await file.moveToDisk(fileUrl, {
-        name: fileName,
+        name: documentName,
       })
       // Save path in DB
       const savedDocument = await db.table('documents').insert({

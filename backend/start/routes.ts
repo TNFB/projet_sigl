@@ -27,7 +27,7 @@ const DepositsController = () => import('../app/controllers/deposits_controller.
 
 // Définir les routes
 Route.group(() => {
-  Route.get('/', [UserController, 'getAllUsers']).as('GetAllUser')
+  Route.post('/getUserEmails', [UserController, 'getUserEmails']).as('getUserEmails')
   Route.post('/getUser/:id', [UserController, 'getUserById']).as('getUserById')
   Route.post('/createUser', [UserController, 'createUser']).as('createUser')
   Route.post('/changePassword', [UserController, 'changePassword']).as('changePassword')

@@ -59,42 +59,59 @@ export default class UsersController {
   }
 
   /**
-   * @brief Récupère tous les utilisateurs.
+   * @brief Récupère les emails des utilisateurs en fonction du rôle spécifié.
    *
-   * Cette méthode vérifie si la table des utilisateurs est vide, puis récupère tous les utilisateurs
-   * et renvoie leurs détails.
+   * Cette méthode vérifie si la table des utilisateurs est vide, puis récupère les emails des utilisateurs
+   * en fonction du rôle spécifié. Si aucun rôle n'est spécifié, elle renvoie tous les emails.
    *
-   * @param {HttpContext} context - Le contexte HTTP contenant la réponse.
+   * @param {HttpContext} context - Le contexte HTTP contenant la requête et la réponse.
+   * @param {Object} context.request - L'objet de requête HTTP.
    * @param {Object} context.response - L'objet de réponse HTTP utilisé pour renvoyer des réponses au client.
    *
    * @throws {NotFound} Si la table des utilisateurs est vide.
    * @throws {InternalServerError} En cas d'erreur lors du traitement de la récupération des utilisateurs.
    *
-   * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et la liste des utilisateurs.
+   * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et la liste des emails des utilisateurs.
    */
-  async getAllUsers({ response }: HttpContext) {
-    console.log('getAllUsers')
+  async getUserEmails({ request, response }: HttpContext) {
+    console.log('getUserEmails')
     try {
-      // check if table 'users' empty
-      const acteurCount = await db.from('users').count('* as total')
-      if (acteurCount[0].total === 0) {
+      // Récupérer le rôle depuis les paramètres de la requête
+      const role = request.input('role')
+
+      // Vérifier si la table 'users' est vide
+      const userCount = await db.from('users').count('* as total')
+      if (userCount[0].total === 0) {
         console.log('User table empty')
         return response.status(404).json({
           status: 'error',
           message: 'No users table found/users table empty',
         })
       }
-      //Table Not Empty
-      const getAllacteurs = await db.from('users').select('*')
+
+      // Préparer la requête
+      let query = db.from('users').select('email')
+
+      // Si un rôle est spécifié, filtrer par ce rôle
+      if (role) {
+        query = query.where('role', role)
+      }
+
+      // Exécuter la requête
+      const users = await query
+
+      // Extraire uniquement les emails
+      const emails = users.map((user) => user.email)
+
       return response.status(200).json({
         status: 'success',
-        users: getAllacteurs,
+        emails: emails,
       })
     } catch (error) {
       console.log(error)
       return response.status(500).json({
         status: 'error',
-        message: 'Erreur in getAllUser',
+        message: 'Erreur dans getUserEmails',
       })
     }
   }
@@ -185,7 +202,11 @@ export default class UsersController {
   async connectionUser({ request, response }: HttpContext) {
     console.log('Connexion')
     try {
-      const { email, password } = request.only(['email', 'password'])
+      const { data } = request.only(['data'])
+      const { email, password } = data
+
+      console.log(`email: ${email}`)
+      console.log(`password: ${password}`)
 
       // check if table 'users' empty
       const userCount = await db.from('users').count('* as total')
@@ -206,7 +227,8 @@ export default class UsersController {
         })
       }
 
-      const isPasswordValid = await bcrypt.compare(password, userDb.password);
+      const isPasswordValid = await bcrypt.compare(password, userDb.password)
+      //const isPasswordValid = password
       if (isPasswordValid) {
         // Creation Token
         const token = `${userDb.idUser}_${Date.now()}`

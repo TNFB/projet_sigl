@@ -86,4 +86,54 @@ export default class EducationalTutorsController {
       return response.status(500).json({ message: 'An error occurred while adding apprentices' })
     }
   }
+
+  /**
+   * @method assignEducationalTutorRole
+   * @description Attribue le rôle "educational_tutor" à un utilisateur existant et l'ajoute à la table educational_tutors.
+   *
+   * @param {HttpContext} context - Le contexte HTTP de la requête.
+   * @param {Object} context.request - L'objet de requête contenant les données.
+   * @param {Object} context.response - L'objet de réponse pour envoyer le résultat.
+   *
+   * @throws {BadRequest} Si l'email n'est pas fourni.
+   * @throws {NotFound} Si l'utilisateur n'est pas trouvé.
+   * @throws {InternalServerError} En cas d'erreur lors de l'attribution du rôle.
+   *
+   * @returns {Promise<Object>} Une promesse qui résout avec un objet JSON contenant le résultat de l'opération.
+   */
+  public async assignEducationalTutorRole({ request, response }: HttpContext) {
+    try {
+      const { email } = request.only(['email'])
+
+      if (!email) {
+        return response.status(400).json({ message: 'Email is required' })
+      }
+
+      // Trouver l'utilisateur par email
+      const user = await db.from('users').where('email', email).first()
+
+      if (!user) {
+        return response.status(404).json({ message: 'User not found' })
+      }
+
+      // Commencer une transaction
+      await db.transaction(async (trx) => {
+        // Mettre à jour le rôle de l'utilisateur
+        await trx.from('users').where('idUser', user.idUser).update({ role: 'educational_tutor' })
+
+        // Insérer l'ID de l'utilisateur dans la table educational_tutors
+        await trx.table('educational_tutors').insert({ id: user.idUser })
+      })
+
+      return response.status(200).json({
+        message: 'User successfully assigned as educational tutor',
+        userId: user.idUser,
+      })
+    } catch (error) {
+      console.error(error)
+      return response
+        .status(500)
+        .json({ message: 'An error occurred while assigning educational tutor role' })
+    }
+  }
 }

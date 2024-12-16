@@ -34,7 +34,7 @@ export default class CompaniesController {
    *   "message": "Company created successfully"
    * }
    */
-  public async create({ request, response }: HttpContext) {
+  public async createCompany({ request, response }: HttpContext) {
     try {
       const { name } = request.only(['name'])
 
@@ -43,11 +43,17 @@ export default class CompaniesController {
         return response.status(400).json({ message: 'Company name is required' })
       }
 
+      // Vérifier si une compagnie avec ce nom existe déjà
+      const existingCompany = await db.from('compagies').where('name', name).first()
+      if (existingCompany) {
+        return response.status(409).json({ message: 'A company with this name already exists' })
+      }
+
       // Add new Compagny
-      const [idCompany] = await db.table('companies').insert({ name }).returning('idCompany')
+      const [idCompagny] = await db.table('compagies').insert({ name }).returning('idCompagny')
 
       // Create response
-      const company = await db.from('companies').where('idCompany', idCompany).first()
+      const company = await db.from('compagies').where('idCompagny', idCompagny).first()
 
       return response.status(201).json({
         ...company,
@@ -55,7 +61,57 @@ export default class CompaniesController {
       })
     } catch (error) {
       console.error(error)
+      if (error.code === 'ER_DUP_ENTRY') {
+        return response.status(409).json({ message: 'A company with this name already exists' })
+      }
       return response.status(500).json({ message: 'An error occurred while creating the company' })
+    }
+  }
+
+  /**
+   * @method getAllCompanyNames
+   * @description Récupère tous les noms de compagnies de la base de données.
+   *
+   * Cette méthode interroge la table 'companies' et renvoie une liste de tous les noms de compagnies.
+   *
+   * @param {HttpContext} context - Le contexte HTTP de la requête.
+   * @param {Object} context.response - L'objet de réponse pour envoyer le résultat.
+   *
+   * @throws {NotFound} Si aucune compagnie n'est trouvée.
+   * @throws {InternalServerError} En cas d'erreur lors de la récupération des compagnies.
+   *
+   * @returns {Promise<Object>} Une promesse qui résout avec un objet JSON contenant la liste des noms de compagnies.
+   *
+   * @example
+   * // Exemple de requête
+   * GET /companies/names
+   *
+   * // Exemple de réponse réussie
+   * {
+   *   "companyNames": ["Acme Corporation", "Globex Corporation", "Soylent Corp"]
+   * }
+   */
+  public async getAllCompanyNames({ response }: HttpContext) {
+    try {
+      // Récupérer tous les noms de compagnies
+      const compagies = await db.from('compagies').select('name')
+
+      // Vérifier si des compagnies ont été trouvées
+      if (compagies.length === 0) {
+        return response.status(404).json({ message: 'No compagies found' })
+      }
+
+      // Extraire uniquement les noms
+      const companyNames = compagies.map((company) => company.name)
+
+      return response.status(200).json({
+        companyNames: companyNames,
+      })
+    } catch (error) {
+      console.error(error)
+      return response
+        .status(500)
+        .json({ message: 'An error occurred while retrieving company names' })
     }
   }
 }

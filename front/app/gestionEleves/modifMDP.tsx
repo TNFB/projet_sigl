@@ -66,7 +66,6 @@ function ModifMDP() {
     });
   };
 
-  // Here
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     postRequest('admin/overritePassword', JSON.stringify({ email: formData.email, newPassword: formData.password }))

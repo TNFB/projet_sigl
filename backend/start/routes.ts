@@ -24,6 +24,7 @@ const EducationalTutorsController = () =>
 const CompanyRepresentativesController = () =>
   import('../app/controllers/compagny_representatives_controller.js')
 const DepositsController = () => import('../app/controllers/deposits_controller.js')
+const CompaniesController = () => import('../app/controllers/compagies_controller.js')
 
 // Définir les routes
 Route.group(() => {
@@ -48,6 +49,10 @@ Route.group(() => {
   Route.post('/addApprenticesEducationalTutor', [EducationalTutorsController, 'addApprentices']).as(
     'addApprenticesEducationalTutor'
   )
+  Route.post('/assignEducationalTutorRole', [
+    EducationalTutorsController,
+    'assignEducationalTutorRole',
+  ]).as('assignEducationalTutorRole')
 }).prefix('/educationalTutor')
 
 Route.group(() => {
@@ -74,6 +79,11 @@ Route.group(() => {
   Route.post('addDeposit', [DepositsController, 'addDeposit']).as('addDeposit')
   Route.post('deleteDeposit', [DepositsController, 'deleteDeposit']).as('deleteDeposit')
 }).prefix('/deposit')
+
+Route.group(() => {
+  Route.post('createCompany', [CompaniesController, 'createCompany']).as('createCompany')
+  Route.get('getAllNames', [CompaniesController, 'getAllCompanyNames']).as('getAllCompanyNames')
+}).prefix('/company')
 
 // Swagger
 

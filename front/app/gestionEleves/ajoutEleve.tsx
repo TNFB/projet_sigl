@@ -4,6 +4,27 @@ import BaseForm from '@/components/BaseForm'
 import { postRequestCreateUser } from '@/api/api'
 import bcrypt from 'bcryptjs'
 
+// Définissez ces interfaces avant de les utiliser
+interface InputField {
+  type: 'input';
+  label: string;
+  inputType: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+interface SelectField {
+  type: 'select';
+  label: string;
+  name: string;
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (value: string) => void;
+}
+
+type Field = InputField | SelectField;
+
 function AjoutEleve() {
   const [formData, setFormData] = useState<{
     email: string;
@@ -57,7 +78,6 @@ function AjoutEleve() {
     }
   };
   
-  type Field = InputField | SelectField;
   const fields: Field[] = [
     {
       type: 'input',

@@ -25,13 +25,16 @@ const Page = () => {
   }, [router]);
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    // Hached password
-    //const hashedPassword = await bcrypt.hash(password, 10);
     console.log(email, password);
-    postRequest('connection', JSON.stringify({ email: email, password: password }))
+    const data = {
+      email: email,
+      password: password
+    };
+    
+    postRequest('connection', JSON.stringify({ data: data }))
       .then(response => {
         console.log('Success:', response);
-        const { role } = response.role;
+        const { role } = response;
         localStorage.setItem('role', role);
         router.push('/');
       })
@@ -39,6 +42,7 @@ const Page = () => {
         console.error('Error:', error);
       });
   };
+  
 
   useEffect(() => {
     if (inputRef.current) {

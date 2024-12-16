@@ -35,14 +35,14 @@ export default class DocumentsController {
 
       const { email, documentName } = request.only(['email', 'documentName'])
 
-       // Found User by Email
-       const userDb = await db.from('users').where('email', email).select('*').first()
-       if (!userDb) {
-         return response.status(404).json({
-           status: 'error',
-           message: 'Email not found',
-         })
-       }
+      // Found User by Email
+      const userDb = await db.from('users').where('email', email).select('*').first()
+      if (!userDb) {
+        return response.status(404).json({
+          status: 'error',
+          message: 'Email not found',
+        })
+      }
 
       if (!file) {
         return response.badRequest({ message: 'No document provided' })

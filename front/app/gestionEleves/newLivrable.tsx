@@ -4,12 +4,33 @@ import BaseForm from '@/components/BaseForm';
 import { postRequest } from '@/api/api';
 
 interface FormData {
-  livrable: string;
+  deposit: string;
 }
+
+// Définissez ces interfaces
+interface InputField {
+  type: 'input';
+  label: string;
+  inputType: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+interface SelectField {
+  type: 'select';
+  label: string;
+  name: string;
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (value: string) => void;
+}
+
+type Field = InputField | SelectField;
 
 const NewLivrable = () => {
   const [formData, setFormData] = useState<FormData>({
-    livrable: '',
+    deposit: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,26 +44,25 @@ const NewLivrable = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await postRequest('deposit/addDeposit', formData.deposit);
+      const response = await postRequest('deposit/addDeposit', JSON.stringify(formData));
       console.log('deposit created successfully:', response);
     } catch (error) {
       console.error('Error create deposit:', error);
     }
   };
 
-  type Field = InputField | SelectField;
   const fields: Field[] = [
     {
       type: 'input',
       label: 'Nom du livrable',
       inputType: 'text',
-      name: 'livrable',
-      value: formData.livrable,
+      name: 'deposit',
+      value: formData.deposit,
       onChange: handleChange,
     },
   ];
 
-  const fieldsOrder = ['livrable'];
+  const fieldsOrder = ['deposit'];
 
   return (
     <BaseForm title="Ajout d'un nouveau livrable" submitLabel="Ajouter" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="h-fit" />

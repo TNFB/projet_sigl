@@ -5,27 +5,6 @@ import BaseMultiAjout from '@/components/BaseMultiAjout'
 import { postRequest } from '@/api/api'
 
 const GestionMaitresApp = () => {
-  const fieldsTemplate = [
-    {
-      type: 'input',
-      label: 'Nom',
-      inputType: 'text',
-      name: 'nom',
-    },
-    {
-      type: 'input',
-      label: 'Prénom',
-      inputType: 'text',
-      name: 'prenom',
-    },
-    {
-      type: 'input',
-      label: 'Adresse Email',
-      inputType: 'email',
-      name: 'email',
-    },
-  ];
-
   const [rows, setRows] = useState([{ nom: '', prenom: '', email: '' }]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, rowIndex: number, fieldName: string) => {
@@ -59,7 +38,6 @@ const GestionMaitresApp = () => {
             title="Ajout de maitres d'apprentissage"
             typeAjout="Maitre d'apprentissage"
             submitLabel="Ajouter"
-            fieldsTemplate={fieldsTemplate}
             rows={rows}
             onChange={handleChange}
             addRow={addRow}

@@ -1,20 +1,10 @@
 'use client'
 import React, { useRef, useEffect } from 'react';
 
-interface InputField {
-  type: 'input';
-  label: string;
-  inputType: string;
-  name: string;
-  value: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>, rowIndex: number) => void;
-}
-
 interface BaseMultiAjoutProps {
   title: string;
   typeAjout: string;
   submitLabel: string;
-  fieldsTemplate: Omit<InputField, 'value' | 'onChange'>[];
   rows: { [key: string]: string }[];
   onChange: (event: React.ChangeEvent<HTMLInputElement>, rowIndex: number, fieldName: string) => void;
   addRow: () => void;

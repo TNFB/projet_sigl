@@ -4,7 +4,7 @@ import BaseForm from '@/components/BaseForm'
 import { postRequest } from '@/api/api'
 
 interface FormData {
-  user: string;
+  email: string;
   password: string;
 }
 
@@ -28,7 +28,7 @@ interface InputField {
 
 function ModifMDP() {
   const [formData, setFormData] = useState<FormData>({
-    user: '',
+    email: '',
     password: '',
   });
 
@@ -43,7 +43,7 @@ function ModifMDP() {
   const handleUserChange = (value: string) => {
     setFormData({
       ...formData,
-      user: value,
+      email: value,
     });
   };
 

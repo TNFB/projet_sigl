@@ -3,8 +3,8 @@ import BaseForm from '@/components/BaseForm';
 import { postRequestCreateUser } from '@/api/api';
 
 interface FormData {
-  nom: string;
-  prenom: string;
+  name: string;
+  lastName: string;
   email: string;
   password: string;
   telephone: string;
@@ -86,7 +86,7 @@ function AjoutEleve() {
         type: 'input',
         label: 'Nom',
         inputType: 'text',
-        name: 'nom',
+        name: 'name',
         value: formData.name,
         onChange: handleChange,
       },
@@ -94,7 +94,7 @@ function AjoutEleve() {
         type: 'input',
         label: 'Prénom',
         inputType: 'text',
-        name: 'prenom',
+        name: 'lastName',
         value: formData.lastName,
         onChange: handleChange,
       },

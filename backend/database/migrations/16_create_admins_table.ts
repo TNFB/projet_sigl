@@ -6,7 +6,7 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table
-        .integer('idAdmin')
+        .integer('id')
         .primary()
         .unsigned()
         .references('idUser')

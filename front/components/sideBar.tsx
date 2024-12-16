@@ -9,11 +9,11 @@ import { ICONS } from '@/utils/iconMapping'
 
 const SideBar = () => {
   const [activeItem, setActiveItem] = useState("Accueil")
-  const [userType, setUserType] = useState<'user' | 'admin' | 'ca'>('user')
+  const [userType, setUserType] = useState<'apprentices' | 'admin' | 'ca'>('apprentices')
 
   useEffect(() => {
-    const userRole = localStorage.getItem('userRole') as 'user' | 'admin' | 'ca' | null
-    setUserType(userRole ?? 'user')
+    const userRole = localStorage.getItem('userRole') as 'apprentices' | 'admin' | 'ca' | null
+    setUserType(userRole ?? 'apprentices')
     setUserType('ca')
     let path = window.location.pathname
     if (path.endsWith('/')) {
@@ -30,6 +30,8 @@ const SideBar = () => {
       case 'admin':
         return SIDEBAR_ADMIN_ITEMS
       case 'ca':
+        return SIDEBAR_CA_ITEMS
+      case 'apprentices':
         return SIDEBAR_CA_ITEMS
       default:
         return SIDEBAR_ITEMS

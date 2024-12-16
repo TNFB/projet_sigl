@@ -1,6 +1,6 @@
 import db from '@adonisjs/lucid/services/db'
 import { HttpContext } from '@adonisjs/core/http'
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt'
 
 /**
  * @class UsersController
@@ -141,7 +141,7 @@ export default class UsersController {
 
       //assigne Role
       let id = createUser
-      if (role !== 'admins' && role !== null) {
+      if (role !== null) {
         await db.table(role).insert({ id })
       } else {
         return response.status(400).json({
@@ -200,7 +200,7 @@ export default class UsersController {
       // Found User by Email
       const userDb = await db.from('users').where('email', email).select('*').first()
       if (!userDb) {
-        return response.status(404).json({
+        return response.status(401).json({
           status: 'error',
           message: 'Email not found',
         })

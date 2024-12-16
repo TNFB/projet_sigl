@@ -25,12 +25,14 @@ const Page = () => {
   }, [router]);
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
     // Hached password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    postRequest('connection', JSON.stringify({ email: email, newPassword: hashedPassword }))
+    //const hashedPassword = await bcrypt.hash(password, 10);
+    console.log(email, password);
+    postRequest('connection', JSON.stringify({ email: email, password: password }))
       .then(response => {
         console.log('Success:', response);
+        const { role } = response.role;
+        localStorage.setItem('role', role);
         router.push('/');
       })
       .catch(error => {

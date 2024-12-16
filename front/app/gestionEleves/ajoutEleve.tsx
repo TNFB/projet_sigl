@@ -2,15 +2,6 @@ import React, { useState } from 'react';
 import BaseForm from '@/components/BaseForm';
 import { postRequestCreateUser } from '@/api/api';
 
-interface FormData {
-  name: string;
-  lastName: string;
-  email: string;
-  password: string;
-  telephone: string;
-  role: string;
-}
-
 interface InputField {
   type: 'input';
   label: string;

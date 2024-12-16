@@ -14,7 +14,7 @@ const SideBar = () => {
   useEffect(() => {
     const userRole = localStorage.getItem('userRole') as 'user' | 'admin' | 'ca' | null
     setUserType(userRole ?? 'user')
-    setUserType('admin')
+    setUserType('ca')
     let path = window.location.pathname
     if (path.endsWith('/')) {
       path = path.slice(0, -1)

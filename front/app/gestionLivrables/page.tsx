@@ -9,6 +9,15 @@ interface FormData {
     type: string;
   }
 
+  interface InputField {
+      type: 'input';
+      label: string;
+      inputType: string;
+      name: string;
+      value: string;
+      onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    }
+
 const Page = () => {
     const [formData, setFormData] = useState<FormData>({
         nom: '',
@@ -29,34 +38,39 @@ const Page = () => {
         e.preventDefault()
         console.log(formData)
     }
-
-    const inputFields = [
+    type Field = InputField;
+    const fields: Field[] = [
         {
+          type: 'input',
           label: 'Nom',
-          type: 'text',
+          inputType: 'text',
           name: 'nom',
           value: formData.nom,
           onChange: handleChange,
         },
         {
+          type: 'input',
           label: 'Date',
-          type: 'date',
+          inputType: 'text',
           name: 'date',
           value: formData.date,
           onChange: handleChange,
         },
         {
+          type: 'input',
           label: 'Type',
-          type: 'text',
+          inputType: 'text',
           name: 'type',
           value: formData.type,
           onChange: handleChange,
         },
       ]
 
+      const fieldsOrder = ['nom','date','type'];
   return (
     <Home>
-        <BaseForm title="Gestion des Livrables" onSubmit={handleSubmit} inputFields={inputFields} className="max-w-md mx-auto mt-8" />
+        empty
+        <BaseForm title="Gestion des Livrables" submitLabel="Ajouter" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="h-fit" />
     </Home>
   )
 }

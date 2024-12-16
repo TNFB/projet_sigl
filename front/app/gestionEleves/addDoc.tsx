@@ -70,18 +70,18 @@ function AddDoc() {
   const fields: Field[] = [
     {
       type: 'input',
-      label: 'Nom du livrable',
+      label: 'Nom du document',
       inputType: 'text',
-      name: 'livrable',
+      name: 'document',
       value: formData.livrable,
       onChange: handleChange,
     },
   ];
 
-  const fieldsOrder = ['livrable'];
+  const fieldsOrder = ['document'];
 
   return (
-    <BaseForm title="Ajouter un Document" submitLabel="Ajouter" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="max-w-md mx-auto mt-8">
+    <BaseForm title="Ajouter un document" submitLabel="Ajouter" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="max-w-md mx-auto mt-8">
       <div className="mb-4">
         <label htmlFor="document" className="block text-sm font-medium text-gray-700">
           Charger un fichier

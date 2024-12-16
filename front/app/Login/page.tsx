@@ -31,6 +31,7 @@ const Page = () => {
     postRequest('connection', JSON.stringify({ email: email, newPassword: hashedPassword }))
       .then(response => {
         console.log('Success:', response);
+        router.push('/');
       })
       .catch(error => {
         console.error('Error:', error);

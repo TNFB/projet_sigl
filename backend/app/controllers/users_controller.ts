@@ -227,8 +227,8 @@ export default class UsersController {
         })
       }
 
-      //const isPasswordValid = await bcrypt.compare(password, userDb.password)
-      const isPasswordValid = password
+      const isPasswordValid = await bcrypt.compare(password, userDb.password)
+      //const isPasswordValid = password
       if (isPasswordValid) {
         // Creation Token
         const token = `${userDb.idUser}_${Date.now()}`

@@ -112,4 +112,4 @@ Route.group(() => {
   Route.post('createMonthlyNote', [MonthluNotesController, 'createMonthlyNote']).as(
     'createMonthlyNote'
   )
-})
+}).prefix('monthlyNotes')

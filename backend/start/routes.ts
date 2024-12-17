@@ -23,6 +23,8 @@ const DepositsController = () => import('../app/controllers/deposits_controller.
 const CompaniesController = () => import('../app/controllers/compagies_controller.js')
 const ProfessionalsController = () => import('../app/controllers/professionals_controller.js')
 const MonthluNotesController = () => import('../app/controllers/monthly_notes_controller.js')
+const ApprenticeshipCoordinatorsController = () =>
+  import('../app/controllers/apprenticeship_coordinators_controller.js')
 
 // Définir les routes
 Route.group(() => {
@@ -113,3 +115,9 @@ Route.group(() => {
     'createMonthlyNote'
   )
 }).prefix('monthlyNotes')
+
+Route.group(() => {
+  Route.post('linkApprentice', [ApprenticeshipCoordinatorsController, 'linkApprentice']).as(
+    'linkApprentice'
+  )
+}).prefix('ApprenticeshipCoordinator')

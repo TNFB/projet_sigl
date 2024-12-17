@@ -9,10 +9,6 @@
 
 import Route from '@adonisjs/core/services/router'
 
-//Auto-Swagger
-import AutoSwagger from 'adonis-autoswagger'
-import swagger from '#config/swagger'
-
 const UserController = () => import('../app/controllers/users_controller.js')
 const DocumentsController = () => import('../app/controllers/documents_controller.js')
 const TraningDiaryController = () => import('../app/controllers/training_diaries_controller.js')
@@ -25,6 +21,7 @@ const CompanyRepresentativesController = () =>
   import('../app/controllers/compagny_representatives_controller.js')
 const DepositsController = () => import('../app/controllers/deposits_controller.js')
 const CompaniesController = () => import('../app/controllers/compagies_controller.js')
+const ProfessionalsController = () => import('../app/controllers/professionals_controller.js')
 
 // Définir les routes
 Route.group(() => {
@@ -43,6 +40,18 @@ Route.group(() => {
   Route.post('/addApprenticesApprenticeMaster', [ApprenticeMastersController, 'addApprentices']).as(
     'addApprenticesApprenticeMaster'
   )
+  Route.post('/createOrUpdateApprenticeMaster', [
+    ApprenticeMastersController,
+    'createOrUpdateApprenticeMaster',
+  ]).as('createOrUpdateApprenticeMaster')
+  Route.post('/getTrainingDiaryByEmailApprenticeMaster', [
+    ApprenticeMastersController,
+    'getTrainingDiaryByEmail',
+  ]).as('getTrainingDiaryByEmailApprenticeMaster')
+  Route.post('/getApprenticeInfoByEmail', [
+    ApprenticeMastersController,
+    'getApprenticeInfoByEmail',
+  ]).as('getApprenticeInfoByEmail')
 }).prefix('/apprenticeMaster')
 
 Route.group(() => {
@@ -53,6 +62,10 @@ Route.group(() => {
     EducationalTutorsController,
     'assignEducationalTutorRole',
   ]).as('assignEducationalTutorRole')
+  Route.post('/getTrainingDiaryByEmailEducationalTutor', [
+    EducationalTutorsController,
+    'getTrainingDiaryByEmail',
+  ]).as('getTrainingDiaryByEmailEducationalTutor')
 }).prefix('/educationalTutor')
 
 Route.group(() => {
@@ -70,9 +83,11 @@ Route.group(() => {
   Route.post('importUsers', [DocumentsController, 'importUsers']).as('importUsers')
 }).prefix('/document')
 
-Route.post('createTraningDiary', [TraningDiaryController, 'createTraningDiary']).as(
-  'createTraningDiary'
-)
+Route.group(() => {
+  Route.post('createTraningDiary', [TraningDiaryController, 'createTraningDiary']).as(
+    'createTraningDiary'
+  )
+}).prefix('/TraningDiary')
 
 Route.group(() => {
   Route.post('getAllDeposits', [DepositsController, 'getAllDeposits']).as('getAllDeposits')
@@ -85,12 +100,9 @@ Route.group(() => {
   Route.get('getAllNames', [CompaniesController, 'getAllCompanyNames']).as('getAllCompanyNames')
 }).prefix('/company')
 
-// Swagger
-
-Route.get('/swagger', async () => {
-  return AutoSwagger.default.docs(Route.toJSON(), swagger)
-})
-
-Route.get('/docs', async () => {
-  return AutoSwagger.default.ui('/swagger', swagger)
-})
+Route.group(() => {
+  Route.post('createOrUpdateProfessional', [
+    ProfessionalsController,
+    'createOrUpdateProfessional',
+  ]).as('createOrUpdateProfessional')
+}).prefix('/professional')

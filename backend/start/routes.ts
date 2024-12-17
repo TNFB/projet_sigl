@@ -9,10 +9,6 @@
 
 import Route from '@adonisjs/core/services/router'
 
-//Auto-Swagger
-import AutoSwagger from 'adonis-autoswagger'
-import swagger from '#config/swagger'
-
 const UserController = () => import('../app/controllers/users_controller.js')
 const DocumentsController = () => import('../app/controllers/documents_controller.js')
 const TraningDiaryController = () => import('../app/controllers/training_diaries_controller.js')

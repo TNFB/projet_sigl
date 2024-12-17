@@ -4,8 +4,9 @@ import BaseForm from '@/components/BaseForm';
 import { postRequestImportUser } from '@/api/api';
 
 interface FormData {
-  livrable: string;
-  file: File | null;
+  email: string;
+  documentName: string;
+  document: File | null;
 }
 
 interface InputField {
@@ -21,8 +22,9 @@ type Field = InputField;
 
 function AddDoc() {
   const [formData, setFormData] = useState<FormData>({
-    livrable: '',
-    file: null,
+    email: 'eleve1@eleve.fr',
+    documentName: '',
+    document: null,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,33 +36,26 @@ function AddDoc() {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files ? e.target.files[0] : null;
+    const document = e.target.files ? e.target.files[0] : null;
     setFormData({
       ...formData,
-      file,
+      document,
     });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
-    const formData = new FormData(e.currentTarget);
-  
-    // Vérification pour s'assurer qu'un fichier est présent
-    const file = formData.get('file') as File | null;
-    if (!file) {
-      console.error('Aucun fichier sélectionné.');
-      return;
+
+    const formDataToSend = new FormData();
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('documentName', formData.documentName);
+    if (formData.document) {
+      formDataToSend.append('document', formData.document);
     }
-  
-    if (!file.name.endsWith('.xlsx')) {
-      console.error('Le fichier doit être au format .xlsx');
-      return;
-    }
-  
-    const url = 'document/importUsers';
+
+    const url = 'document/dropDocument';
     try {
-      const response = await postRequestImportUser(url, formData);
+      const response = await postRequestImportUser(url, formDataToSend);
       console.log('Success:', response);
     } catch (error) {
       console.error('Error:', error);
@@ -72,13 +67,13 @@ function AddDoc() {
       type: 'input',
       label: 'Nom du document',
       inputType: 'text',
-      name: 'document',
-      value: formData.livrable,
+      name: 'documentName',
+      value: formData.documentName,
       onChange: handleChange,
     },
   ];
 
-  const fieldsOrder = ['document'];
+  const fieldsOrder = ['documentName'];
 
   return (
     <BaseForm title="Ajouter un document" submitLabel="Ajouter" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="max-w-md mx-auto mt-8">

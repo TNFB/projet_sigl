@@ -60,7 +60,7 @@ export default class DepositsController {
       const { deposit } = request.only(['deposit'])
       const deletedCount = await Database.from('deposits').where('deposit', deposit).delete()
       if (deletedCount[0] === 0) {
-        return response.status(404).json({ message: 'deposit Not found' })
+        return response.status(400).json({ message: 'deposit Not found' })
       }
 
       return response.status(200).json({ message: 'depos deleted successfully' })

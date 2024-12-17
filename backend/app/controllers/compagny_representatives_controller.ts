@@ -50,7 +50,7 @@ export default class CompanyRepresentativesController {
       // check apprentice exist
       const apprentice = await db.from('apprentices').where('id', apprenticeId).first()
       if (!apprentice) {
-        return response.status(404).json({ message: 'Apprentice not found' })
+        return response.status(400).json({ message: 'Apprentice not found' })
       }
 
       // check all mission field

@@ -34,7 +34,7 @@ export default class AdminController {
       const userCount = await db.from('users').count('* as total')
       if (userCount[0].total === 0) {
         console.log('User table empty')
-        return response.status(404).json({
+        return response.status(400).json({
           status: 'error',
           message: 'No User table found/table users empty',
         })
@@ -43,7 +43,7 @@ export default class AdminController {
       // Found User by Email
       const userDb = await db.from('users').where('email', email).select('*').first()
       if (!userDb) {
-        return response.status(404).json({
+        return response.status(400).json({
           status: 'error',
           message: 'Email not found',
         })
@@ -93,7 +93,7 @@ export default class AdminController {
       const userCount = await db.from('users').count('* as total')
       if (userCount[0].total === 0) {
         console.log('User table empty')
-        return response.status(404).json({
+        return response.status(400).json({
           status: 'error',
           message: 'No User table found/table users empty',
         })
@@ -102,7 +102,7 @@ export default class AdminController {
       // Found User by Email
       const userDb = await db.from('users').where('email', email).select('*').first()
       if (!userDb) {
-        return response.status(404).json({
+        return response.status(400).json({
           status: 'error',
           message: 'Email not found',
         })

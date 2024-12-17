@@ -31,7 +31,7 @@ export default class UsersController {
       const acteurCount = await db.from('users').count('* as total')
       if (acteurCount[0].total === 0) {
         console.log('User table empty')
-        return response.status(404).json({
+        return response.status(400).json({
           status: 'error',
           message: 'No users table found/users table empty',
         })
@@ -44,7 +44,7 @@ export default class UsersController {
           users: getUserById,
         })
       } else {
-        return response.status(404).json({
+        return response.status(400).json({
           status: 'error',
           message: 'No users table found',
         })
@@ -83,7 +83,7 @@ export default class UsersController {
       const userCount = await db.from('users').count('* as total')
       if (userCount[0].total === 0) {
         console.log('User table empty')
-        return response.status(404).json({
+        return response.status(400).json({
           status: 'error',
           message: 'No users table found/users table empty',
         })
@@ -212,7 +212,7 @@ export default class UsersController {
       const userCount = await db.from('users').count('* as total')
       if (userCount[0].total === 0) {
         console.log('User table empty')
-        return response.status(404).json({
+        return response.status(400).json({
           status: 'error',
           message: 'No User table found/table users empty',
         })
@@ -308,7 +308,7 @@ export default class UsersController {
       const userCount = await db.from('users').count('* as total')
       if (userCount[0].total === 0) {
         console.log('User table empty')
-        return response.status(404).json({
+        return response.status(400).json({
           status: 'error',
           message: 'No User table found/table users empty',
         })
@@ -317,7 +317,7 @@ export default class UsersController {
       // Found User by Email
       const userDb = await db.from('users').where('email', email).select('*').first()
       if (!userDb) {
-        return response.status(404).json({
+        return response.status(400).json({
           status: 'error',
           message: 'Email not found',
         })

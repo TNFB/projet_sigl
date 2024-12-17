@@ -43,7 +43,7 @@ export default class ApprenticeMastersController {
       // master existe ?
       const master = await db.from('apprentice_masters').where('id', masterId).first()
       if (!master) {
-        return response.status(404).json({ message: 'Master not found' })
+        return response.status(400).json({ message: 'Master not found' })
       }
 
       // get apprentice list (if existe)

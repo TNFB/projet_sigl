@@ -89,7 +89,7 @@ const Header = () => {
                   <DropdownMenuItem>Paramètres</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
-                    <Link href="/Login" className='flex items-center'>
+                    <Link onClick={() => { localStorage.clear() }} href="/Login" className='flex items-center'>
                       Logout
                       <LogOut className='ml-2 size-4'/>
                     </Link>

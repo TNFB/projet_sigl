@@ -47,20 +47,8 @@ export default class ApprenticeMastersController {
         return response.status(404).json({ message: 'Master not found' })
       }
 
-      // get apprentice list (if existe)
-      let currentApprentices = master.listeIdApprentice ? JSON.parse(master.listeIdApprentice) : []
-
-      // add new apprentices ID
-      const newApprentices = [...new Set([...currentApprentices, ...apprenticeIds])]
-
       // Start Transaction
       await db.transaction(async (trx) => {
-        // Update apprentice_masters
-        await trx
-          .from('apprentice_masters')
-          .where('id', masterId)
-          .update({ listeIdApprentice: JSON.stringify(newApprentices) })
-
         // Update table apprentices for each apprentice
         for (const apprenticeId of apprenticeIds) {
           await trx
@@ -185,6 +173,86 @@ export default class ApprenticeMastersController {
       return response.status(500).json({
         error: 'An error occurred while creating or updating the user: apprentice_masters',
       })
+    }
+  }
+
+  /**
+   * @method getTrainingDiary
+   * @description Récupère le journal de formation d'un apprenti spécifique en utilisant son email.
+   *
+   * @param {HttpContext} context - Le contexte HTTP de la requête.
+   * @param {Object} context.params - Les paramètres de la route.
+   * @param {Object} context.response - L'objet de réponse pour envoyer le résultat.
+   *
+   * @throws {NotFound} Si l'apprenti ou son journal de formation n'est pas trouvé.
+   * @throws {InternalServerError} En cas d'erreur lors de la récupération du journal.
+   *
+   * @returns {Promise<Object>} Une promesse qui résout avec le journal de formation de l'apprenti.
+   */
+  public async getTrainingDiaryByEmail({ request, response }: HttpContext) {
+    try {
+      const { email } = request.only(['email'])
+
+      const existingUser = await db.from('users').where('email', email).first()
+
+      if (existingUser) {
+        const apprentice = await db.from('apprentices').where('id', existingUser.idUser).first()
+
+        if (!apprentice || !apprentice.idTrainingDiary) {
+          return response.status(404).json({
+            status: 'not found',
+            message: 'Training diary not found for this user',
+          })
+        }
+
+        const trainingDiary = await db
+          .from('training_diaries')
+          .where('idTrainingDiary', apprentice.idTrainingDiary)
+          .first()
+
+        if (!trainingDiary) {
+          return response.status(404).json({
+            status: 'not found',
+            message: 'Training diary not found',
+          })
+        }
+
+        return response.status(200).json({ trainingDiary })
+      } else {
+        return response.status(404).json({
+          status: 'not found',
+          message: 'User not found',
+        })
+      }
+    } catch (error) {
+      console.error(error)
+      return response
+        .status(500)
+        .json({ message: 'An error occurred while fetching the training diary' })
+    }
+  }
+
+  public async getApprenticeInfoByEmail({ request, response }: HttpContext) {
+    try {
+      const { email } = request.only(['email'])
+
+      const existingUser = await db.from('users').where('email', email).first()
+
+      if (existingUser) {
+        const apprentice = await db.from('apprentices').where('id', existingUser.idUser).first()
+
+        return response.status(200).json({ apprentice })
+      } else {
+        return response.status(404).json({
+          status: 'not found',
+          message: 'User not found',
+        })
+      }
+    } catch (error) {
+      console.error(error)
+      return response
+        .status(500)
+        .json({ message: 'An error occurred while fetching the training diary' })
     }
   }
 }

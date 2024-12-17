@@ -150,20 +150,22 @@ export default class UsersController {
           message: `email: ${email} already existe in DB`,
         })
       }
-
+      const hashedPassword = await bcrypt.hash(password, 10)
       const createUser = await db
         .table('users')
-        .insert({ email, password, name, lastName, telephone, role })
+        .insert({ email, password: hashedPassword, name, lastName, telephone, role })
       console.log(`User created: ${createUser}`)
 
       //assigne Role
       let id = createUser
-      if (role !== null) {
+      console.log('role', role)
+      // eslint-disable-next-line eqeqeq
+      if (role != null) {
         await db.table(role).insert({ id })
       } else {
-        return response.status(400).json({
-          status: 'error',
-          message: 'bad request,User created but role is null or admin',
+        return response.status(200).json({
+          status: 'success',
+          message: 'User created without role',
         })
       }
       console.log(`User Role created ${createUser[0].role}`)

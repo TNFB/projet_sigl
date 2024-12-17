@@ -48,6 +48,14 @@ Route.group(() => {
     ApprenticeMastersController,
     'createOrUpdateApprenticeMaster',
   ]).as('createOrUpdateApprenticeMaster')
+  Route.post('/getTrainingDiaryByEmailApprenticeMaster', [
+    ApprenticeMastersController,
+    'getTrainingDiaryByEmail',
+  ]).as('getTrainingDiaryByEmailApprenticeMaster')
+  Route.post('/getApprenticeInfoByEmail', [
+    ApprenticeMastersController,
+    'getApprenticeInfoByEmail',
+  ]).as('getApprenticeInfoByEmail')
 }).prefix('/apprenticeMaster')
 
 Route.group(() => {
@@ -58,6 +66,10 @@ Route.group(() => {
     EducationalTutorsController,
     'assignEducationalTutorRole',
   ]).as('assignEducationalTutorRole')
+  Route.post('/getTrainingDiaryByEmailEducationalTutor', [
+    EducationalTutorsController,
+    'getTrainingDiaryByEmail',
+  ]).as('getTrainingDiaryByEmailEducationalTutor')
 }).prefix('/educationalTutor')
 
 Route.group(() => {
@@ -75,9 +87,11 @@ Route.group(() => {
   Route.post('importUsers', [DocumentsController, 'importUsers']).as('importUsers')
 }).prefix('/document')
 
-Route.post('createTraningDiary', [TraningDiaryController, 'createTraningDiary']).as(
-  'createTraningDiary'
-)
+Route.group(() => {
+  Route.post('createTraningDiary', [TraningDiaryController, 'createTraningDiary']).as(
+    'createTraningDiary'
+  )
+}).prefix('/TraningDiary')
 
 Route.group(() => {
   Route.post('getAllDeposits', [DepositsController, 'getAllDeposits']).as('getAllDeposits')

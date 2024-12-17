@@ -6,4 +6,7 @@ export default class ApprenticeMaster extends BaseModel {
 
   @column()
   declare idCompagny: number
+
+  @column()
+  declare listeIdApprentice: JSON
 }

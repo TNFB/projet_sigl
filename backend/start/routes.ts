@@ -110,7 +110,3 @@ Route.group(() => {
     'createOrUpdateProfessional',
   ]).as('createOrUpdateProfessional')
 }).prefix('/professional')
-
-Route.get('/docs', async () => {
-  return AutoSwagger.default.ui('/swagger', swagger)
-})

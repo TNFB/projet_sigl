@@ -22,6 +22,7 @@ const CompanyRepresentativesController = () =>
 const DepositsController = () => import('../app/controllers/deposits_controller.js')
 const CompaniesController = () => import('../app/controllers/compagies_controller.js')
 const ProfessionalsController = () => import('../app/controllers/professionals_controller.js')
+const MonthluNotesController = () => import('../app/controllers/monthly_notes_controller.js')
 
 // Définir les routes
 Route.group(() => {
@@ -106,3 +107,9 @@ Route.group(() => {
     'createOrUpdateProfessional',
   ]).as('createOrUpdateProfessional')
 }).prefix('/professional')
+
+Route.group(() => {
+  Route.post('createMonthlyNote', [MonthluNotesController, 'createMonthlyNote']).as(
+    'createMonthlyNote'
+  )
+})

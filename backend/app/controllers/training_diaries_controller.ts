@@ -31,18 +31,28 @@ export default class TrainingDiariesController {
       const { idUser } = request.only(['idUser'])
       const user = await db.from('users').where('idUser', idUser).first()
       if (user && user.role === 'apprentices') {
-        const newTrainingDiary = await db.table('training_diaries').insert({
+        const apprentice = await db.from('apprentices').where('id', idUser).first()
+
+        if (apprentice && apprentice.idTrainingDiary) {
+          return response.status(400).json({
+            message: 'Un journal de formation existe déjà pour cet utilisateur',
+            trainingDiaryId: apprentice.idTrainingDiary,
+          })
+        }
+
+        // Si aucun journal n'existe, en créer un nouveau
+        const [newTrainingDiaryId] = await db.table('training_diaries').insert({
           createdAt: new Date(),
         })
 
         await db
           .from('apprentices')
           .where('id', idUser)
-          .update({ idTrainingDiary: newTrainingDiary })
+          .update({ idTrainingDiary: newTrainingDiaryId })
 
         return response.status(200).json({
           message: 'Training Diary created',
-          trainingDiaryId: newTrainingDiary,
+          trainingDiaryId: newTrainingDiaryId,
         })
       } else {
         return response.status(403).json({

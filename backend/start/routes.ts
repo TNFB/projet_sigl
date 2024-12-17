@@ -25,6 +25,7 @@ const CompanyRepresentativesController = () =>
   import('../app/controllers/compagny_representatives_controller.js')
 const DepositsController = () => import('../app/controllers/deposits_controller.js')
 const CompaniesController = () => import('../app/controllers/compagies_controller.js')
+const ProfessionalsController = () => import('../app/controllers/professionals_controller.js')
 
 // Définir les routes
 Route.group(() => {
@@ -43,6 +44,10 @@ Route.group(() => {
   Route.post('/addApprenticesApprenticeMaster', [ApprenticeMastersController, 'addApprentices']).as(
     'addApprenticesApprenticeMaster'
   )
+  Route.post('/createOrUpdateApprenticeMaster', [
+    ApprenticeMastersController,
+    'createOrUpdateApprenticeMaster',
+  ]).as('createOrUpdateApprenticeMaster')
 }).prefix('/apprenticeMaster')
 
 Route.group(() => {
@@ -85,8 +90,14 @@ Route.group(() => {
   Route.get('getAllNames', [CompaniesController, 'getAllCompanyNames']).as('getAllCompanyNames')
 }).prefix('/company')
 
-// Swagger
+Route.group(() => {
+  Route.post('createOrUpdateProfessional', [
+    ProfessionalsController,
+    'createOrUpdateProfessional',
+  ]).as('createOrUpdateProfessional')
+}).prefix('/professional')
 
+// Swagger
 Route.get('/swagger', async () => {
   return AutoSwagger.default.docs(Route.toJSON(), swagger)
 })

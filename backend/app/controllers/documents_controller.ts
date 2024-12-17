@@ -38,7 +38,7 @@ export default class DocumentsController {
       // Found User by Email
       const userDb = await db.from('users').where('email', email).select('*').first()
       if (!userDb) {
-        return response.status(404).json({
+        return response.status(400).json({
           status: 'error',
           message: 'Email not found',
         })
@@ -54,7 +54,7 @@ export default class DocumentsController {
         })
       }
       //Path
-      const basePath = `/${userDb.email}`
+      const basePath = `/${userDb.idUser}`
       const fileUrl = `${basePath}/${documentName}`
       // Save to disk
       await file.moveToDisk(fileUrl, {

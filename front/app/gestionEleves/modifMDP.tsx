@@ -1,21 +1,14 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import BaseForm from '@/components/BaseForm'
 import { postRequest } from '@/api/api'
+import bcrypt from 'bcryptjs'
 
 interface FormData {
   email: string;
   password: string;
 }
 
-interface InputField {
-    type: 'input';
-    label: string;
-    inputType: string;
-    name: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  }
   
   interface SelectField {
     type: 'select';
@@ -32,12 +25,7 @@ function ModifMDP() {
     password: '',
   });
 
-  const [email] = useState([
-    { value: 'email1', label: 'email1@test.com' },
-    { value: 'email2', label: 'email2@test.com' },
-    { value: 'email3', label: 'email3@test.com' },
-  ]);
-
+  const [emails, setEmails] = useState<{ value: string; label: string }[]>([]);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleUserChange = (value: string) => {
@@ -46,6 +34,23 @@ function ModifMDP() {
       email: value,
     });
   };
+
+  useEffect(() => {
+    const fetchEmails = async () => {
+      try {
+        const response = await postRequest('user/getUserEmails?role');
+        const emailOptions = response.emails.map((email: string) => ({
+          value: email,
+          label: email,
+        }));
+        setEmails(emailOptions);
+      } catch (error) {
+        console.error('Error fetching emails:', error);
+      }
+    };
+
+    fetchEmails();
+  }, []);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -66,9 +71,10 @@ function ModifMDP() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    postRequest('admin/overritePassword', JSON.stringify({ email: formData.email, newPassword: formData.password }))
+    const hashedPassword = await bcrypt.hash(formData.password, 10);
+    postRequest('admin/overritePassword', JSON.stringify({ email: formData.email, newPassword: hashedPassword }))
       .then(response => {
        console.log('Success:', response);
     })
@@ -77,19 +83,19 @@ function ModifMDP() {
     });
   };
 
-  type Field = InputField | SelectField;
+  type Field = SelectField;
   const fields: Field[] = [
     {
       type: 'select',
       label: 'Email',
       name: 'email',
       value: formData.email,
-      options: email,
+      options: emails,
       onChange: handleUserChange,
     },
   ];
 
-  const fieldsOrder = ['utilisateur'];
+  const fieldsOrder = ['email'];
 
   return (
     <BaseForm title="Modification MDP utilisateur" submitLabel="Modifier" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="h-fit">

@@ -9,12 +9,12 @@ import { ICONS } from '@/utils/iconMapping'
 
 const SideBar = () => {
   const [activeItem, setActiveItem] = useState("Accueil")
-  const [userType, setUserType] = useState<'apprentices' | 'admin' | 'ca'>('apprentices')
+  const [userType, setUserType] = useState<'apprentices' | 'admins' | 'ca'>('apprentices')
 
   useEffect(() => {
-    const userRole = localStorage.getItem('userRole') as 'apprentices' | 'admin' | 'ca' | null
+    const userRole = localStorage.getItem('role') as 'apprentices' | 'admins' | 'ca' | null
     setUserType(userRole ?? 'apprentices')
-    setUserType('ca')
+    //setUserType('admin')
     let path = window.location.pathname
     if (path.endsWith('/')) {
       path = path.slice(0, -1)
@@ -27,12 +27,12 @@ const SideBar = () => {
 
   const getSidebarItems = (userType: string) => {
     switch (userType) {
-      case 'admin':
+      case 'admins':
         return SIDEBAR_ADMIN_ITEMS
       case 'ca':
         return SIDEBAR_CA_ITEMS
       case 'apprentices':
-        return SIDEBAR_CA_ITEMS
+        return SIDEBAR_ITEMS
       default:
         return SIDEBAR_ITEMS
     }

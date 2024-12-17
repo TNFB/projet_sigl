@@ -54,7 +54,7 @@ export default class EducationalTutorsController {
       // master existe ?
       const master = await db.from('educational_tutors').where('id', tutorId).first()
       if (!master) {
-        return response.status(404).json({ message: 'educational tutors not found' })
+        return response.status(400).json({ message: 'educational tutors not found' })
       }
 
       // get apprentice list (if existe)
@@ -113,7 +113,7 @@ export default class EducationalTutorsController {
       const user = await db.from('users').where('email', email).first()
 
       if (!user) {
-        return response.status(404).json({ message: 'User not found' })
+        return response.status(400).json({ message: 'User not found' })
       }
 
       // Commencer une transaction

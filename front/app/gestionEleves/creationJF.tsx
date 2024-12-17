@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import BaseForm from '@/components/BaseForm';
+import { postRequestImportUser } from '@/api/api';
 
 interface FormData {
   promotion: string;
@@ -45,10 +46,30 @@ function CreationJF() {
     { value: 'promotion_e5a', label: 'Promotion E5a' },
   ]);
 
-  //TODO
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+  
+    const formData = new FormData(e.currentTarget);
+  
+    // Vérification pour s'assurer qu'un fichier est présent
+    const file = formData.get('file') as File | null;
+    if (!file) {
+      console.error('Aucun fichier sélectionné.');
+      return;
+    }
+  
+    if (!file.name.endsWith('.xlsx')) {
+      console.error('Le fichier doit être au format .xlsx');
+      return;
+    }
+  
+    const url = 'document/importUsers';
+    try {
+      const response = await postRequestImportUser(url, formData);
+      console.log('Success:', response);
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   const fields: Field[] = [
@@ -74,7 +95,7 @@ function CreationJF() {
           type="file"
           id="file"
           name="file"
-          accept=".pdf,.docx"
+          accept=".xlsx"
           onChange={handleFileChange}
           className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />

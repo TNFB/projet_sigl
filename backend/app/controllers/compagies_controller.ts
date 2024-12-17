@@ -98,7 +98,7 @@ export default class CompaniesController {
 
       // Vérifier si des compagnies ont été trouvées
       if (compagies.length === 0) {
-        return response.status(404).json({ message: 'No compagies found' })
+        return response.status(400).json({ message: 'No compagies found' })
       }
 
       // Extraire uniquement les noms

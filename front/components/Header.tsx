@@ -31,12 +31,10 @@ const Header = () => {
         if (path.endsWith('/')) {
           path = path.slice(0, -1)
         }
-        console.log(path)
         if (path) {
             setUrl(path.charAt(0).toUpperCase() + path.slice(1))
         }
     }, [])
-    console.log(url)
     return (
         <div className="flex items-center justify-between p-4 border-b border-gray-300">
             <div className="flex items-center space-x-4">

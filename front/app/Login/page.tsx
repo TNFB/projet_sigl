@@ -36,6 +36,7 @@ const Page = () => {
         console.log('Success:', response);
         const { role } = response;
         localStorage.setItem('role', role);
+        console.log(role)
         router.push('/');
       })
       .catch(error => {

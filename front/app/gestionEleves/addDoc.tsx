@@ -22,7 +22,7 @@ type Field = InputField;
 
 function AddDoc() {
   const [formData, setFormData] = useState<FormData>({
-    email: 'eleve1@eleve.fr',
+    email: 'admin@test.com',
     documentName: '',
     document: null,
   });
@@ -85,7 +85,7 @@ function AddDoc() {
           type="file"
           id="document"
           name="document"
-          accept=".xlsx"
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
           onChange={handleFileChange}
           className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />

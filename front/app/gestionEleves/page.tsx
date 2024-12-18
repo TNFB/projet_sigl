@@ -15,7 +15,7 @@ function GestionEleves() {
 
   useEffect(() => {
     const role = localStorage.getItem('role');
-    if (role !== 'admin') {
+    if (role !== 'admins') {
       router.push('/Login');
     } else {
       setIsLoading(false);

@@ -55,7 +55,7 @@ export default class DocumentsController {
       }
       //Path
       const basePath = `/${userDb.idUser}`
-      const fileUrl = `${basePath}/${documentName}`
+      const fileUrl = `${basePath}/${documentName}.${file.extname}`
       // Save to disk
       await file.moveToDisk(fileUrl, {
         name: documentName,

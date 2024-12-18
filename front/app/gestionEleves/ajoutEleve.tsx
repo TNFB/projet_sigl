@@ -129,6 +129,7 @@ function AjoutEleve() {
         { value: 'apprentices', label: 'Apprenti' },
         { value: 'apprentice_masters', label: 'Maitre d\'apprentissage' },
         { value: 'educational_tutors', label: 'Tuteur pédagogique' },
+        { value: 'apprenticeship_coordinators', label: 'Coordinatrice alternance' },
       ],
       onChange: handleRoleChange,
     },

@@ -33,7 +33,7 @@ const GestionEntreprises = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const url = '/company/createCompany';
+    const url = 'company/createCompany';
     const formattedData = {
       data: rows.map(row => ({
         name: row.name,

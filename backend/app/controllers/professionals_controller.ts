@@ -18,75 +18,103 @@ export default class ProfessionalsController {
    *
    * @returns {Promise<Object>} Une promesse qui résout avec un objet JSON contenant un message de succès ou d'erreur.
    */
-  async createOrUpdateProfessional({ request, response }: HttpContext) {
+  async createOrUpdateProfessionals({ request, response }: HttpContext) {
     try {
-      const { name, lastName, email, companyName } = request.only([
-        'name',
-        'lastName',
-        'email',
-        'companyName',
-      ])
+      const peopleData = request.input('data')
 
-      // Vérifier si l'entreprise existe, sinon la créer
-      let idCompagny = 0
-      let company = await db.from('compagies').where('name', companyName).first()
-      if (!company) {
-        const newIdCompany = await db
-          .table('compagies')
-          .insert({ name: companyName })
-          .returning('idCompagny')
-        idCompagny = newIdCompany[0]
-      } else {
-        idCompagny = company.idCompagny
+      if (!Array.isArray(peopleData)) {
+        return response.status(400).json({ error: 'Input should be an array of people' })
       }
-      console.log(`create New Compagny: ${idCompagny}`)
 
-      // Vérifier si l'utilisateur existe déjà
-      const existingUser = await db.from('users').where('email', email).first()
+      const results = []
 
-      if (existingUser) {
-        // Mettre à jour les informations de l'utilisateur existant
-        await db.from('users').where('email', email).update({ name, lastName })
+      for (const person of peopleData) {
+        const { name, lastName, email, companyName } = person
 
-        // Mettre à jour l'entrée dans professionals si nécessaire
-        await db
-          .from('professionals')
-          .where('id', existingUser.idUser)
-          .update({ idCompagny: idCompagny })
+        // Vérifier si l'entreprise existe, sinon la créer
+        let idCompagny = 0
+        let company = await db.from('compagies').where('name', companyName).first()
+        if (!company) {
+          const newIdCompany = await db
+            .table('compagies')
+            .insert({ name: companyName })
+            .returning('idCompagny')
+          idCompagny = newIdCompany[0]
+        } else {
+          idCompagny = company.idCompagny
+        }
 
-        return response.status(200).json({ message: 'User updated successfully' })
-      } else {
-        // Créer un nouvel utilisateur
-        const password = Math.random().toString(36).slice(-8) // Générer un mot de passe aléatoire
-        const hashedPassword = await bcrypt.hash(password, 10)
+        // Vérifier si l'utilisateur existe déjà
+        const existingUser = await db.from('users').where('email', email).first()
 
-        const [userId] = await db
-          .table('users')
-          .insert({
+        if (existingUser) {
+          // Mettre à jour les informations de l'utilisateur existant
+          await db.from('users').where('email', email).update({ name, lastName })
+
+          // Vérifier si l'entrée existe dans professionals
+          const existingMaster = await db
+            .from('professionals')
+            .where('id', existingUser.idUser)
+            .first()
+
+          if (existingMaster) {
+            // Mettre à jour l'entrée dans professionals si nécessaire
+            await db
+              .from('professionals')
+              .where('id', existingUser.idUser)
+              .update({ idCompagny: idCompagny })
+          } else {
+            // Créer une nouvelle entrée dans professionals si elle n'existe pas
+            await db.table('professionals').insert({
+              id: existingUser.idUser,
+              idCompagny: idCompagny,
+            })
+          }
+
+          results.push({
             email,
-            name,
-            lastName,
-            password: hashedPassword,
-            role: 'professionals',
+            status: 'updated',
+            userId: existingUser.idUser,
+            compagnyId: idCompagny,
           })
-          .returning('idUser')
+        } else {
+          // Créer un nouvel utilisateur
+          const password = Math.random().toString(36).slice(-8) // Générer un mot de passe aléatoire
+          const hashedPassword = await bcrypt.hash(password, 10)
 
-        // Créer l'entrée dans la table professionals
-        await db.table('professionals').insert({
-          id: userId,
-          idCompagny: idCompagny,
-        })
+          const [userId] = await db
+            .table('users')
+            .insert({
+              email,
+              name,
+              lastName,
+              password: hashedPassword,
+              role: 'professionals',
+            })
+            .returning('idUser')
 
-        // Vous devriez envoyer le mot de passe par email à l'utilisateur ici
-        console.log(`Mot de passe généré pour ${email}: ${password}`)
+          // Créer l'entrée dans la table professionals
+          await db.table('professionals').insert({
+            id: userId,
+            idCompagny: idCompagny,
+          })
 
-        return response.status(201).json({ message: 'professionals created successfully', userId })
+          // Vous devriez envoyer le mot de passe par email à l'utilisateur ici
+          console.log(`Mot de passe généré pour ${email}: ${password}`)
+
+          results.push({ email, status: 'created', userId, compagnyId: idCompagny })
+        }
       }
+
+      return response.status(200).json({
+        message: 'Apprentice masters processed successfully',
+        results: results,
+      })
     } catch (error) {
       console.error(error)
-      return response
-        .status(500)
-        .json({ error: 'An error occurred while creating or updating the user: professionals' })
+      return response.status(500).json({
+        error: 'An error occurred while processing professionals',
+      })
     }
   }
 }

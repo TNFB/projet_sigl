@@ -76,7 +76,7 @@ export const SIDEBAR_CA_ITEMS = [
     icon: "UsersRound",
   },
   {
-    title: "Equipes tutorales",
+    title: "Équipes tutorales",
     url: "/gestionEquipes",
     icon: "UsersRound",
   },

@@ -39,8 +39,10 @@ function DeleteAccount() {
     try {
       const response = await postRequest('admin/deleteUser', JSON.stringify(formDataJson));
       console.log('User deleted successfully:', response);
+      alert('Utilisateur supprimé avec succès');
     } catch (error) {
       console.error('Error delete user:', error);
+      alert('Erreur lors de la suppression de l\'utilisateur');
     }
   };
 

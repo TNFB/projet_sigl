@@ -25,7 +25,6 @@ const Page = () => {
   }, [router]);
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    console.log(email, password);
     const data = {
       email: email,
       password: password
@@ -36,11 +35,11 @@ const Page = () => {
         console.log('Success:', response);
         const { role } = response;
         localStorage.setItem('role', role);
-        console.log(role)
         router.push('/');
       })
       .catch(error => {
         console.error('Error:', error);
+        alert('Identifiant ou mot de passe incorrect');
       });
   };
   

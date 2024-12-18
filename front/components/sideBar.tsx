@@ -19,7 +19,6 @@ const SideBar = () => {
     if (path.endsWith('/')) {
       path = path.slice(0, -1)
     }
-    console.log(path)
     if (path) {
       setActiveItem(path.charAt(0).toUpperCase() + path.slice(1))
     }

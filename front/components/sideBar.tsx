@@ -14,7 +14,7 @@ const SideBar = () => {
   const [email, setEmail] = useState<string | null>(null)
   const [students, setStudents] = useState([])
 
-  const fetchStudents = async (url: string) => {
+  const fetchStudents = React.useCallback(async (url: string) => {
     const formattedData = {
       data: {
         email: email
@@ -29,7 +29,7 @@ const SideBar = () => {
       .catch(error => {
         console.error('Error:', error)
       })
-  }
+  }, [email])
 
 
   useEffect(() => {

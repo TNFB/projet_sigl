@@ -39,14 +39,14 @@ const GestionEntreprises = () => {
         name: row.name,
       }))
     };
-   postRequest(url, JSON.stringify(formattedData))
-      .then(response => {
-      console.log('Success:', response);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-    console.log(formattedData);
+    postRequest(url, JSON.stringify(formattedData))
+        .then(response => {
+        console.log('Success:', response);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+      console.log(formattedData);
   };
 
   if (isLoading) {

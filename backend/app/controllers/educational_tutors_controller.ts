@@ -1,5 +1,6 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
+import bcrypt from 'bcrypt'
 
 export default class EducationalTutorsController {
   /**
@@ -190,6 +191,84 @@ export default class EducationalTutorsController {
       return response
         .status(500)
         .json({ message: 'An error occurred while fetching the training diary' })
+    }
+  }
+
+  async createOrUpdateEducationalTutor({ request, response }: HttpContext) {
+    try {
+      const peopleData = request.input('data')
+
+      if (!Array.isArray(peopleData)) {
+        return response.status(400).json({ error: 'Input should be an array of people' })
+      }
+
+      const results = []
+
+      for (const person of peopleData) {
+        const { name, lastName, email } = person
+
+        // Vérifier si l'utilisateur existe déjà
+        const existingUser = await db.from('users').where('email', email).first()
+
+        if (existingUser) {
+          // Mettre à jour les informations de l'utilisateur existant
+          await db.from('users').where('email', email).update({ name, lastName })
+
+          // Vérifier si l'entrée existe dans educational_tutors
+          const existingTutor = await db
+            .from('educational_tutors')
+            .where('id', existingUser.idUser)
+            .first()
+
+          if (!existingTutor) {
+            // Créer une nouvelle entrée dans educational_tutors si elle n'existe pas
+            await db.table('educational_tutors').insert({
+              id: existingUser.idUser,
+            })
+          }
+
+          results.push({
+            email,
+            status: 'updated',
+            userId: existingUser.idUser,
+          })
+        } else {
+          // Créer un nouvel utilisateur
+          const password = Math.random().toString(36).slice(-8) // Générer un mot de passe aléatoire
+          const hashedPassword = await bcrypt.hash(password, 10)
+
+          const [userId] = await db
+            .table('users')
+            .insert({
+              email,
+              name,
+              lastName,
+              password: hashedPassword,
+              role: 'educational_tutors',
+            })
+            .returning('idUser')
+
+          // Créer l'entrée dans la table educational_tutors
+          await db.table('educational_tutors').insert({
+            id: userId,
+          })
+
+          // Vous devriez envoyer le mot de passe par email à l'utilisateur ici
+          console.log(`Mot de passe généré pour ${email}: ${password}`)
+
+          results.push({ email, status: 'created', userId })
+        }
+      }
+
+      return response.status(200).json({
+        message: 'Educational tutors processed successfully',
+        results: results,
+      })
+    } catch (error) {
+      console.error(error)
+      return response.status(500).json({
+        error: 'An error occurred while processing educational tutors',
+      })
     }
   }
 }

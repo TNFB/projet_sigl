@@ -34,17 +34,19 @@ const GestionEntreprises = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const url = '/company/createCompany';
-    
-    for (const row of rows) {
-      if (row.name) {
-        try {
-          const response = await postRequest(url, JSON.stringify({ name: row.name }));
-          console.log('Success:', response);
-        } catch (error) {
-          console.error('Error:', error);
-        }
-      }
-    }
+    const formattedData = {
+      data: rows.map(row => ({
+        name: row.name,
+      }))
+    };
+   postRequest(url, JSON.stringify(formattedData))
+      .then(response => {
+      console.log('Success:', response);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+    console.log(formattedData);
   };
 
   if (isLoading) {

@@ -85,8 +85,6 @@ function Documents() {
     }
   };
 
-  
-
   const fields: Field[] = [
     {
         type: 'select',

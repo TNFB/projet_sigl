@@ -265,4 +265,56 @@ export default class ApprenticeMastersController {
         .json({ message: 'An error occurred while fetching the training diary' })
     }
   }
+
+  async getApprenticesByMasterEmail({ request, response }: HttpContext) {
+    try {
+      const { email } = request.input('data')
+
+      if (!email) {
+        return response.status(400).json({ error: 'Email is required' })
+      }
+
+      // Trouver le tuteur pédagogique par son email
+      const master = await db
+        .from('users')
+        .where('email', email)
+        .where('role', 'apprentice_masters')
+        .first()
+
+      if (!master) {
+        return response.status(404).json({ error: 'Apprentice Masters not found' })
+      }
+
+      // Trouver les apprentis associés à ce tuteur
+      const apprentices = await db
+        .from('apprentices')
+        .join('users', 'apprentices.id', 'users.idUser')
+        .where('apprentices.idApprenticeMasters', master.idUser)
+        .select('users.email', 'users.name', 'users.lastName')
+
+      // Formater les données des apprentis
+      const formattedApprentices = apprentices.map((apprentice) => ({
+        email: apprentice.email,
+        nom: apprentice.name,
+        prenom: apprentice.lastName,
+      }))
+
+      // Créer l'objet JSON de réponse
+      const responseData = {
+        tuteur: {
+          email: master.email,
+          nom: master.name,
+          prenom: master.lastName,
+        },
+        apprentis: formattedApprentices,
+      }
+
+      return response.status(200).json(responseData)
+    } catch (error) {
+      console.error(error)
+      return response.status(500).json({
+        error: 'An error occurred while retrieving apprentices',
+      })
+    }
+  }
 }

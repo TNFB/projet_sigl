@@ -55,6 +55,10 @@ Route.group(() => {
     ApprenticeMastersController,
     'getApprenticeInfoByEmail',
   ]).as('getApprenticeInfoByEmail')
+  Route.post('/getApprenticesByMasterEmail', [
+    ApprenticeMastersController,
+    'getApprenticesByMasterEmail',
+  ]).as('getApprenticesByMasterEmail')
 }).prefix('/apprenticeMaster')
 
 Route.group(() => {

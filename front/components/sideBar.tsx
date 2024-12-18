@@ -8,11 +8,17 @@ import { SIDEBAR_ITEMS, SIDEBAR_ADMIN_ITEMS, SIDEBAR_CA_ITEMS } from '@/utils/co
 import { ICONS } from '@/utils/iconMapping'
 import { postRequest } from '@/api/api';
 
+interface Student {
+  prenom: string
+  nom: string
+  email: string
+}
+
 const SideBar = () => {
   const [activeItem, setActiveItem] = useState("Accueil")
-  const [userType, setUserType] = useState<'apprentices' | 'admins' | 'apprenticeship_coordinators'>('apprentices')
+  const [userType, setUserType] = useState<'apprentices' | 'admins' | 'apprenticeship_coordinators' | 'apprentice_masters' | 'educational_tutors'>('apprentices')
   const [email, setEmail] = useState<string | null>(null)
-  const [students, setStudents] = useState([])
+  const [students, setStudents] = useState<Student[]>([])
 
   const fetchStudents = React.useCallback(async (url: string) => {
     const formattedData = {
@@ -33,7 +39,7 @@ const SideBar = () => {
 
 
   useEffect(() => {
-    const userRole = localStorage.getItem('role') as 'apprentices' | 'admins' | 'apprenticeship_coordinators' | null
+    const userRole = localStorage.getItem('role') as 'apprentices' | 'admins' | 'apprenticeship_coordinators' | 'apprentice_masters' | 'educational_tutors' | null
     const storedEmail = localStorage.getItem('email')
     setEmail(storedEmail)
     setUserType(userRole ?? 'apprentices')
@@ -62,7 +68,7 @@ const SideBar = () => {
     }
   }, [userType, email, fetchStudents])
 
-  const transformStudentsToSidebarItems = (students) => {
+  const transformStudentsToSidebarItems = (students: Student[]) => {
     const items = students.map((student) => ({
       title: `${student.prenom} ${student.nom}`,
       url: '/',

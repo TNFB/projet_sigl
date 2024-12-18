@@ -60,7 +60,7 @@ const SideBar = () => {
           break
       }
     }
-  }, [userType, email])
+  }, [userType, email, fetchStudents])
 
   const transformStudentsToSidebarItems = (students) => {
     const items = students.map((student) => ({

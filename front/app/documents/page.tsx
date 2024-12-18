@@ -1,79 +1,152 @@
 'use client'
-import React, { useState } from 'react'
-import Home from '@/components/Home'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import React, { useState } from 'react';
+import BaseForm from '@/components/BaseForm';
+import Home from '@/components/Home';
+import { postRequestDropDocument } from '@/api/api';
 
-export default function Documents() {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [documentType, setDocumentType] = useState('')
+interface FormData {
+  document: string;
+  file: File | null;
+}
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      setSelectedFile(event.target.files[0])
+interface SelectField {
+    type: 'select';
+    label: string;
+    name: string;
+    value: string;
+    options: { value: string; label: string }[];
+    onChange: (value: string) => void;
+  }
+
+type Field = SelectField;
+
+function Documents() {
+  const [formData, setFormData] = useState<FormData>({
+    document: '',
+    file: null,
+  });
+
+  const handleDocumentChange = (value: string) => {
+    setFormData({
+      ...formData,
+      document: value,
+    });
+  };
+
+  /*const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files ? e.target.files[0] : null;
+    setFormData({
+      ...formData,
+      file,
+    });
+  };*/
+
+  const [documents] = useState([
+    { value: 'doc_1', label: 'Fiche de synthèse S5' },
+    { value: 'doc_2', label: 'Fiche de synthèse S6' },
+    { value: 'doc_3', label: 'Fiche de synthèse S7' },
+    { value: 'doc_4', label: 'Fiche de synthèse S8' },
+    { value: 'doc_5', label: 'Fiche de synthèse S9' },
+    { value: 'doc_6', label: 'Fiche de synthèse S10' },
+    { value: 'doc_7', label: 'Rapport de conduite de projet S6' },
+    { value: 'doc_8', label: 'Rapport de conduite de projet S7' },
+    { value: 'doc_9', label: 'Rapport avant PING' },
+    { value: 'doc_10', label: 'Rapport avancement PING' },
+    { value: 'doc_11', label: 'Rapport final PING' },
+  ]);
+
+  const [file, setFile] = useState<File | null>(null);
+  const [documentName, setDocumentName] = useState('');
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+  
+    if (!file) {
+      console.error('No file selected');
+      setError('Veuillez sélectionner un fichier à télécharger.');
+      return;
     }
-  }
 
-  const handleTypeChange = (value: string) => {
-    setDocumentType(value)
-  }
+    setError(null);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    // Logic to handle file upload and form submission
-    console.log('File:', selectedFile)
-    console.log('Document Type:', documentType)
-  }
+    // Construire un FormData avec le fichier et les métadonnées
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('email', email);
+    formData.append('documentName', documentName);
+  
+    try {
+      const response = await postRequestDropDocument('document/dropDocument', formData);
+      console.log('Document uploaded successfully:', response);
+    } catch (error) {
+      console.error('Error uploading document:', error);
+    }
+  };
+
+  const fields: Field[] = [
+    {
+        type: 'select',
+        label: 'type document :',
+        name: 'document',
+        value: formData.document,
+        options: documents,
+        onChange: handleDocumentChange,
+      },
+  ];
+
+  const fieldsOrder = ['document'];
 
   return (
     <Home>
-      <div className="p-4 border-2 w-fit" >
-        <h2 className="text-xl font-bold mb-4">Déposer un document</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <div className="flex-1">
-              <Label className="block text-sm font-medium text-gray-700">
-                Choisir un fichier
-              </Label>
-              <Input
-                type="file"
-                onChange={handleFileChange}
-                className="mt-1 block w-56 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              />
-            </div>
-            <div className="flex-1">
-              <Label className="block text-sm font-medium text-gray-700">
-                Type de document
-              </Label>
-              <Select onValueChange={handleTypeChange}>
-                <SelectTrigger className="mt-1 block w-24 text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                  <SelectValue placeholder="Type" />
-                </SelectTrigger>
-                <SelectContent>
-                <SelectItem value="s5">Fiche de synthèse S5</SelectItem>
-                  <SelectItem value="s6">Fiche de synthèse S6</SelectItem>
-                  <SelectItem value="s7">Fiche de synthèse S7</SelectItem>
-                  <SelectItem value="s8">Fiche de synthèse S8</SelectItem>
-                  <SelectItem value="s9">Fiche de synthèse S9</SelectItem>
-                  <SelectItem value="s10">Fiche de synthèse S10</SelectItem>
-                  <SelectItem value="RCS6">Rapport de conduite de projet S6</SelectItem>
-                  <SelectItem value="RCS7">Rapport de conduite de projet S7</SelectItem>
-                  <SelectItem value="RAP8">Rapport avant PING</SelectItem>
-                  <SelectItem value="RAP9">Rapport avancement PING</SelectItem>
-                  <SelectItem value="RFP10">Rapport final PING</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div>
-            <Button type="submit" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              Envoyer
-            </Button>
-          </div>
-        </form>
+      <BaseForm title="Ajout d'un document" submitLabel="Ajouter" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="h-fit w-fit">
+        <div className="mb-4">
+          <label htmlFor="file" className="block text-sm font-medium text-gray-700">
+            Charger un fichier
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+          </label>
+          <input
+            type="file"
+            id="file"
+            name="file"
+            accept=".pdf,.docx,.xlsx,.xls,.odt,.txt,.mdj" // Extensions autorisées
+            onChange={(e) => {
+              const selectedFile = e.target.files?.[0];
+              if (selectedFile) {
+                setFile(selectedFile);
+              }
+            }}
+            className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div className="mb-4">
+        <label htmlFor="documentName" className="block text-sm font-medium text-gray-700">
+          Nom du document
+        </label>
+        <input
+          type="text"
+          id="documentName"
+          name="documentName"
+          onChange={(e) => setDocumentName(e.target.value)}
+          className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
       </div>
+      <div className="mb-4">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          Email
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          onChange={(e) => setEmail(e.target.value)}
+          className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
+      </BaseForm>
     </Home>
   );
 }
+
+export default Documents;

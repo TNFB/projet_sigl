@@ -4,16 +4,17 @@ import { Home, CheckSquare, FileText, BookOpen, Clipboard } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader } from "@/components/ui/sidebar"
 import Image from 'next/image'
 import Link from 'next/link'
-import { SIDEBAR_ITEMS, SIDEBAR_ADMIN_ITEMS } from '@/utils/constants'
+import { SIDEBAR_ITEMS, SIDEBAR_ADMIN_ITEMS, SIDEBAR_CA_ITEMS } from '@/utils/constants'
 import { ICONS } from '@/utils/iconMapping'
 
 const SideBar = () => {
   const [activeItem, setActiveItem] = useState("Accueil")
-  const [userType, setUserType] = useState<'user' | 'admin'>('user')
+  const [userType, setUserType] = useState<'apprentices' | 'admins' | 'apprenticeship_coordinators'>('apprentices')
 
   useEffect(() => {
-    const userRole = localStorage.getItem('userRole') as 'user' | 'admin' | null
-    setUserType(userRole ?? 'user')
+    const userRole = localStorage.getItem('role') as 'apprentices' | 'admins' | 'apprenticeship_coordinators' | null
+    setUserType(userRole ?? 'apprentices')
+    //setUserType('admin')
     let path = window.location.pathname
     if (path.endsWith('/')) {
       path = path.slice(0, -1)
@@ -24,7 +25,20 @@ const SideBar = () => {
     }
   }, [])
 
-  const items = userType === 'admin' ? SIDEBAR_ADMIN_ITEMS : SIDEBAR_ITEMS
+  const getSidebarItems = (userType: string) => {
+    switch (userType) {
+      case 'admins':
+        return SIDEBAR_ADMIN_ITEMS
+      case 'apprenticeship_coordinators':
+        return SIDEBAR_CA_ITEMS
+      case 'apprentices':
+        return SIDEBAR_ITEMS
+      default:
+        return SIDEBAR_ITEMS
+    }
+  }
+
+  const items = getSidebarItems(userType)
 
   return (
     <Sidebar className="bg-[#fafafa] ml-2 mt-2 rounded-lg shadow-lg">

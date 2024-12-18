@@ -44,7 +44,40 @@ export const SIDEBAR_ADMIN_ITEMS = [
   },
   {
     title: "Gestion des livrables",
-    url: "/gestionLivrables",
+    url: "/blocNote",
     icon: "BookOpen",
+  },
+]
+
+export const SIDEBAR_CA_ITEMS = [
+  {
+    title: "Accueil",
+    url: "/",
+    icon: "Home",
+  },
+  {
+    title: "Maîtres d'apprentissage",
+    url: "/gestionMaitresApp",
+    icon: "UsersRound",
+  },
+  {
+    title: "Tuteurs pédagogiques",
+    url: "/gestionTuteurs",
+    icon: "UsersRound",
+  },
+  {
+    title: "Intervenants extérieurs",
+    url: "/gestionIntervenants",
+    icon: "UsersRound",
+  },
+  {
+    title: "Entreprises partenaires",
+    url: "/gestionEntreprises",
+    icon: "UsersRound",
+  },
+  {
+    title: "Equipes tutorales",
+    url: "/gestionEquipes",
+    icon: "UsersRound",
   },
 ]

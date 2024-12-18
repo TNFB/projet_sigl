@@ -108,9 +108,9 @@ Route.group(() => {
 }).prefix('/company')
 
 Route.group(() => {
-  Route.post('createOrUpdateProfessional', [
+  Route.post('createOrUpdateProfessionals', [
     ProfessionalsController,
-    'createOrUpdateProfessional',
+    'createOrUpdateProfessionals',
   ]).as('createOrUpdateProfessional')
 }).prefix('/professional')
 

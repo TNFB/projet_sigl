@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Home from '@/components/Home';
 import BaseMultiAjout from '@/components/BaseMultiAjout'
+import { postRequest } from '@/api/api';
 
 const GestionEntreprises = () => {
   const router = useRouter();
@@ -17,7 +18,7 @@ const GestionEntreprises = () => {
     }
   }, [router]);
 
-  const [rows, setRows] = useState([{ nom: '', prenom: '', email: '' }]);
+  const [rows, setRows] = useState([{ name: '' }]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, rowIndex: number, fieldName: string) => {
     const newRows = rows.map((row, i) => 
@@ -27,13 +28,23 @@ const GestionEntreprises = () => {
   };
 
   const addRow = () => {
-    setRows([...rows, { nom: '', prenom: '', email: '' }]);
+    setRows([...rows, { name: '' }]);
   };
 
-  //TODO
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(rows);
+    const url = '/company/createCompany';
+    
+    for (const row of rows) {
+      if (row.name) {
+        try {
+          const response = await postRequest(url, JSON.stringify({ name: row.name }));
+          console.log('Success:', response);
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+    }
   };
 
   if (isLoading) {

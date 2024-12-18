@@ -6,31 +6,36 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { SIDEBAR_ITEMS, SIDEBAR_ADMIN_ITEMS, SIDEBAR_CA_ITEMS } from '@/utils/constants'
 import { ICONS } from '@/utils/iconMapping'
+import { postRequest } from '@/api/api';
 
 const SideBar = () => {
   const [activeItem, setActiveItem] = useState("Accueil")
   const [userType, setUserType] = useState<'apprentices' | 'admins' | 'apprenticeship_coordinators'>('apprentices')
-  const email = localStorage.getItem('email')
+  const [email, setEmail] = useState<string | null>(null)
   const [students, setStudents] = useState([])
 
   const fetchStudents = async (url: string) => {
     const formattedData = {
-      data: email
-    };
-    postRequest(url, JSON.stringify(formattedData,email))
-        .then(response => {
-        const apprentices = response.data.apprentis
+      data: {
+        email: email
+      }
+    }
+    postRequest(url, JSON.stringify(formattedData))
+      .then(response => {
+        const apprentices = response.apprentis
         setStudents(apprentices)
         console.log('Success:', response)
-
       })
       .catch(error => {
         console.error('Error:', error)
-      });
+      })
   }
+
 
   useEffect(() => {
     const userRole = localStorage.getItem('role') as 'apprentices' | 'admins' | 'apprenticeship_coordinators' | null
+    const storedEmail = localStorage.getItem('email')
+    setEmail(storedEmail)
     setUserType(userRole ?? 'apprentices')
     //setUserType('admin')
     let path = window.location.pathname
@@ -41,6 +46,21 @@ const SideBar = () => {
       setActiveItem(path.charAt(0).toUpperCase() + path.slice(1))
     }
   }, [])
+
+  useEffect(() => {
+    if (email) {
+      switch (userType) {
+        case 'apprentice_masters':
+          fetchStudents('apprenticeMaster/getApprenticesByMasterEmail')
+          break
+        case 'educational_tutors':
+          fetchStudents('educationalTutor/getApprenticesByTutorEmail')
+          break
+        default:
+          break
+      }
+    }
+  }, [userType, email])
 
   const transformStudentsToSidebarItems = (students) => {
     const items = students.map((student) => ({
@@ -67,10 +87,8 @@ const SideBar = () => {
       case 'apprentices':
         return SIDEBAR_ITEMS
       case 'apprentice_masters':
-        fetchStudents('apprenticeMaster/getApprenticesByMasterEmail')
         return transformStudentsToSidebarItems(students)
       case 'educational_tutors':
-        fetchStudents('educationalTutor/getApprenticesByTutorEmail')
         return transformStudentsToSidebarItems(students)
       default:
         return SIDEBAR_ITEMS

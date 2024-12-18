@@ -289,7 +289,7 @@ export default class ApprenticeMastersController {
       const apprentices = await db
         .from('apprentices')
         .join('users', 'apprentices.id', 'users.idUser')
-        .where('apprentices.idApprenticeMasters', master.idUser)
+        .where('apprentices.idApprenticeMaster', master.idUser)
         .select('users.email', 'users.name', 'users.lastName')
 
       // Formater les données des apprentis

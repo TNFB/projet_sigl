@@ -57,8 +57,10 @@ function AddDoc() {
     try {
       const response = await postRequestImportUser(url, formDataToSend);
       console.log('Success:', response);
+      alert('Document ajouté avec succès');
     } catch (error) {
       console.error('Error:', error);
+      alert('Erreur lors de l\'ajout du document');
     }
   };
 

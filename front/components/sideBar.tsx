@@ -10,6 +10,24 @@ import { ICONS } from '@/utils/iconMapping'
 const SideBar = () => {
   const [activeItem, setActiveItem] = useState("Accueil")
   const [userType, setUserType] = useState<'apprentices' | 'admins' | 'apprenticeship_coordinators'>('apprentices')
+  const email = localStorage.getItem('email')
+  const [students, setStudents] = useState([])
+
+  const fetchStudents = async (url: string) => {
+    const formattedData = {
+      data: email
+    };
+    postRequest(url, JSON.stringify(formattedData,email))
+        .then(response => {
+        const apprentices = response.data.apprentis
+        setStudents(apprentices)
+        console.log('Success:', response)
+
+      })
+      .catch(error => {
+        console.error('Error:', error)
+      });
+  }
 
   useEffect(() => {
     const userRole = localStorage.getItem('role') as 'apprentices' | 'admins' | 'apprenticeship_coordinators' | null
@@ -19,11 +37,26 @@ const SideBar = () => {
     if (path.endsWith('/')) {
       path = path.slice(0, -1)
     }
-    console.log(path)
     if (path) {
       setActiveItem(path.charAt(0).toUpperCase() + path.slice(1))
     }
   }, [])
+
+  const transformStudentsToSidebarItems = (students) => {
+    const items = students.map((student) => ({
+      title: `${student.prenom} ${student.nom}`,
+      url: '/',
+      icon: 'UsersRound',
+    }))
+    return [
+      {
+        title: "Accueil",
+        url: "/",
+        icon: "Home",
+      },
+      ...items
+    ]
+  }
 
   const getSidebarItems = (userType: string) => {
     switch (userType) {
@@ -33,6 +66,12 @@ const SideBar = () => {
         return SIDEBAR_CA_ITEMS
       case 'apprentices':
         return SIDEBAR_ITEMS
+      case 'apprentice_masters':
+        fetchStudents('apprenticeMaster/getApprenticesByMasterEmail')
+        return transformStudentsToSidebarItems(students)
+      case 'educational_tutors':
+        fetchStudents('educationalTutor/getApprenticesByTutorEmail')
+        return transformStudentsToSidebarItems(students)
       default:
         return SIDEBAR_ITEMS
     }

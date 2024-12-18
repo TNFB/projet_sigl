@@ -44,11 +44,12 @@ const GestionEquipes = () => {
     postRequest(url, JSON.stringify(formattedData))
       .then(response => {
        console.log('Success:', response);
+        alert('Équipe(s) ajoutée(s) avec succès');
     })
     .catch(error => {
       console.error('Error:', error);
+      alert('Erreur lors de l\'ajout de l\'équipe');
     });
-    console.log(formattedData);
   };
 
   if (isLoading) {
@@ -67,8 +68,8 @@ const GestionEquipes = () => {
     <Home>
         <div className="flex space-x-4 p-4 w-fit">
           <BaseMultiAjout
-            title="Ajout de tuteurs pédagogiques"
-            typeAjout="Equipe tutorale"
+            title="Ajout de tuteur(s) pédagogique(s)"
+            typeAjout="Équipe tutorale n°"
             submitLabel="Ajouter"
             rows={rows}
             onChange={handleChange}

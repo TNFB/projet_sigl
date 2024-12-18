@@ -46,8 +46,10 @@ const NewLivrable = () => {
     try {
       const response = await postRequest('deposit/addDeposit', JSON.stringify(formData));
       console.log('deposit created successfully:', response);
+      alert('Livrable ajouté avec succès');
     } catch (error) {
       console.error('Error create deposit:', error);
+      alert('Erreur lors de l\'ajout du livrable');
     }
   };
 

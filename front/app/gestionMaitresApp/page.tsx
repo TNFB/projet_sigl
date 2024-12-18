@@ -45,11 +45,12 @@ const GestionMaitresApp = () => {
     postRequest(url, JSON.stringify(formattedData))
       .then(response => {
        console.log('Success:', response);
+        alert('Maître(s) d\'apprentissage ajouté(s) avec succès');
     })
     .catch(error => {
       console.error('Error:', error);
+      alert('Erreur lors de l\'ajout du maître d\'apprentissage');
     });
-    console.log(formattedData);
   };
 
   if (isLoading) {
@@ -68,8 +69,8 @@ const GestionMaitresApp = () => {
     <Home>
         <div className="flex space-x-4 p-4 w-fit">
           <BaseMultiAjout
-            title="Ajout de maitres d'apprentissage"
-            typeAjout="Maitre d'apprentissage"
+            title="Ajout de(s) maitre(s) d'apprentissage"
+            typeAjout="Maître d'apprentissage n°"
             submitLabel="Ajouter"
             rows={rows}
             onChange={handleChange}

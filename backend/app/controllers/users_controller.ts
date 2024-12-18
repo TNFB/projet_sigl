@@ -243,6 +243,7 @@ export default class UsersController {
           status: 'success',
           password: true,
           role: userDb.role,
+          email: userDb.email,
           cookieToken: token,
         })
       } else {

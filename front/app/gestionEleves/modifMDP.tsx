@@ -77,9 +77,11 @@ function ModifMDP() {
     postRequest('admin/overritePassword', JSON.stringify({ email: formData.email, newPassword: hashedPassword }))
       .then(response => {
        console.log('Success:', response);
+        alert('Mot de passe modifié avec succès');
     })
     .catch(error => {
       console.error('Error:', error);
+      alert('Erreur lors de la modification du mot de passe');
     });
   };
 

@@ -42,11 +42,12 @@ const GestionEntreprises = () => {
     postRequest(url, JSON.stringify(formattedData))
         .then(response => {
         console.log('Success:', response);
+        alert('Entreprise(s) ajoutée(s) avec succès');
       })
       .catch(error => {
         console.error('Error:', error);
+        alert('Erreur lors de l\'ajout de l\'entreprise');
       });
-      console.log(formattedData);
   };
 
   if (isLoading) {
@@ -65,8 +66,8 @@ const GestionEntreprises = () => {
     <Home>
         <div className="flex space-x-4 p-4 w-fit">
           <BaseMultiAjout
-            title="Ajout d'entreprises"
-            typeAjout="Entreprise"
+            title="Ajout d'entreprise(s)"
+            typeAjout="Entreprise n°"
             submitLabel="Ajouter"
             rows={rows}
             onChange={handleChange}

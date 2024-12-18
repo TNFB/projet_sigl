@@ -73,8 +73,10 @@ function AjoutEleve() {
         password: hashedPassword,
       });
       console.log('User created successfully:', response);
+      alert('Utilisateur ajouté avec succès');
     } catch (error) {
       console.error('Error creating user:', error);
+      alert('Erreur lors de l\'ajout de l\'utilisateur');
     }
   };
   

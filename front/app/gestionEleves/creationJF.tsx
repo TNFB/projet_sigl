@@ -67,8 +67,10 @@ function CreationJF() {
     try {
       const response = await postRequestImportUser(url, formData);
       console.log('Success:', response);
+      alert('Fichier importé avec succès');
     } catch (error) {
       console.error('Error:', error);
+      alert('Erreur lors de l\'import du fichier');
     }
   };
 
@@ -86,10 +88,10 @@ function CreationJF() {
   const fieldsOrder = ['promotion'];
 
   return (
-    <BaseForm title="Création des journeaux de formations" submitLabel="Créer" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="h-fit">
+    <BaseForm title="Création des journaux de formations" submitLabel="Créer" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="h-fit">
       <div className="mb-4">
         <label htmlFor="file" className="block text-sm font-medium text-gray-700">
-          Charger un fichier
+          Charger le fichier
         </label>
         <input
           type="file"

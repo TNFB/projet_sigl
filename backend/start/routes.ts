@@ -69,6 +69,10 @@ Route.group(() => {
     EducationalTutorsController,
     'getTrainingDiaryByEmail',
   ]).as('getTrainingDiaryByEmailEducationalTutor')
+  Route.post('createOrUpdateEducationalTutor', [
+    EducationalTutorsController,
+    'createOrUpdateEducationalTutor',
+  ]).as('createOrUpdateEducationalTutor')
 }).prefix('/educationalTutor')
 
 Route.group(() => {

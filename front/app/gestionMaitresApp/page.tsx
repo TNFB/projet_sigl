@@ -5,7 +5,7 @@ import BaseMultiAjout from '@/components/BaseMultiAjout'
 import { postRequest } from '@/api/api'
 
 const GestionMaitresApp = () => {
-  const [rows, setRows] = useState([{ nom: '', prenom: '', email: '' }]);
+  const [rows, setRows] = useState([{ nom: '', prenom: '', email: '', entreprise: '' }]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, rowIndex: number, fieldName: string) => {
     const newRows = rows.map((row, i) => 
@@ -15,20 +15,28 @@ const GestionMaitresApp = () => {
   };
 
   const addRow = () => {
-    setRows([...rows, { nom: '', prenom: '', email: '' }]);
+    setRows([...rows, { nom: '', prenom: '', email: '', entreprise: '' }]);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const url = '/apprenticeMaster/addApprenticesApprenticeMaster';
-    postRequest(url, JSON.stringify(rows))
+    const url = 'apprenticeMaster/createOrUpdateApprenticeMaster';
+    const formattedData = {
+      data: rows.map(row => ({
+        name: row.prenom,
+        lastName: row.nom,
+        email: row.email,
+        companyName: row.entreprise
+      }))
+    };
+    postRequest(url, JSON.stringify(formattedData))
       .then(response => {
        console.log('Success:', response);
     })
     .catch(error => {
       console.error('Error:', error);
     });
-    console.log(rows);
+    console.log(formattedData);
   };
 
   return (

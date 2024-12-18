@@ -88,90 +88,100 @@ export default class ApprenticeMastersController {
    */
   async createOrUpdateApprenticeMaster({ request, response }: HttpContext) {
     try {
-      const { name, lastName, email, companyName } = request.only([
-        'name',
-        'lastName',
-        'email',
-        'companyName',
-      ])
+      const peopleData = request.input('data')
 
-      // Vérifier si l'entreprise existe, sinon la créer
-      let idCompagny = 0
-      let company = await db.from('compagies').where('name', companyName).first()
-      if (!company) {
-        const newIdCompany = await db
-          .table('compagies')
-          .insert({ name: companyName })
-          .returning('idCompagny')
-        idCompagny = newIdCompany[0]
-      } else {
-        idCompagny = company.idCompagny
+      if (!Array.isArray(peopleData)) {
+        return response.status(400).json({ error: 'Input should be an array of people' })
       }
-      console.log(`create New Compagny: ${idCompagny}`)
 
-      // Vérifier si l'utilisateur existe déjà
-      const existingUser = await db.from('users').where('email', email).first()
+      const results = []
 
-      if (existingUser) {
-        // Mettre à jour les informations de l'utilisateur existant
-        await db.from('users').where('email', email).update({ name, lastName })
+      for (const person of peopleData) {
+        const { name, lastName, email, companyName } = person
 
-        // Vérifier si l'entrée existe dans apprentice_masters
-        const existingMaster = await db
-          .from('apprentice_masters')
-          .where('id', existingUser.idUser)
-          .first()
-
-        if (existingMaster) {
-          // Mettre à jour l'entrée dans apprentice_masters si nécessaire
-          await db
-            .from('apprentice_masters')
-            .where('id', existingUser.idUser)
-            .update({ idCompagny: idCompagny })
+        // Vérifier si l'entreprise existe, sinon la créer
+        let idCompagny = 0
+        let company = await db.from('compagies').where('name', companyName).first()
+        if (!company) {
+          const newIdCompany = await db
+            .table('compagies')
+            .insert({ name: companyName })
+            .returning('idCompagny')
+          idCompagny = newIdCompany[0]
         } else {
-          // Créer une nouvelle entrée dans apprentice_masters si elle n'existe pas
-          await db.table('apprentice_masters').insert({
-            id: existingUser.idUser,
-            idCompagny: idCompagny,
-          })
+          idCompagny = company.idCompagny
         }
 
-        return response.status(200).json({ message: 'User updated successfully' })
-      } else {
-        // Créer un nouvel utilisateur
-        const password = Math.random().toString(36).slice(-8) // Générer un mot de passe aléatoire
-        const hashedPassword = await bcrypt.hash(password, 10)
+        // Vérifier si l'utilisateur existe déjà
+        const existingUser = await db.from('users').where('email', email).first()
 
-        const [userId] = await db
-          .table('users')
-          .insert({
+        if (existingUser) {
+          // Mettre à jour les informations de l'utilisateur existant
+          await db.from('users').where('email', email).update({ name, lastName })
+
+          // Vérifier si l'entrée existe dans apprentice_masters
+          const existingMaster = await db
+            .from('apprentice_masters')
+            .where('id', existingUser.idUser)
+            .first()
+
+          if (existingMaster) {
+            // Mettre à jour l'entrée dans apprentice_masters si nécessaire
+            await db
+              .from('apprentice_masters')
+              .where('id', existingUser.idUser)
+              .update({ idCompagny: idCompagny })
+          } else {
+            // Créer une nouvelle entrée dans apprentice_masters si elle n'existe pas
+            await db.table('apprentice_masters').insert({
+              id: existingUser.idUser,
+              idCompagny: idCompagny,
+            })
+          }
+
+          results.push({
             email,
-            name,
-            lastName,
-            password: hashedPassword,
-            role: 'apprentice_masters',
+            status: 'updated',
+            userId: existingUser.idUser,
+            compagnyId: idCompagny,
           })
-          .returning('idUser')
+        } else {
+          // Créer un nouvel utilisateur
+          const password = Math.random().toString(36).slice(-8) // Générer un mot de passe aléatoire
+          const hashedPassword = await bcrypt.hash(password, 10)
 
-        // Créer l'entrée dans la table apprentice_masters
-        await db.table('apprentice_masters').insert({
-          id: userId,
-          idCompagny: idCompagny,
-        })
+          const [userId] = await db
+            .table('users')
+            .insert({
+              email,
+              name,
+              lastName,
+              password: hashedPassword,
+              role: 'apprentice_masters',
+            })
+            .returning('idUser')
 
-        // Vous devriez envoyer le mot de passe par email à l'utilisateur ici
-        console.log(`Mot de passe généré pour ${email}: ${password}`)
+          // Créer l'entrée dans la table apprentice_masters
+          await db.table('apprentice_masters').insert({
+            id: userId,
+            idCompagny: idCompagny,
+          })
 
-        return response.status(201).json({
-          message: 'apprentice_masters created successfully',
-          userId,
-          compagnyId: idCompagny,
-        })
+          // Vous devriez envoyer le mot de passe par email à l'utilisateur ici
+          console.log(`Mot de passe généré pour ${email}: ${password}`)
+
+          results.push({ email, status: 'created', userId, compagnyId: idCompagny })
+        }
       }
+
+      return response.status(200).json({
+        message: 'Apprentice masters processed successfully',
+        results: results,
+      })
     } catch (error) {
       console.error(error)
       return response.status(500).json({
-        error: 'An error occurred while creating or updating the user: apprentice_masters',
+        error: 'An error occurred while processing apprentice masters',
       })
     }
   }

@@ -36,35 +36,51 @@ export default class CompaniesController {
    */
   public async createCompany({ request, response }: HttpContext) {
     try {
-      const { name } = request.only(['name'])
+      const { data } = request.only(['data'])
 
-      // Check if name existe
-      if (!name) {
-        return response.status(400).json({ message: 'Company name is required' })
+      if (!Array.isArray(data) || data.length === 0) {
+        return response
+          .status(400)
+          .json({ message: 'Invalid input: data should be a non-empty array of company names' })
       }
 
-      // Vérifier si une compagnie avec ce nom existe déjà
-      const existingCompany = await db.from('compagies').where('name', name).first()
-      if (existingCompany) {
-        return response.status(409).json({ message: 'A company with this name already exists' })
+      const results = []
+
+      for (const companyData of data) {
+        const { name } = companyData
+
+        if (!name) {
+          results.push({ name, status: 'error', message: 'Company name is required' })
+          continue
+        }
+
+        // Vérifier si une compagnie avec ce nom existe déjà
+        const existingCompany = await db.from('compagies').where('name', name).first()
+        if (existingCompany) {
+          results.push({
+            name,
+            status: 'error',
+            message: 'A company with this name already exists',
+          })
+          continue
+        }
+
+        // Add new Company
+        const [idCompagny] = await db.table('compagies').insert({ name }).returning('idCompagny')
+
+        // Create response
+        const company = await db.from('compagies').where('idCompagny', idCompagny).first()
+
+        results.push({ ...company, status: 'success', message: 'Company created successfully' })
       }
 
-      // Add new Compagny
-      const [idCompagny] = await db.table('compagies').insert({ name }).returning('idCompagny')
-
-      // Create response
-      const company = await db.from('compagies').where('idCompagny', idCompagny).first()
-
-      return response.status(201).json({
-        ...company,
-        message: 'Company created successfully',
+      return response.status(200).json({
+        results,
+        message: 'Companies processing completed',
       })
     } catch (error) {
       console.error(error)
-      if (error.code === 'ER_DUP_ENTRY') {
-        return response.status(409).json({ message: 'A company with this name already exists' })
-      }
-      return response.status(500).json({ message: 'An error occurred while creating the company' })
+      return response.status(500).json({ message: 'An error occurred while processing companies' })
     }
   }
 

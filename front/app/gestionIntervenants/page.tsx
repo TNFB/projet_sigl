@@ -68,8 +68,8 @@ const GestionIntervenants = () => {
     <Home>
         <div className="flex space-x-4 p-4 w-fit">
           <BaseMultiAjout
-            title="Ajout d'intervenants"
-            typeAjout="Intervenant"
+            title="Ajout d'intervenant(s)"
+            typeAjout="Intervenant n°"
             submitLabel="Ajouter"
             rows={rows}
             onChange={handleChange}

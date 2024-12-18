@@ -67,8 +67,8 @@ const GestionEquipes = () => {
     <Home>
         <div className="flex space-x-4 p-4 w-fit">
           <BaseMultiAjout
-            title="Ajout de tuteurs pédagogiques"
-            typeAjout="Equipe tutorale"
+            title="Ajout de tuteur(s) pédagogique(s)"
+            typeAjout="Équipe tutorale n°"
             submitLabel="Ajouter"
             rows={rows}
             onChange={handleChange}

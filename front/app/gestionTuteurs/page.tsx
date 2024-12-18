@@ -44,11 +44,12 @@ const GestionTuteurs = () => {
     postRequest(url, JSON.stringify(formattedData))
       .then(response => {
        console.log('Success:', response);
+        alert('Tuteur(s) pédagogique(s) ajouté(s) avec succès');
     })
     .catch(error => {
       console.error('Error:', error);
+      alert('Erreur lors de l\'ajout du tuteur pédagogique');
     });
-    console.log(formattedData);
   };
 
   if (isLoading) {

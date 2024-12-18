@@ -67,8 +67,10 @@ function CreationJF() {
     try {
       const response = await postRequestImportUser(url, formData);
       console.log('Success:', response);
+      alert('Fichier importé avec succès');
     } catch (error) {
       console.error('Error:', error);
+      alert('Erreur lors de l\'import du fichier');
     }
   };
 

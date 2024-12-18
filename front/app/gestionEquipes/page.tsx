@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import BaseMultiAjout from '@/components/BaseMultiAjout'
 import { postRequest } from '@/api/api'
 
-const GestionMaitresApp = () => {
-  const [rows, setRows] = useState([{ nom: '', prenom: '', email: '', entreprise: '' }]);
+const GestionEquipes = () => {
+  const [rows, setRows] = useState([{ alternant: '', tuteur: '', maitre_apprentissage: '' }]);
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -28,18 +28,17 @@ const GestionMaitresApp = () => {
   };
 
   const addRow = () => {
-    setRows([...rows, { nom: '', prenom: '', email: '', entreprise: '' }]);
+    setRows([...rows, { alternant: '', tuteur: '', maitre_apprentissage: '' }]);
   };
-
+    
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const url = 'apprenticeMaster/createOrUpdateApprenticeMaster';
+    const url = 'ApprenticeshipCoordinator/linkApprentice';
     const formattedData = {
       data: rows.map(row => ({
-        name: row.prenom,
-        lastName: row.nom,
-        email: row.email,
-        companyName: row.entreprise
+        apprenticeEmail: row.alternant,
+        masterEmail: row.maitre_apprentissage,
+        tutorEmail: row.tuteur
       }))
     };
     postRequest(url, JSON.stringify(formattedData))
@@ -68,8 +67,8 @@ const GestionMaitresApp = () => {
     <Home>
         <div className="flex space-x-4 p-4 w-fit">
           <BaseMultiAjout
-            title="Ajout de(s) maitre(s) d'apprentissage"
-            typeAjout="Maître d'apprentissage n°"
+            title="Ajout de tuteur(s) pédagogique(s)"
+            typeAjout="Équipe tutorale n°"
             submitLabel="Ajouter"
             rows={rows}
             onChange={handleChange}
@@ -82,4 +81,4 @@ const GestionMaitresApp = () => {
   );
 }
 
-export default GestionMaitresApp
+export default GestionEquipes

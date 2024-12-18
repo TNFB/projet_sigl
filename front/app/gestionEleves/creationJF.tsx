@@ -86,10 +86,10 @@ function CreationJF() {
   const fieldsOrder = ['promotion'];
 
   return (
-    <BaseForm title="Création des journeaux de formations" submitLabel="Créer" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="h-fit">
+    <BaseForm title="Création des journaux de formations" submitLabel="Créer" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="h-fit">
       <div className="mb-4">
         <label htmlFor="file" className="block text-sm font-medium text-gray-700">
-          Charger un fichier
+          Charger le fichier
         </label>
         <input
           type="file"

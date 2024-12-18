@@ -75,4 +75,9 @@ export const SIDEBAR_CA_ITEMS = [
     url: "/gestionEntreprises",
     icon: "UsersRound",
   },
+  {
+    title: "Équipes tutorales",
+    url: "/gestionEquipes",
+    icon: "UsersRound",
+  },
 ]

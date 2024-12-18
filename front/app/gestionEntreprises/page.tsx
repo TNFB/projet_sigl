@@ -65,8 +65,8 @@ const GestionEntreprises = () => {
     <Home>
         <div className="flex space-x-4 p-4 w-fit">
           <BaseMultiAjout
-            title="Ajout d'entreprises"
-            typeAjout="Entreprise"
+            title="Ajout d'entreprise(s)"
+            typeAjout="Entreprise n°"
             submitLabel="Ajouter"
             rows={rows}
             onChange={handleChange}

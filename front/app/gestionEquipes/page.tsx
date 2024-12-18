@@ -33,12 +33,12 @@ const GestionEquipes = () => {
     
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const url = 'ApprenticeshipCoordinator/linkApprentice ';
+    const url = 'ApprenticeshipCoordinator/linkApprentice';
     const formattedData = {
       data: rows.map(row => ({
         apprenticeEmail: row.alternant,
-        masterEmail: row.tuteur,
-        tutorEmail: row.maitre_apprentissage
+        masterEmail: row.maitre_apprentissage,
+        tutorEmail: row.tuteur
       }))
     };
     postRequest(url, JSON.stringify(formattedData))

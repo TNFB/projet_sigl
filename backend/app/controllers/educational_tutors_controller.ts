@@ -77,7 +77,7 @@ export default class EducationalTutorsController {
           await trx
             .from('apprentices')
             .where('id', apprenticeId)
-            .update({ idEducationalTutor: tutorId })
+            .update({ id_educational_tutor: tutorId })
         }
       })
 
@@ -120,15 +120,15 @@ export default class EducationalTutorsController {
       // Commencer une transaction
       await db.transaction(async (trx) => {
         // Mettre à jour le rôle de l'utilisateur
-        await trx.from('users').where('idUser', user.idUser).update({ role: 'educational_tutor' })
+        await trx.from('users').where('id_user', user.id_user).update({ role: 'educational_tutor' })
 
         // Insérer l'ID de l'utilisateur dans la table educational_tutors
-        await trx.table('educational_tutors').insert({ id: user.idUser })
+        await trx.table('educational_tutors').insert({ id: user.id_user })
       })
 
       return response.status(200).json({
         message: 'User successfully assigned as educational tutor',
-        userId: user.idUser,
+        userId: user.id_user,
       })
     } catch (error) {
       console.error(error)
@@ -158,9 +158,9 @@ export default class EducationalTutorsController {
       const existingUser = await db.from('users').where('email', email).first()
 
       if (existingUser) {
-        const apprentice = await db.from('apprentices').where('id', existingUser.idUser).first()
+        const apprentice = await db.from('apprentices').where('id', existingUser.id_user).first()
 
-        if (!apprentice || !apprentice.idTrainingDiary) {
+        if (!apprentice || !apprentice.id_training_diary) {
           return response.status(404).json({
             status: 'not found',
             message: 'Training diary not found for this user',
@@ -169,7 +169,7 @@ export default class EducationalTutorsController {
 
         const trainingDiary = await db
           .from('training_diaries')
-          .where('idTrainingDiary', apprentice.idTrainingDiary)
+          .where('id_training_diary', apprentice.id_training_diary)
           .first()
 
         if (!trainingDiary) {
@@ -217,20 +217,20 @@ export default class EducationalTutorsController {
           // Vérifier si l'entrée existe dans educational_tutors
           const existingTutor = await db
             .from('educational_tutors')
-            .where('id', existingUser.idUser)
+            .where('id', existingUser.id_user)
             .first()
 
           if (!existingTutor) {
             // Créer une nouvelle entrée dans educational_tutors si elle n'existe pas
             await db.table('educational_tutors').insert({
-              id: existingUser.idUser,
+              id: existingUser.id_user,
             })
           }
 
           results.push({
             email,
             status: 'updated',
-            userId: existingUser.idUser,
+            userId: existingUser.id_user,
           })
         } else {
           // Créer un nouvel utilisateur
@@ -246,7 +246,7 @@ export default class EducationalTutorsController {
               password: hashedPassword,
               role: 'educational_tutors',
             })
-            .returning('idUser')
+            .returning('id_user')
 
           // Créer l'entrée dans la table educational_tutors
           await db.table('educational_tutors').insert({
@@ -294,8 +294,8 @@ export default class EducationalTutorsController {
       // Trouver les apprentis associés à ce tuteur
       const apprentices = await db
         .from('apprentices')
-        .join('users', 'apprentices.id', 'users.idUser')
-        .where('apprentices.idEducationalTutor', tutor.idUser)
+        .join('users', 'apprentices.id', 'users.id_user')
+        .where('apprentices.id_educational_tutor', tutor.id_user)
         .select('users.email', 'users.name', 'users.lastName')
 
       // Formater les données des apprentis

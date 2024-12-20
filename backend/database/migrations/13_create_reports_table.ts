@@ -5,10 +5,10 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('idReport').primary()
-      table.string('linkReport')
+      table.increments('id_report').primary()
+      table.string('link_report')
       table.dateTime('deadline')
-      table.integer('idJury')
+      table.integer('id_jury')
       table.double('grade')
     })
   }

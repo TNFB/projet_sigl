@@ -20,7 +20,7 @@ const EducationalTutorsController = () =>
 const CompanyRepresentativesController = () =>
   import('../app/controllers/compagny_representatives_controller.js')
 const DepositsController = () => import('../app/controllers/deposits_controller.js')
-const CompaniesController = () => import('../app/controllers/compagies_controller.js')
+const CompaniesController = () => import('../app/controllers/companies_controller.js')
 const ProfessionalsController = () => import('../app/controllers/professionals_controller.js')
 const MonthluNotesController = () => import('../app/controllers/monthly_notes_controller.js')
 const ApprenticeshipCoordinatorsController = () =>

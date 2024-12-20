@@ -233,7 +233,7 @@ export default class UsersController {
       //const isPasswordValid = password
       if (isPasswordValid) {
         // Creation Token
-        const token = `${userDb.idUser}_${Date.now()}`
+        const token = `${userDb.id_user}_${Date.now()}`
         response.cookie('access_token', token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production', // Utilisez true en production avec HTTPS

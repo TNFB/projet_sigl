@@ -29,7 +29,7 @@ export default class CompaniesController {
    *
    * // Exemple de réponse réussie
    * {
-   *   "idCompany": 1,
+   *   "id_company": 1,
    *   "name": "Acme Corporation",
    *   "message": "Company created successfully"
    * }
@@ -55,7 +55,7 @@ export default class CompaniesController {
         }
 
         // Vérifier si une compagnie avec ce nom existe déjà
-        const existingCompany = await db.from('compagies').where('name', name).first()
+        const existingCompany = await db.from('companies').where('name', name).first()
         if (existingCompany) {
           results.push({
             name,
@@ -66,10 +66,10 @@ export default class CompaniesController {
         }
 
         // Add new Company
-        const [idCompagny] = await db.table('compagies').insert({ name }).returning('idCompagny')
+        const [id_company] = await db.table('companies').insert({ name }).returning('id_company')
 
         // Create response
-        const company = await db.from('compagies').where('idCompagny', idCompagny).first()
+        const company = await db.from('companies').where('id_company', id_company).first()
 
         results.push({ ...company, status: 'success', message: 'Company created successfully' })
       }
@@ -110,15 +110,15 @@ export default class CompaniesController {
   public async getAllCompanyNames({ response }: HttpContext) {
     try {
       // Récupérer tous les noms de compagnies
-      const compagies = await db.from('compagies').select('name')
+      const companies = await db.from('companies').select('name')
 
       // Vérifier si des compagnies ont été trouvées
-      if (compagies.length === 0) {
-        return response.status(400).json({ message: 'No compagies found' })
+      if (companies.length === 0) {
+        return response.status(400).json({ message: 'No companies found' })
       }
 
       // Extraire uniquement les noms
-      const companyNames = compagies.map((company) => company.name)
+      const companyNames = companies.map((company) => company.name)
 
       return response.status(200).json({
         companyNames: companyNames,

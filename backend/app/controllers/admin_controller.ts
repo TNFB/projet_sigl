@@ -29,8 +29,9 @@ export default class AdminController {
   async overritePassword({ request, response }: HttpContext) {
     console.log('overritePassword')
     try {
-      const { email, newPassword } = request.only(['email', 'newPassword'])
-
+      // Récupérer les données du JSON d'entrée
+      const { token, email, newPassword } = request.only(['token', 'email', 'newPassword'])
+  
       const userCount = await db.from('users').count('* as total')
       if (userCount[0].total === 0) {
         console.log('User table empty')
@@ -39,37 +40,54 @@ export default class AdminController {
           message: 'No User table found/table users empty',
         })
       }
-
-      // Found User by Email
-      const userDb = await db.from('users').where('email', email).select('*').first()
+      
+      // HACK TOKEN?
+      // Vérifier si l'utilisateur existe et si le token est valide
+      const userDb = await db.from('users')
+        .where('email', email)
+        .where('token', token)
+        .where('expired_date', '>', new Date()) // Vérifier si le token n'a pas expiré
+        .select('*')
+        .first()
+  
       if (!userDb) {
         return response.status(400).json({
           status: 'error',
-          message: 'Email not found',
+          message: 'Invalid email, token, or token has expired',
         })
       }
-
-      const bddPassword = userDb.password
-      if (bddPassword === newPassword) {
+  
+      // Vérifier si le nouveau mot de passe est différent de l'ancien
+      if (userDb.password === newPassword) {
         return response.status(422).json({
           status: 'error',
-          Message: 'The new password is the same the old one',
-        })
-      } else {
-        await db.from('users').where('email', email).update({ password: newPassword })
-        return response.status(200).json({
-          status: 'succes',
-          message: 'password changed succesfully',
+          message: 'The new password is the same as the old one',
         })
       }
+  
+      // Mettre à jour le mot de passe
+      await db.from('users')
+        .where('email', email)
+        .update({ 
+          password: newPassword,
+          token: null, // Optionnel : réinitialiser le token après utilisation
+          expired_date: null // Optionnel : réinitialiser la date d'expiration
+        })
+  
+      return response.status(200).json({
+        status: 'success',
+        message: 'Password changed successfully',
+      })
+  
     } catch (error) {
       console.log(error)
       return response.status(500).json({
         status: 'error',
-        message: 'Erreur in users overritePassword',
+        message: 'Error in users overritePassword',
       })
     }
   }
+  
 
   /**
    * @method deleteUserByEmail

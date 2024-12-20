@@ -5,11 +5,11 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('idInterview').primary()
+      table.increments('id_interview').primary()
       table.integer('semester')
       table.dateTime('date')
-      table.dateTime('startPeriod')
-      table.dateTime('endPeriod')
+      table.dateTime('start_period')
+      table.dateTime('end_period')
     })
   }
 

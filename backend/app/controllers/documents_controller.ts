@@ -54,7 +54,7 @@ export default class DocumentsController {
         })
       }
       //Path
-      const basePath = `/${userDb.idUser}`
+      const basePath = `/${userDb.id_user}`
       const fileUrl = `${basePath}/${documentName}.${file.extname}`
       // Save to disk
       await file.moveToDisk(fileUrl, {
@@ -136,22 +136,22 @@ export default class DocumentsController {
             })
             .returning('*') // Récupérer toutes les colonnes
 
-          user = { idUser: result[0], email, name, lastName }
+          user = { id_user: result[0], email, name, lastName }
         }
 
         // Créer un journal de formation (training diary)
         const [trainingDiaryId] = await db
           .table('training_diaries')
           .insert({
-            semesterGrades: JSON.stringify({}),
-            documentList: JSON.stringify([]),
+            semester_grades: JSON.stringify({}),
+            document_list: JSON.stringify([]),
             evaluation: 0,
-            listInterview: JSON.stringify([]),
-            listReport: JSON.stringify([]),
-            listPresentation: JSON.stringify([]),
+            list_interview: JSON.stringify([]),
+            list_report: JSON.stringify([]),
+            list_presentation: JSON.stringify([]),
             createdAt: new Date(),
           })
-          .returning('idTrainingDiary')
+          .returning('id_training_diary')
 
         const apprenticeMaster = await db
           .from('users')
@@ -166,28 +166,28 @@ export default class DocumentsController {
           .where('role', 'educational_tutors')
           .first()
 
-        const alreadyCreated = await db.from('apprentices').where('id', user.idUser).first()
+        const alreadyCreated = await db.from('apprentices').where('id', user.id_user).first()
 
         if (!alreadyCreated) {
           // Insérer dans la table apprentices
-          console.log(`create new User : ${user.idUser}`)
+          console.log(`create new User : ${user.id_user}`)
           await db.table('apprentices').insert({
-            id: user.idUser,
-            idEducationalTutor: educationalTutor ? educationalTutor.idUser : null,
-            idApprenticeMaster: apprenticeMaster ? apprenticeMaster.idUser : null,
-            idTrainingDiary: trainingDiaryId,
-            listMissions: JSON.stringify([]),
+            id: user.id_user,
+            id_educational_tutor: educationalTutor ? educationalTutor.id_user : null,
+            id_apprentice_master: apprenticeMaster ? apprenticeMaster.id_user : null,
+            id_training_diary: trainingDiaryId,
+            list_missions: JSON.stringify([]),
           })
         } else {
           // Mettre à jour l'enregistrement existant
-          console.log(`already existing user : ${user.idUser}`)
+          console.log(`already existing user : ${user.id_user}`)
           await db
             .from('apprentices')
-            .where('id', user.idUser)
+            .where('id', user.id_user)
             .update({
-              idEducationalTutor: educationalTutor ? educationalTutor.idUser : null,
-              idApprenticeMaster: apprenticeMaster ? apprenticeMaster.idUser : null,
-              idTrainingDiary: trainingDiaryId,
+              id_educational_tutor: educationalTutor ? educationalTutor.id_user : null,
+              id_apprentice_master: apprenticeMaster ? apprenticeMaster.id_user : null,
+              id_training_diary: trainingDiaryId,
             })
         }
 

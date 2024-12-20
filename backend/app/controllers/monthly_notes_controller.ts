@@ -27,8 +27,8 @@ export default class MonthluNotesController {
 
       // Insérer la nouvelle note mensuelle
       const [newNoteId] = await db.table('monthly_notes').insert({
-        idTraningDiary: apprentice.idTrainingDiary,
-        creationDate: new Date(),
+        id_traning_diary: apprentice.id_training_diary,
+        creation_date: new Date(),
         title,
         content,
       })

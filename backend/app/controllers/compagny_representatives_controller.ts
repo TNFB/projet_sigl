@@ -7,7 +7,7 @@ export default class CompanyRepresentativesController {
    * @description Ajoute une nouvelle mission à la liste des missions d'un apprenti.
    *
    * Cette méthode prend les détails de la mission et l'ID de l'apprenti,
-   * puis ajoute la mission à la liste existante dans le champ JSON 'listMissions'.
+   * puis ajoute la mission à la liste existante dans le champ JSON 'list_missions'.
    *
    * @param {HttpContext} context - Le contexte HTTP de la requête.
    * @param {Object} context.request - L'objet de requête contenant les données.
@@ -59,10 +59,10 @@ export default class CompanyRepresentativesController {
       }
 
       // get current mission
-      let listMissions = apprentice.listMissions ? JSON.parse(apprentice.listMissions) : []
+      let list_missions = apprentice.list_missions ? JSON.parse(apprentice.list_missions) : []
 
       // add new mission
-      listMissions.push({
+      list_missions.push({
         'Titre mission': mission.titreMission,
         'Description Mission': mission.descriptionMission,
         'competances': mission.competences,
@@ -72,7 +72,7 @@ export default class CompanyRepresentativesController {
       await db
         .from('apprentices')
         .where('id', apprenticeId)
-        .update({ listMissions: JSON.stringify(listMissions) })
+        .update({ list_missions: JSON.stringify(list_missions) })
 
       return response
         .status(200)

@@ -28,15 +28,15 @@ export default class TrainingDiariesController {
   async createTraningDiary({ request, response }: HttpContext) {
     console.log('createTraningDiary')
     try {
-      const { idUser } = request.only(['idUser'])
-      const user = await db.from('users').where('idUser', idUser).first()
+      const { id_user } = request.only(['id_user'])
+      const user = await db.from('users').where('id_user', id_user).first()
       if (user && user.role === 'apprentices') {
-        const apprentice = await db.from('apprentices').where('id', idUser).first()
+        const apprentice = await db.from('apprentices').where('id', id_user).first()
 
-        if (apprentice && apprentice.idTrainingDiary) {
+        if (apprentice && apprentice.id_training_diary) {
           return response.status(400).json({
             message: 'Un journal de formation existe déjà pour cet utilisateur',
-            trainingDiaryId: apprentice.idTrainingDiary,
+            trainingDiaryId: apprentice.id_training_diary,
           })
         }
 
@@ -47,8 +47,8 @@ export default class TrainingDiariesController {
 
         await db
           .from('apprentices')
-          .where('id', idUser)
-          .update({ idTrainingDiary: newTrainingDiaryId })
+          .where('id', id_user)
+          .update({ id_training_diary: newTrainingDiaryId })
 
         return response.status(200).json({
           message: 'Training Diary created',

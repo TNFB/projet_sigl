@@ -2,7 +2,7 @@
 FROM node:22.9.0
 
 # Installation de PNPM globalement
-RUN npm install -g pnpm@9.4.0
+RUN npm install -g pnpm@9.15.1
 
 # Définir le dossier de travail dans le conteneur
 WORKDIR /app

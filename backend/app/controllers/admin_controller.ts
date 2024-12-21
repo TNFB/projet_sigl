@@ -1,5 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import { HttpContext } from '@adonisjs/core/http'
+import bcrypt from 'bcrypt'
+import { findUserByEmail } from 'app/utils/userUtils.js'
 
 /**
  * @class AdminController
@@ -29,8 +31,14 @@ export default class AdminController {
   async overritePassword({ request, response }: HttpContext) {
     console.log('overritePassword')
     try {
-      // Récupérer les données du JSON d'entrée
-      const { token, email, newPassword } = request.only(['token', 'email', 'newPassword'])
+      //Get JSON 'Data'
+      const { data } = request.only(['data'])
+      const { token, email, newPassword } = data
+
+      //TO Remove?
+      console.log(`email: ${email}`)
+      console.log(`password: ${newPassword}`)
+      console.log(`token: ${token}`)
   
       const userCount = await db.from('users').count('* as total')
       if (userCount[0].total === 0) {
@@ -41,35 +49,47 @@ export default class AdminController {
         })
       }
       
-      // HACK TOKEN?
-      // Vérifier si l'utilisateur existe et si le token est valide
-      const userDb = await db.from('users')
-        .where('email', email)
+      // HASH TOKEN?
+      // Vérifier si l'admin existe et si le token est valide
+      const adminUser = await db.from('users')
+        .where('role', 'admins')
         .where('token', token)
         .where('expired_date', '>', new Date()) // Vérifier si le token n'a pas expiré
-        .select('*')
+        .select('id')
         .first()
   
-      if (!userDb) {
+      if (!adminUser) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid email, token, or token has expired',
+          message: 'Invalid role, token, or token has expired',
         })
       }
   
-      // Vérifier si le nouveau mot de passe est différent de l'ancien
-      if (userDb.password === newPassword) {
+      const userDb = await findUserByEmail(email)
+
+      if(!userDb) {
+        return response.status(404).json({
+          status: 'error',
+          message: 'User not found',
+        })
+      }
+
+      // Check if same Password
+      const isPasswordValid = await bcrypt.compare(newPassword, userDb.password)
+      if (isPasswordValid) {
         return response.status(422).json({
           status: 'error',
           message: 'The new password is the same as the old one',
         })
       }
   
+      //Hasher le nouveau mot de passe
+      const hashedPassword = await bcrypt.hash(newPassword, 10)
       // Mettre à jour le mot de passe
       await db.from('users')
-        .where('email', email)
+        .where('id_user', userDb.id_user)
         .update({ 
-          password: newPassword,
+          password: hashedPassword,
           token: null, // Optionnel : réinitialiser le token après utilisation
           expired_date: null // Optionnel : réinitialiser la date d'expiration
         })
@@ -106,8 +126,11 @@ export default class AdminController {
   async deleteUser({ request, response }: HttpContext) {
     console.log('deleteUser')
     try {
-      const { email } = request.only(['email'])
+      //Get JSON 'Data'
+      const { data } = request.only(['data'])
+      const { email, token } = data
 
+      //Table User Vide ?
       const userCount = await db.from('users').count('* as total')
       if (userCount[0].total === 0) {
         console.log('User table empty')
@@ -117,8 +140,24 @@ export default class AdminController {
         })
       }
 
+      // Vérifier si l'admin existe et si le token est valide
+      const adminUser = await db.from('users')
+        .where('role', 'admins')
+        .where('token', token)
+        .where('expired_date', '>', new Date()) // Vérifier si le token n'a pas expiré
+        .select('id')
+        .first()
+  
+      if (!adminUser) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
+
       // Found User by Email
-      const userDb = await db.from('users').where('email', email).select('*').first()
+      const userDb = await findUserByEmail(email)
+      
       if (!userDb) {
         return response.status(400).json({
           status: 'error',

@@ -17,12 +17,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Move to backend directory
-        run: cd backend
-
       - name: Run the Dockerfile
         run: |
           commit_count=$(git rev-list --count HEAD)
+          cd backend
           docker build -t backend:2.1.$commit_count .
 
       - name: Export the image

@@ -10,46 +10,32 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build_backend:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.9.0'
+      - name: Move to backend directory
+        run: cd backend
 
-      - name: Setup pnpm
-        # You may pin to the exact commit or the version.
-        # uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2
-        uses: pnpm/action-setup@v4.0.0
-        with:
-          version: 9.15.1
-
-      - name: Create the directory for releases
+      - name: Run the Dockerfile
         run: |
-          mkdir releases
-      - name: pnpm install and build front
-        run: |
-          cd front
-          pnpm install
-          pnpm build
-      - name: Zip artifact for deployment
-        run: |
-          cd ..
-          zip releases/front.zip front/* -r
+          commit_count=$(git rev-list --count HEAD)
+          docker build -t backend:2.1.$commit_count .
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+      - name: Export the image
+        run: docker save backend:2.1.$commit_count > backend.tar
+
+      - name: Upload the image
+        uses: actions/upload-artifact@v2
         with:
-          name: node-app
-          path: releases/front.zip
+            name: backend-2.1.$(git rev-list --count HEAD).tar
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build_backend
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
@@ -60,10 +46,7 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: node-app
-
-      - name: Unzip artifact for deployment
-        run: unzip front.zip
+          name: backend-2.1.$(git rev-list --count HEAD).tar
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -72,10 +55,10 @@ jobs:
           tenant-id: ${{ secrets.__tenantidsecretname__ }}
           subscription-id: ${{ secrets.__subscriptionidsecretname__ }}
 
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
+        uses: azure/webapps-deploy@v2
         with:
-          app-name: 'journal-formation'
-          slot-name: 'Production'
-          package: .
+          app-name: 'journaldeformation'
+          package: backend-2.1.$(git rev-list --count HEAD).tar
+          slot-name: 'production'

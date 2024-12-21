@@ -24,7 +24,7 @@ jobs:
           docker build -t backend:2.1.$commit_count .
 
       - name: Export the image
-        run: docker save backend:2.1.$commit_count > backend.tar
+        run: docker save backend:2.1.$(git rev-list --count HEAD) > backend.tar
 
       - name: Upload the image
         uses: actions/upload-artifact@v4

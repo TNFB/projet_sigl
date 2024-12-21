@@ -10,8 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  ARTIFACT_NAME: backend:${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}.tar
-
+  ARTIFACT_VERSION: 2.${{ github.run_number }}.${{ github.run_attempt }}.tar
 
 jobs:
   build_backend:
@@ -24,15 +23,15 @@ jobs:
       - name: Run the Dockerfile
         run: |
           cd backend
-          docker build -t ${{ env.ARTIFACT_NAME }} .
+          docker build -t backend:${{ env.ARTIFACT_VERSION }} .
 
       - name: Export the image
-        run: docker save ${{ env.ARTIFACT_NAME }} > backend.tar
+        run: docker save backend:${{ env.ARTIFACT_VERSION }} > backend.tar
 
       - name: Upload the image
         uses: actions/upload-artifact@v4
         with:
-            name: ${{ env.ARTIFACT_NAME }}
+            name: backend-${{ env.ARTIFACT_VERSION }}
             path: backend.tar
 
   deploy:
@@ -48,7 +47,7 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_NAME }}
+          name: backend-${{ env.ARTIFACT_VERSION }}
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -62,5 +61,5 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'journaldeformation'
-          package: ${{ env.ARTIFACT_NAME }}
+          package: backend.tar
           slot-name: 'production'

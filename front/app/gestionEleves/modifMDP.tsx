@@ -38,7 +38,7 @@ function ModifMDP() {
   useEffect(() => {
     const fetchEmails = async () => {
       try {
-        const response = await postRequest('user/getUserEmails?role');
+        const response = await postRequest('user/getUserEmailsByRole?role');
         const emailOptions = response.emails.map((email: string) => ({
           value: email,
           label: email,

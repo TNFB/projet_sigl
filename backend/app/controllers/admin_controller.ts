@@ -1,7 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
-import { findUserByEmail } from 'app/utils/userUtils.js'
+import { findUserByEmail, isUserTableEmpty, isValidTokenAndRole } from 'app/utils/apiUtils.js'
 
 /**
  * @class AdminController
@@ -40,8 +40,7 @@ export default class AdminController {
       console.log(`password: ${newPassword}`)
       console.log(`token: ${token}`)
   
-      const userCount = await db.from('users').count('* as total')
-      if (userCount[0].total === 0) {
+      if (await isUserTableEmpty()) {
         console.log('User table empty')
         return response.status(400).json({
           status: 'error',
@@ -51,14 +50,7 @@ export default class AdminController {
       
       // HASH TOKEN?
       // Vérifier si l'admin existe et si le token est valide
-      const adminUser = await db.from('users')
-        .where('role', 'admins')
-        .where('token', token)
-        .where('expired_date', '>', new Date()) // Vérifier si le token n'a pas expiré
-        .select('id')
-        .first()
-  
-      if (!adminUser) {
+      if (!await isValidTokenAndRole(token, 'admins')) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -131,8 +123,7 @@ export default class AdminController {
       const { email, token } = data
 
       //Table User Vide ?
-      const userCount = await db.from('users').count('* as total')
-      if (userCount[0].total === 0) {
+      if (await isUserTableEmpty()) {
         console.log('User table empty')
         return response.status(400).json({
           status: 'error',
@@ -140,15 +131,9 @@ export default class AdminController {
         })
       }
 
+      // HASH TOKEN?
       // Vérifier si l'admin existe et si le token est valide
-      const adminUser = await db.from('users')
-        .where('role', 'admins')
-        .where('token', token)
-        .where('expired_date', '>', new Date()) // Vérifier si le token n'a pas expiré
-        .select('id')
-        .first()
-  
-      if (!adminUser) {
+      if (! await isValidTokenAndRole(token, 'admins')) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',

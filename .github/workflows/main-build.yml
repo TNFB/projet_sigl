@@ -37,13 +37,15 @@ jobs:
           pnpm install
           pnpm build
       - name: Zip artifact for deployment
-        run: zip ../releases/front.zip ./* -r
+        run: |
+          cd ..
+          zip releases/front.zip front/* -r
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: ../releases/front.zip
+          path: releases/front.zip
 
   deploy:
     runs-on: ubuntu-latest

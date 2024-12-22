@@ -36,3 +36,7 @@ jobs:
         run: |
           docker push ghcr.io/tnfb/${{ github.event.repository.name }}/backend:${{ env.ARTIFACT_VERSION }}
           docker push ghcr.io/tnfb/${{ github.event.repository.name }}/backend:latest
+      
+      - name: Trigger the deployment
+        run: |
+          curl -X POST https://${{ secrets.WEBHOOK_CREDS }}@journaldeformation-bndwfxa2dafmh2hu.scm.francecentral-01.azurewebsites.net/api/registry/webhook

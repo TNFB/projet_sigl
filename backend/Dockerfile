@@ -26,4 +26,4 @@ RUN pnpm i --prod
 EXPOSE 3333
 
 # Commande de démarrage de l'application
-CMD ["pnpm", "start"]
+CMD ["node", "/app/backend/build/bin/server.js"]

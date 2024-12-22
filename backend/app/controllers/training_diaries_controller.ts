@@ -1,5 +1,6 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
+import { isValidTokenAndRole } from 'app/utils/apiUtils.js'
 
 /**
  * @class TrainingDiariesController
@@ -28,7 +29,20 @@ export default class TrainingDiariesController {
   async createTraningDiary({ request, response }: HttpContext) {
     console.log('createTraningDiary')
     try {
-      const { id_user } = request.only(['id_user'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { id_user, token } = data
+
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
+
       const user = await db.from('users').where('id_user', id_user).first()
       if (user && user.role === 'apprentices') {
         const apprentice = await db.from('apprentices').where('id', id_user).first()

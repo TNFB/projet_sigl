@@ -30,6 +30,9 @@ export default class UsersController {
     try {
       // Récupérer le rôle depuis les paramètres de la requête
       const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
       const { role } = data
 
       // Vérifier si la table 'users' est vide
@@ -87,6 +90,9 @@ export default class UsersController {
     console.log('createUser')
     try {
       const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
       const { email, password, name, lastName, telephone, role, token } = data
 
       //Need to check token
@@ -161,6 +167,9 @@ export default class UsersController {
     console.log('Connexion')
     try {
       const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
       const { email, password } = data
 
       console.log(`email: ${email}`)
@@ -226,6 +235,9 @@ export default class UsersController {
    */
   async logoutUser({ request, response }: HttpContext) {
     const { data } = request.only(['data'])
+    if (!data) {
+      return response.status(400).json({ error: 'Data is required' })
+    }
     const { token } = data
 
     const users = await db
@@ -275,6 +287,9 @@ export default class UsersController {
   async changePassword({ request, response }: HttpContext) {
     try {
       const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
       const { email, oldPassword, newPassword, token } = data
 
       // Vérifier si la table 'users' est vide

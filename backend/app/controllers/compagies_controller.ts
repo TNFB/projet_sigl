@@ -1,5 +1,6 @@
 import { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
+import { isValidTokenAndRole } from 'app/utils/apiUtils.js'
 
 export default class CompaniesController {
   /**
@@ -37,8 +38,20 @@ export default class CompaniesController {
   public async createCompany({ request, response }: HttpContext) {
     try {
       const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { companiesData, token } = data
 
-      if (!Array.isArray(data) || data.length === 0) {
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
+
+      if (!Array.isArray(companiesData) || companiesData.length === 0) {
         return response
           .status(400)
           .json({ message: 'Invalid input: data should be a non-empty array of company names' })
@@ -46,7 +59,7 @@ export default class CompaniesController {
 
       const results = []
 
-      for (const companyData of data) {
+      for (const companyData of companiesData) {
         const { name } = companyData
 
         if (!name) {
@@ -107,8 +120,21 @@ export default class CompaniesController {
    *   "companyNames": ["Acme Corporation", "Globex Corporation", "Soylent Corp"]
    * }
    */
-  public async getAllCompanyNames({ response }: HttpContext) {
+  public async getAllCompanyNames({ request, response }: HttpContext) {
     try {
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { token } = data
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
+      
       // Récupérer tous les noms de compagnies
       const companies = await db.from('companies').select('name')
 

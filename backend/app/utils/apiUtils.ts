@@ -43,8 +43,8 @@ export async function isValidTokenAndRole(token: string, requiredRole: string): 
   
       return false // No matching token found
   
-    } catch (error) {
-      console.error('Error verifying token and role:', error)
-      return false
-    }
+  } catch (error) {
+    console.error('Error verifying token and role:', error)
+    return false
   }
+}

@@ -1,6 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
+import { isValidTokenAndRole } from 'app/utils/apiUtils.js'
 
 export default class ProfessionalsController {
   /**
@@ -20,7 +21,19 @@ export default class ProfessionalsController {
    */
   async createOrUpdateProfessionals({ request, response }: HttpContext) {
     try {
-      const peopleData = request.input('data')
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { peopleData, token } = data
+
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
 
       if (!Array.isArray(peopleData)) {
         return response.status(400).json({ error: 'Input should be an array of people' })

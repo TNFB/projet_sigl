@@ -1,12 +1,25 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
+import { isValidTokenAndRole } from 'app/utils/apiUtils.js'
 
 export default class ApprenticeshipCoordinatorsController {
-  async linkApprentice({ request, response }: HttpContext) {
+  public async linkApprentice({ request, response }: HttpContext) {
     try {
       const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
 
-      if (!Array.isArray(data) || data.length === 0) {
+      const { peopleData, token } = data
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
+
+      if (!Array.isArray(peopleData) || peopleData.length === 0) {
         return response
           .status(400)
           .json({ message: 'Invalid input: data should be a non-empty array' })
@@ -14,7 +27,7 @@ export default class ApprenticeshipCoordinatorsController {
 
       const results = []
 
-      for (const liaison of data) {
+      for (const liaison of peopleData) {
         const { apprenticeEmail, masterEmail, tutorEmail } = liaison
 
         // Vérifier si l'apprenti existe et s'il a le bon rôle

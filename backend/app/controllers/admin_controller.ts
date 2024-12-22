@@ -33,6 +33,9 @@ export default class AdminController {
     try {
       //Get JSON 'Data'
       const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
       const { token, email, newPassword } = data
 
       //TO Remove?
@@ -120,6 +123,9 @@ export default class AdminController {
     try {
       //Get JSON 'Data'
       const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
       const { email, token } = data
 
       //Table User Vide ?

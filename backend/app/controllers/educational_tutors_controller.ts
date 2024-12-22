@@ -1,6 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
+import { isValidTokenAndRole } from 'app/utils/apiUtils.js'
 
 export default class EducationalTutorsController {
   /**
@@ -50,7 +51,19 @@ export default class EducationalTutorsController {
   async addApprentices({ request, response }: HttpContext) {
     console.log('addApprentices')
     try {
-      const { tutorId, apprenticeIds } = request.only(['tutorId', 'apprenticeIds'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { tutorId, apprenticeIds, token } = data
+
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
 
       // master existe ?
       const master = await db.from('educational_tutors').where('id', tutorId).first()
@@ -104,7 +117,19 @@ export default class EducationalTutorsController {
    */
   public async assignEducationalTutorRole({ request, response }: HttpContext) {
     try {
-      const { email } = request.only(['email'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { email, token } = data
+
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
 
       if (!email) {
         return response.status(400).json({ message: 'Email is required' })
@@ -153,7 +178,19 @@ export default class EducationalTutorsController {
    */
   public async getTrainingDiaryByEmail({ request, response }: HttpContext) {
     try {
-      const { email } = request.only(['email'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { email, token } = data
+
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
 
       const existingUser = await db.from('users').where('email', email).first()
 
@@ -194,9 +231,21 @@ export default class EducationalTutorsController {
     }
   }
 
-  async createOrUpdateEducationalTutor({ request, response }: HttpContext) {
+  public async createOrUpdateEducationalTutor({ request, response }: HttpContext) {
     try {
-      const peopleData = request.input('data')
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { peopleData, token } = data
+
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
 
       if (!Array.isArray(peopleData)) {
         return response.status(400).json({ error: 'Input should be an array of people' })
@@ -272,9 +321,21 @@ export default class EducationalTutorsController {
     }
   }
 
-  async getApprenticesByTutorEmail({ request, response }: HttpContext) {
+  public async getApprenticesByTutorEmail({ request, response }: HttpContext) {
     try {
-      const { email } = request.input('data')
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { email, token } = data
+
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
 
       if (!email) {
         return response.status(400).json({ error: 'Email is required' })

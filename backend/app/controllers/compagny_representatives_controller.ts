@@ -1,5 +1,6 @@
 import { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
+import { isValidTokenAndRole } from 'app/utils/apiUtils.js'
 
 export default class CompanyRepresentativesController {
   /**
@@ -45,10 +46,22 @@ export default class CompanyRepresentativesController {
   public async addMissionToApprentice({ request, response }: HttpContext) {
     console.log('addMissionToApprentice')
     try {
-      const { apprenticeId, mission } = request.only(['apprenticeId', 'mission'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { apprentiEmail, mission, token } = data
+
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
 
       // check apprentice exist
-      const apprentice = await db.from('apprentices').where('id', apprenticeId).first()
+      const apprentice = await db.from('apprentices').where('email', apprentiEmail).select('id', 'list_mission').first()
       if (!apprentice) {
         return response.status(400).json({ message: 'Apprentice not found' })
       }
@@ -71,7 +84,7 @@ export default class CompanyRepresentativesController {
       // update DB
       await db
         .from('apprentices')
-        .where('id', apprenticeId)
+        .where('id', apprentice.id)
         .update({ list_missions: JSON.stringify(list_missions) })
 
       return response

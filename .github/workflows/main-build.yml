@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  ARTIFACT_VERSION: 2.${{ github.run_number }}.${{ github.run_attempt }}.tar
+  ARTIFACT_VERSION: 2.${{ github.run_number }}.tar
 
 jobs:
   build_backend:
@@ -49,12 +49,10 @@ jobs:
         with:
           name: backend-${{ env.ARTIFACT_VERSION }}
 
-      - name: Login to Azure
-        uses: azure/login@v2
+      - name: Login with Managed Identity
+        uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          managed-identity-client-id: ${{ secrets.AZURE_MANAGED_CLIENT_ID }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp

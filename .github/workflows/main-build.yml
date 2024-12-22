@@ -50,9 +50,13 @@ jobs:
           name: backend-${{ env.ARTIFACT_VERSION }}
 
       - name: Login with Managed Identity
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
-          managed-identity-client-id: ${{ secrets.AZURE_MANAGED_CLIENT_ID }}
+          auth-type: IDENTITY
+          client-id: ${{ secrets.AZURE_MANAGED_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp

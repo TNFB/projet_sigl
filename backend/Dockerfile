@@ -7,18 +7,15 @@ RUN npm install -g pnpm@9.15.1
 # Définir le dossier de travail dans le conteneur
 WORKDIR /app
 
-# Copier les fichiers package.json et pnpm-lock.yaml
+# Copier les fichiers
 COPY . .
-
-# Définir le dossier de travail backend
-WORKDIR /app/backend
 
 # Installation des dépendances du projet avec PNPM
 RUN pnpm install
 
 RUN pnpm build
 
-WORKDIR /app/backend/build
+WORKDIR /app/build
 
 RUN pnpm i --prod
 
@@ -26,4 +23,4 @@ RUN pnpm i --prod
 EXPOSE 3333
 
 # Commande de démarrage de l'application
-CMD ["node", "/app/backend/build/bin/server.js"]
+CMD ["pnpm", "start"]

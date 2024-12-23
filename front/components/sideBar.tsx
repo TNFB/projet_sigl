@@ -21,6 +21,26 @@ const SideBar = () => {
   const [students, setStudents] = useState<Student[]>([])
 
   const fetchStudents = React.useCallback(async (url: string) => {
+    
+    try {
+      const data = {
+        email: email,
+        token: 'token'
+      };
+      
+      postRequest(url, JSON.stringify({ data: data }))
+        .then(response => {
+          const apprentices = response.apprentis
+          setStudents(apprentices)
+          console.log('Success:', response)
+          //Here can get return opf response 
+          // exemple : const { somthing } = response;
+        })
+    } catch (error) {
+      console.error('Error:', error)
+    }
+
+    /*
     const formattedData = {
       data: {
         email: email
@@ -35,6 +55,7 @@ const SideBar = () => {
       .catch(error => {
         console.error('Error:', error)
       })
+        */
   }, [email])
 
 

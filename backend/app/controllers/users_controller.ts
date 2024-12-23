@@ -33,7 +33,15 @@ export default class UsersController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { role } = data
+      const { role, token } = data
+
+      //Need to check token
+      if (!await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
 
       // Vérifier si la table 'users' est vide
       if (await isUserTableEmpty()) {

@@ -38,12 +38,28 @@ function ModifMDP() {
   useEffect(() => {
     const fetchEmails = async () => {
       try {
-        const response = await postRequest('user/getUserEmailsByRole?role');
-        const emailOptions = response.emails.map((email: string) => ({
-          value: email,
-          label: email,
-        }));
-        setEmails(emailOptions);
+        const data = {
+          role: 'role',
+          token: 'token'
+        };
+        
+        postRequest('user/getUserEmailsByRole', JSON.stringify({ data: data }))
+          .then(response => {
+            console.log('get USers Emal by Roles successfull:', response);
+            //Here can get return opf response 
+            // exemple : const { somthing } = response;
+            const emailOptions = response.emails.map((email: string) => ({
+              value: email,
+              label: email,
+            }));
+            setEmails(emailOptions);
+          })
+        //const response = await postRequest('user/getUserEmailsByRole?role');
+        //const emailOptions = response.emails.map((email: string) => ({
+        //  value: email,
+        //  label: email,
+        //}));
+        //setEmails(emailOptions);
       } catch (error) {
         console.error('Error fetching emails:', error);
       }
@@ -73,16 +89,32 @@ function ModifMDP() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const hashedPassword = await bcrypt.hash(formData.password, 10);
-    postRequest('admin/overritePassword', JSON.stringify({ email: formData.email, newPassword: hashedPassword }))
-      .then(response => {
-       console.log('Success:', response);
-        alert('Mot de passe modifié avec succès');
-    })
-    .catch(error => {
+    try {
+      const hashedPassword = await bcrypt.hash(formData.password, 10);
+      const data = {
+        email: formData.email,
+        newPassword: hashedPassword,
+        token: 'token'
+      };
+      
+      postRequest('admin/overritePassword', JSON.stringify({ data: data }))
+        .then(response => {
+          console.log('OverritePassword successfull:', response);
+          alert('Mot de passe modifié avec succès');
+          //Here can get return opf response 
+          // exemple : const { somthing } = response;
+        })
+      /*
+      const hashedPassword = await bcrypt.hash(formData.password, 10);
+      postRequest('admin/overritePassword', JSON.stringify({ email: formData.email, newPassword: hashedPassword }))
+        .then(response => {
+        console.log('Success:', response);
+          alert('Mot de passe modifié avec succès');
+      })*/
+      } catch(error) {
       console.error('Error:', error);
       alert('Erreur lors de la modification du mot de passe');
-    });
+    };
   };
 
   type Field = SelectField;

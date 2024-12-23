@@ -33,6 +33,24 @@ const GestionEntreprises = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    try {
+      const data = {
+        companiesData: rows.map(row => ({ name: row.name })),
+        token: 'token'
+      };
+      
+      postRequest('company/createCompany', JSON.stringify({ data: data }))
+        .then(response => {
+          console.log('Success:', response);
+          alert('Entreprise(s) ajoutée(s) avec succès');
+          //Here can get return opf response 
+          // exemple : const { somthing } = response;
+        })
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Erreur lors de l\'ajout de l\'entreprise');
+      }
+    /*
     const url = 'company/createCompany';
     const formattedData = {
       data: rows.map(row => ({
@@ -48,6 +66,7 @@ const GestionEntreprises = () => {
         console.error('Error:', error);
         alert('Erreur lors de l\'ajout de l\'entreprise');
       });
+      */
   };
 
   if (isLoading) {

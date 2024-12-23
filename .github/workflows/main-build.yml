@@ -58,10 +58,14 @@ jobs:
       - name: Run the Dockerfile
         run: |
           cd front
-          docker build -t ghcr.io/tnfb/${{ github.event.repository.name }}/front:${{ env.ARTIFACT_VERSION }} -t ghcr.io/tnfb/${{ github.event.repository.name }}/front:latest --build-arg ARG_NEXT_PUBLIC_API_URL=http://example.com .
+          docker build -t ghcr.io/tnfb/${{ github.event.repository.name }}/front:${{ env.ARTIFACT_VERSION }} -t ghcr.io/tnfb/${{ github.event.repository.name }}/front:latest --build-arg ARG_NEXT_PUBLIC_API_URL=https://backend-journaldeformation-g4hbd5bcb7gme4dv.francecentral-01.azurewebsites.net .
 
       # Pousser l'image Docker vers GHCR
       - name: Push Docker image to GitHub Container Registry
         run: |
           docker push ghcr.io/tnfb/${{ github.event.repository.name }}/front:${{ env.ARTIFACT_VERSION }}
           docker push ghcr.io/tnfb/${{ github.event.repository.name }}/front:latest
+      
+          - name: Trigger the deployment
+          run: |
+            curl -X POST https://${{ secrets.WEBHOOK_CREDS }}@backend-journaldeformation-g4hbd5bcb7gme4dv.scm.francecentral-01.azurewebsites.net/api/registry/webhook

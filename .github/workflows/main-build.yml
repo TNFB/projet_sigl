@@ -58,7 +58,7 @@ jobs:
       - name: Run the Dockerfile
         run: |
           cd front
-          docker build -t ghcr.io/tnfb/${{ github.event.repository.name }}/front:${{ env.ARTIFACT_VERSION }} -t ghcr.io/tnfb/${{ github.event.repository.name }}/front:latest -a ARG_NEXT_PUBLIC_API_URL=http://example.com .
+          docker build -t ghcr.io/tnfb/${{ github.event.repository.name }}/front:${{ env.ARTIFACT_VERSION }} -t ghcr.io/tnfb/${{ github.event.repository.name }}/front:latest --build-arg ARG_NEXT_PUBLIC_API_URL=http://example.com .
 
       # Pousser l'image Docker vers GHCR
       - name: Push Docker image to GitHub Container Registry

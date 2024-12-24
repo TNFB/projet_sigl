@@ -1,28 +1,26 @@
-import { defineConfig } from '@adonisjs/auth'
-import { sessionGuard, sessionUserProvider } from '@adonisjs/auth/session'
-import type { InferAuthEvents, Authenticators } from '@adonisjs/auth/types'
+import { AuthConfig } from '@ioc:Adonis/Addons/Auth'
 
-const authConfig = defineConfig({
-  default: 'web',
+const authConfig: AuthConfig = {
+  guard: 'api',
   guards: {
-    web: sessionGuard({
-      useRememberMeTokens: false,
-      provider: sessionUserProvider({
-        model: () => import('#models/user')
-      }),
-    }),
+    api: {
+      driver: 'jwt',
+      tokenProvider: {
+        type: 'jwt',
+        driver: 'jwt',
+        secret: process.env.APP_KEY,
+        options: {
+          expiresIn: '1h',
+        },
+      },
+      provider: {
+        driver: 'lucid',
+        identifierKey: 'id_user',
+        uids: ['email'],
+        model: () => import('App/Models/User'),
+      },
+    },
   },
-})
+}
 
 export default authConfig
-
-/**
- * Inferring types from the configured auth
- * guards.
- */
-declare module '@adonisjs/auth/types' {
-  export interface Authenticators extends InferAuthenticators<typeof authConfig> {}
-}
-declare module '@adonisjs/core/types' {
-  interface EventsList extends InferAuthEvents<Authenticators> {}
-}

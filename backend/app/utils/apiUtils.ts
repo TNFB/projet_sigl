@@ -23,28 +23,16 @@ export async function isUserTableEmpty(): Promise<boolean> {
   return count?.total === 0
 }
 
-export async function isValidTokenAndRole(token: string, requiredRole: string): Promise<boolean> {
+export async function isValidRole(user: json, requiredRole: string): Promise<boolean> {
   try {
-    const users = await db
+    const userRole = await db
       .from('users')
-      .select('token', 'role', 'expired_date')
+      .where('email', user.email)
+      .select('role')
 
-      for (const user of users) {
-        const isTokenMatch = await bcrypt.compare(token, user.token)
-        if (isTokenMatch) {
-          // Check if token is expired
-          if (user.expired_date && DateTime.fromJSDate(user.expired_date) < DateTime.now()) {
-            return false // Token is expired
-          }
-          // Check if user has the required role
-          return user.role === requiredRole
-        }
-      }
-  
-      return false // No matching token found
-  
+      return userRole === requiredRole
   } catch (error) {
-    console.error('Error verifying token and role:', error)
+    console.error('Error verifying role:', error)
     return false
   }
 }

@@ -1,6 +1,6 @@
 import { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
-import { isValidTokenAndRole } from 'app/utils/apiUtils.js'
+import { isValidRole } from 'app/utils/apiUtils.js'
 
 export default class CompanyRepresentativesController {
   /**
@@ -53,7 +53,7 @@ export default class CompanyRepresentativesController {
       const { apprentiEmail, mission, token } = data
 
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidTokenAndRole(token, 'admins')) {
+      if (! await isValidRole(token, 'admins')) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',

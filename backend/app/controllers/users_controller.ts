@@ -1,7 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
-import { findUserByEmail, isUserTableEmpty, isValidTokenAndRole } from 'app/utils/apiUtils.js'
+import { findUserByEmail, isUserTableEmpty, isValidRole } from 'app/utils/apiUtils.js'
 
 /**
  * @class UsersController
@@ -36,7 +36,7 @@ export default class UsersController {
       const { role, token } = data
 
       //Need to check token
-      if (!await isValidTokenAndRole(token, 'admins')) {
+      if (!await isValidRole(token, 'admins')) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -104,7 +104,7 @@ export default class UsersController {
       const { email, password, name, lastName, telephone, role, token } = data
 
       //Need to check token
-      if (!await isValidTokenAndRole(token, 'admins')) {
+      if (!await isValidRole(token, 'admins')) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -206,17 +206,16 @@ export default class UsersController {
       if (isPasswordValid) {
         //TODO
         // Gerer Token => Inserte Token In BDD if user can connect 
-        // Maybe add 1-2sec delay if password Wrong 
+        // Maybe add 1-2sec delay if password Wrong
+        const token = await auth.use('api').attempt(email, password)
         return response.status(200).json({
           status: 'success',
-          password: true,
-          role: userDb.role,
-          email: userDb.email,
+          token: token.token,
+          user: token.user,
         })
       } else {
         return response.status(401).json({
           status: 'error',
-          password: false,
           message: 'password incorrect',
         })
       }
@@ -318,7 +317,7 @@ export default class UsersController {
         })
       }
 
-      if(!await isValidTokenAndRole(token, userDb.role)){
+      if(!await isValidRole(token, userDb.role)){
         return response.status(400).json({
           status: 'error',
           message: 'Invalid token, or token has expired',

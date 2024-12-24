@@ -1,7 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
-import { findUserByEmail, isUserTableEmpty, isValidTokenAndRole } from 'app/utils/apiUtils.js'
+import { findUserByEmail, isUserTableEmpty, isValidRole } from 'app/utils/apiUtils.js'
 
 /**
  * @class AdminController
@@ -36,12 +36,11 @@ export default class AdminController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { token, email, newPassword } = data
+      const { user, email, newPassword } = data
 
       //TO Remove?
       console.log(`email: ${email}`)
       console.log(`password: ${newPassword}`)
-      console.log(`token: ${token}`)
   
       if (await isUserTableEmpty()) {
         console.log('User table empty')
@@ -53,7 +52,7 @@ export default class AdminController {
       
       // HASH TOKEN?
       // Vérifier si l'admin existe et si le token est valide
-      if (!await isValidTokenAndRole(token, 'admins')) {
+      if (!await isValidRole(user, 'admins')) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -139,7 +138,7 @@ export default class AdminController {
 
       // HASH TOKEN?
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidTokenAndRole(token, 'admins')) {
+      if (! await isValidRole(token, 'admins')) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',

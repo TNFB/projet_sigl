@@ -1,8 +1,8 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 
-export default class Compagy extends BaseModel {
+export default class Company extends BaseModel {
   @column({ isPrimary: true })
-  declare idCompagny: number
+  declare id_company: number
 
   @column()
   declare name: string

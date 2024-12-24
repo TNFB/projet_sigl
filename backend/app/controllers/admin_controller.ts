@@ -1,5 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import { HttpContext } from '@adonisjs/core/http'
+import bcrypt from 'bcrypt'
+import { findUserByEmail, isUserTableEmpty, isValidTokenAndRole } from 'app/utils/apiUtils.js'
 
 /**
  * @class AdminController
@@ -29,47 +31,78 @@ export default class AdminController {
   async overritePassword({ request, response }: HttpContext) {
     console.log('overritePassword')
     try {
-      const { email, newPassword } = request.only(['email', 'newPassword'])
+      //Get JSON 'Data'
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { token, email, newPassword } = data
 
-      const userCount = await db.from('users').count('* as total')
-      if (userCount[0].total === 0) {
+      //TO Remove?
+      console.log(`email: ${email}`)
+      console.log(`password: ${newPassword}`)
+      console.log(`token: ${token}`)
+  
+      if (await isUserTableEmpty()) {
         console.log('User table empty')
         return response.status(400).json({
           status: 'error',
           message: 'No User table found/table users empty',
         })
       }
-
-      // Found User by Email
-      const userDb = await db.from('users').where('email', email).select('*').first()
-      if (!userDb) {
+      
+      // HASH TOKEN?
+      // Vérifier si l'admin existe et si le token est valide
+      if (!await isValidTokenAndRole(token, 'admins')) {
         return response.status(400).json({
           status: 'error',
-          message: 'Email not found',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
+  
+      const userDb = await findUserByEmail(email)
+
+      if(!userDb) {
+        return response.status(404).json({
+          status: 'error',
+          message: 'User not found',
         })
       }
 
-      const bddPassword = userDb.password
-      if (bddPassword === newPassword) {
+      // Check if same Password
+      const isPasswordValid = await bcrypt.compare(newPassword, userDb.password)
+      if (isPasswordValid) {
         return response.status(422).json({
           status: 'error',
-          Message: 'The new password is the same the old one',
-        })
-      } else {
-        await db.from('users').where('email', email).update({ password: newPassword })
-        return response.status(200).json({
-          status: 'succes',
-          message: 'password changed succesfully',
+          message: 'The new password is the same as the old one',
         })
       }
+  
+      //Hasher le nouveau mot de passe
+      const hashedPassword = await bcrypt.hash(newPassword, 10)
+      // Mettre à jour le mot de passe
+      await db.from('users')
+        .where('id_user', userDb.id_user)
+        .update({ 
+          password: hashedPassword,
+          token: null, // Optionnel : réinitialiser le token après utilisation
+          expired_date: null // Optionnel : réinitialiser la date d'expiration
+        })
+  
+      return response.status(200).json({
+        status: 'success',
+        message: 'Password changed successfully',
+      })
+  
     } catch (error) {
       console.log(error)
       return response.status(500).json({
         status: 'error',
-        message: 'Erreur in users overritePassword',
+        message: 'Error in users overritePassword',
       })
     }
   }
+  
 
   /**
    * @method deleteUserByEmail
@@ -88,10 +121,15 @@ export default class AdminController {
   async deleteUser({ request, response }: HttpContext) {
     console.log('deleteUser')
     try {
-      const { email } = request.only(['email'])
+      //Get JSON 'Data'
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { email, token } = data
 
-      const userCount = await db.from('users').count('* as total')
-      if (userCount[0].total === 0) {
+      //Table User Vide ?
+      if (await isUserTableEmpty()) {
         console.log('User table empty')
         return response.status(400).json({
           status: 'error',
@@ -99,8 +137,18 @@ export default class AdminController {
         })
       }
 
+      // HASH TOKEN?
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
+
       // Found User by Email
-      const userDb = await db.from('users').where('email', email).select('*').first()
+      const userDb = await findUserByEmail(email)
+      
       if (!userDb) {
         return response.status(400).json({
           status: 'error',

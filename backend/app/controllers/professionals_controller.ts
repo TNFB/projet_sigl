@@ -1,6 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
+import { isValidTokenAndRole } from 'app/utils/apiUtils.js'
 
 export default class ProfessionalsController {
   /**
@@ -20,7 +21,19 @@ export default class ProfessionalsController {
    */
   async createOrUpdateProfessionals({ request, response }: HttpContext) {
     try {
-      const peopleData = request.input('data')
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { peopleData, token } = data
+
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
 
       if (!Array.isArray(peopleData)) {
         return response.status(400).json({ error: 'Input should be an array of people' })
@@ -32,16 +45,16 @@ export default class ProfessionalsController {
         const { name, lastName, email, companyName } = person
 
         // Vérifier si l'entreprise existe, sinon la créer
-        let idCompagny = 0
-        let company = await db.from('compagies').where('name', companyName).first()
+        let id_company = 0
+        let company = await db.from('companies').where('name', companyName).first()
         if (!company) {
-          const newIdCompany = await db
-            .table('compagies')
+          const newid_company = await db
+            .table('companies')
             .insert({ name: companyName })
-            .returning('idCompagny')
-          idCompagny = newIdCompany[0]
+            .returning('id_company')
+          id_company = newid_company[0]
         } else {
-          idCompagny = company.idCompagny
+          id_company = company.id_company
         }
 
         // Vérifier si l'utilisateur existe déjà
@@ -54,28 +67,28 @@ export default class ProfessionalsController {
           // Vérifier si l'entrée existe dans professionals
           const existingMaster = await db
             .from('professionals')
-            .where('id', existingUser.idUser)
+            .where('id', existingUser.id_user)
             .first()
 
           if (existingMaster) {
             // Mettre à jour l'entrée dans professionals si nécessaire
             await db
               .from('professionals')
-              .where('id', existingUser.idUser)
-              .update({ idCompagny: idCompagny })
+              .where('id', existingUser.id_user)
+              .update({ id_company: id_company })
           } else {
             // Créer une nouvelle entrée dans professionals si elle n'existe pas
             await db.table('professionals').insert({
-              id: existingUser.idUser,
-              idCompagny: idCompagny,
+              id: existingUser.id_user,
+              id_company: id_company,
             })
           }
 
           results.push({
             email,
             status: 'updated',
-            userId: existingUser.idUser,
-            compagnyId: idCompagny,
+            userId: existingUser.id_user,
+            compagnyId: id_company,
           })
         } else {
           // Créer un nouvel utilisateur
@@ -91,18 +104,18 @@ export default class ProfessionalsController {
               password: hashedPassword,
               role: 'professionals',
             })
-            .returning('idUser')
+            .returning('id_user')
 
           // Créer l'entrée dans la table professionals
           await db.table('professionals').insert({
             id: userId,
-            idCompagny: idCompagny,
+            id_company: id_company,
           })
 
           // Vous devriez envoyer le mot de passe par email à l'utilisateur ici
           console.log(`Mot de passe généré pour ${email}: ${password}`)
 
-          results.push({ email, status: 'created', userId, compagnyId: idCompagny })
+          results.push({ email, status: 'created', userId, compagnyId: id_company })
         }
       }
 

@@ -3,14 +3,14 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 export default class Cursus extends BaseModel {
   @column({ isPrimary: true })
-  declare idCursus: number
+  declare id_cursus: number
 
   @column()
-  declare promotionName: string
+  declare promotion_name: string
 
   @column()
-  declare startPromotionYear: DateTime
+  declare start_promotion_year: DateTime
 
   @column()
-  declare endPromotionYear: DateTime
+  declare end_promotion_year: DateTime
 }

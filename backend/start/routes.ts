@@ -28,8 +28,7 @@ const ApprenticeshipCoordinatorsController = () =>
 
 // Définir les routes
 Route.group(() => {
-  Route.post('/getUserEmails', [UserController, 'getUserEmails']).as('getUserEmails')
-  Route.post('/getUser/:id', [UserController, 'getUserById']).as('getUserById')
+  Route.post('/getUserEmailsByRole', [UserController, 'getUserEmailsByRole']).as('getUserEmailsByRole')
   Route.post('/createUser', [UserController, 'createUser']).as('createUser')
   Route.post('/changePassword', [UserController, 'changePassword']).as('changePassword')
 }).prefix('/user')

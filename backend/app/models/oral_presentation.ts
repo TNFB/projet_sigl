@@ -3,22 +3,22 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 export default class OralPresentation extends BaseModel {
   @column({ isPrimary: true })
-  declare idOralPresentation: number
+  declare id_oral_presentation: number
 
   @column()
-  declare linkOralPresentation: string
+  declare link_oral_presentation: string
 
   @column()
   declare deadline: DateTime
 
   @column()
-  declare idJury: number
+  declare id_jury: number
 
   @column()
-  declare idPresident: number
+  declare id_president: number
 
   @column()
-  declare presentationDate: DateTime
+  declare presentation_date: DateTime
 
   @column()
   declare grade: number

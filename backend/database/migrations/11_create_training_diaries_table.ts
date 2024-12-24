@@ -5,13 +5,13 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('idTrainingDiary').primary()
-      table.json('semesterGrades')
-      table.json('documentList')
+      table.increments('id_training_diary').primary()
+      table.json('semester_grades')
+      table.json('document_list')
       table.integer('evaluation')
-      table.json('listInterview')
-      table.json('listReport')
-      table.json('listPresentation')
+      table.json('list_interview')
+      table.json('list_report')
+      table.json('list_presentation')
       table.timestamp('createdAt', { useTz: true })
     })
   }

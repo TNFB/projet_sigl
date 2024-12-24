@@ -1,5 +1,6 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
+import { isValidTokenAndRole } from 'app/utils/apiUtils.js'
 
 /**
  * @class TrainingDiariesController
@@ -28,15 +29,28 @@ export default class TrainingDiariesController {
   async createTraningDiary({ request, response }: HttpContext) {
     console.log('createTraningDiary')
     try {
-      const { idUser } = request.only(['idUser'])
-      const user = await db.from('users').where('idUser', idUser).first()
-      if (user && user.role === 'apprentices') {
-        const apprentice = await db.from('apprentices').where('id', idUser).first()
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { id_user, token } = data
 
-        if (apprentice && apprentice.idTrainingDiary) {
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
+
+      const user = await db.from('users').where('id_user', id_user).first()
+      if (user && user.role === 'apprentices') {
+        const apprentice = await db.from('apprentices').where('id', id_user).first()
+
+        if (apprentice && apprentice.id_training_diary) {
           return response.status(400).json({
             message: 'Un journal de formation existe déjà pour cet utilisateur',
-            trainingDiaryId: apprentice.idTrainingDiary,
+            trainingDiaryId: apprentice.id_training_diary,
           })
         }
 
@@ -47,8 +61,8 @@ export default class TrainingDiariesController {
 
         await db
           .from('apprentices')
-          .where('id', idUser)
-          .update({ idTrainingDiary: newTrainingDiaryId })
+          .where('id', id_user)
+          .update({ id_training_diary: newTrainingDiaryId })
 
         return response.status(200).json({
           message: 'Training Diary created',

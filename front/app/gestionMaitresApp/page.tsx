@@ -33,6 +33,30 @@ const GestionMaitresApp = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    try {
+      const data = {
+        peopleData: rows.map(row => ({
+          name: row.prenom,
+          lastName: row.nom,
+          email: row.email,
+          companyName: row.entreprise
+        })),
+        token: 'token'
+      };
+      
+      postRequest('apprenticeMaster/createOrUpdateApprenticeMaster', JSON.stringify({ data: data }))
+        .then(response => {
+          console.log('Success:', response);
+          alert('Maître(s) d\'apprentissage ajouté(s) avec succès');
+          //Here can get return opf response 
+          // exemple : const { somthing } = response;
+        })
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Erreur lors de l\'ajout du maître d\'apprentissage');
+    }
+
+    /*
     const url = 'apprenticeMaster/createOrUpdateApprenticeMaster';
     const formattedData = {
       data: rows.map(row => ({
@@ -51,6 +75,7 @@ const GestionMaitresApp = () => {
       console.error('Error:', error);
       alert('Erreur lors de l\'ajout du maître d\'apprentissage');
     });
+    */
   };
 
   if (isLoading) {

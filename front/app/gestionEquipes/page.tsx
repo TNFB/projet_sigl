@@ -33,6 +33,28 @@ const GestionEquipes = () => {
     
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    try {
+      const data = {
+        peopleData: rows.map(row => ({
+          apprenticeEmail: row.alternant,
+          masterEmail: row.maitre_apprentissage,
+          tutorEmail: row.tuteur
+        })),
+        token: 'token'
+      };
+      
+      postRequest('ApprenticeshipCoordinator/linkApprentice', JSON.stringify({ data: data }))
+        .then(response => {
+          console.log('Success:', response);
+          alert('Équipe(s) ajoutée(s) avec succès');
+          //Here can get return opf response 
+          // exemple : const { somthing } = response;
+        })
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Erreur lors de l\'ajout de l\'équipe');
+    }
+    /*
     const url = 'ApprenticeshipCoordinator/linkApprentice';
     const formattedData = {
       data: rows.map(row => ({
@@ -50,6 +72,7 @@ const GestionEquipes = () => {
       console.error('Error:', error);
       alert('Erreur lors de l\'ajout de l\'équipe');
     });
+    */
   };
 
   if (isLoading) {

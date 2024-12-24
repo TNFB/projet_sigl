@@ -3,11 +3,11 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 export default class Document extends BaseModel {
   @column({ isPrimary: true })
-  declare idDocument: number
+  declare id_document: number
 
   @column()
-  declare documentLink: string
+  declare document_link: string
 
   @column()
-  declare dropDate: DateTime
+  declare drop_date: DateTime
 }

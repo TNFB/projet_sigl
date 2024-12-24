@@ -33,6 +33,29 @@ const GestionIntervenants = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      try {
+        const data = {
+          peopleData: rows.map(row => ({
+            name: row.prenom,
+            lastName: row.nom,
+            email: row.email,
+            companyName: row.entreprise
+          })),
+          token: 'token'
+        };
+        
+        postRequest('professional/createOrUpdateProfessionals', JSON.stringify({ data: data }))
+          .then(response => {
+            console.log('Success:', response);
+            alert('Intervenant(s) ajouté(s) avec succès');
+            //Here can get return opf response 
+            // exemple : const { somthing } = response;
+          })
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Erreur lors de l\'ajout de l\'intervenant');
+      }
+      /*
       const url = 'professional/createOrUpdateProfessionals';
       const formattedData = {
         data: rows.map(row => ({
@@ -51,6 +74,7 @@ const GestionIntervenants = () => {
         console.error('Error:', error);
         alert('Erreur lors de l\'ajout de l\'intervenant');
       });
+      */
     };
 
   if (isLoading) {

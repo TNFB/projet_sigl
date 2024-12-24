@@ -1,11 +1,24 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
+import { isValidTokenAndRole } from 'app/utils/apiUtils.js'
 
 export default class MonthluNotesController {
   async createMonthlyNote({ request, response }: HttpContext) {
     console.log('createMonthlyNote')
     try {
-      const { email, title, content } = request.only(['email', 'title', 'content'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { email, title, content, token } = data
+
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
 
       // Vérifier si l'utilisateur existe et s'il est un apprenti
       const user = await db.from('users').where('email', email).first()
@@ -27,8 +40,8 @@ export default class MonthluNotesController {
 
       // Insérer la nouvelle note mensuelle
       const [newNoteId] = await db.table('monthly_notes').insert({
-        idTraningDiary: apprentice.idTrainingDiary,
-        creationDate: new Date(),
+        id_traning_diary: apprentice.id_training_diary,
+        creation_date: new Date(),
         title,
         content,
       })

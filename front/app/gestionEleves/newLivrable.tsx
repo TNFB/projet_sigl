@@ -44,9 +44,22 @@ const NewLivrable = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await postRequest('deposit/addDeposit', JSON.stringify(formData));
+      const data = {
+        deposit: formData.deposit,
+        token: 'token'
+      };
+      
+      postRequest('deposit/addDeposit', JSON.stringify({ data: data }))
+        .then(response => {
+          console.log('deposit created successfully:', response);
+          alert('Livrable ajouté avec succès');
+          //Here can get return opf response 
+          // exemple : const { somthing } = response;
+        })
+        
+      /*const response = await postRequest('deposit/addDeposit', JSON.stringify(formData));
       console.log('deposit created successfully:', response);
-      alert('Livrable ajouté avec succès');
+      alert('Livrable ajouté avec succès');*/
     } catch (error) {
       console.error('Error create deposit:', error);
       alert('Erreur lors de l\'ajout du livrable');

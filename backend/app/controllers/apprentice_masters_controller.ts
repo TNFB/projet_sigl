@@ -1,6 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
+import { findUserByEmail, isValidTokenAndRole } from 'app/utils/apiUtils.js'
 
 export default class ApprenticeMastersController {
   /**
@@ -39,7 +40,19 @@ export default class ApprenticeMastersController {
   async addApprentices({ request, response }: HttpContext) {
     console.log('addApprentices')
     try {
-      const { masterId, apprenticeIds } = request.only(['masterId', 'apprenticeIds'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { masterId, apprenticeIds, token } = data
+
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
 
       // master existe ?
       const master = await db.from('apprentice_masters').where('id', masterId).first()
@@ -54,7 +67,7 @@ export default class ApprenticeMastersController {
           await trx
             .from('apprentices')
             .where('id', apprenticeId)
-            .update({ idApprenticeMaster: masterId })
+            .update({ id_apprentice_master: masterId })
         }
       })
 
@@ -80,7 +93,7 @@ export default class ApprenticeMastersController {
    * @property {string} name - Le nom de l'utilisateur.
    * @property {string} lastName - Le nom de famille de l'utilisateur.
    * @property {string} email - L'email de l'utilisateur.
-   * @property {number} idCompagny - L'ID de l'entreprise de l'utilisateur.
+   * @property {number} id_company - L'ID de l'entreprise de l'utilisateur.
    *
    * @throws {InternalServerError} En cas d'erreur lors du traitement de la requête.
    *
@@ -88,7 +101,19 @@ export default class ApprenticeMastersController {
    */
   async createOrUpdateApprenticeMaster({ request, response }: HttpContext) {
     try {
-      const peopleData = request.input('data')
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { peopleData, token } = data
+
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
 
       if (!Array.isArray(peopleData)) {
         return response.status(400).json({ error: 'Input should be an array of people' })
@@ -100,16 +125,16 @@ export default class ApprenticeMastersController {
         const { name, lastName, email, companyName } = person
 
         // Vérifier si l'entreprise existe, sinon la créer
-        let idCompagny = 0
-        let company = await db.from('compagies').where('name', companyName).first()
+        let id_company = 0
+        let company = await db.from('companies').where('name', companyName).first()
         if (!company) {
-          const newIdCompany = await db
-            .table('compagies')
+          const newid_company = await db
+            .table('companies')
             .insert({ name: companyName })
-            .returning('idCompagny')
-          idCompagny = newIdCompany[0]
+            .returning('id_company')
+          id_company = newid_company[0]
         } else {
-          idCompagny = company.idCompagny
+          id_company = company.id_company
         }
 
         // Vérifier si l'utilisateur existe déjà
@@ -122,28 +147,28 @@ export default class ApprenticeMastersController {
           // Vérifier si l'entrée existe dans apprentice_masters
           const existingMaster = await db
             .from('apprentice_masters')
-            .where('id', existingUser.idUser)
+            .where('id', existingUser.id_user)
             .first()
 
           if (existingMaster) {
             // Mettre à jour l'entrée dans apprentice_masters si nécessaire
             await db
               .from('apprentice_masters')
-              .where('id', existingUser.idUser)
-              .update({ idCompagny: idCompagny })
+              .where('id', existingUser.id_user)
+              .update({ id_company: id_company })
           } else {
             // Créer une nouvelle entrée dans apprentice_masters si elle n'existe pas
             await db.table('apprentice_masters').insert({
-              id: existingUser.idUser,
-              idCompagny: idCompagny,
+              id: existingUser.id_user,
+              id_company: id_company,
             })
           }
 
           results.push({
             email,
             status: 'updated',
-            userId: existingUser.idUser,
-            compagnyId: idCompagny,
+            userId: existingUser.id_user,
+            compagnyId: id_company,
           })
         } else {
           // Créer un nouvel utilisateur
@@ -159,18 +184,18 @@ export default class ApprenticeMastersController {
               password: hashedPassword,
               role: 'apprentice_masters',
             })
-            .returning('idUser')
+            .returning('id_user')
 
           // Créer l'entrée dans la table apprentice_masters
           await db.table('apprentice_masters').insert({
             id: userId,
-            idCompagny: idCompagny,
+            id_company: id_company,
           })
 
           // Vous devriez envoyer le mot de passe par email à l'utilisateur ici
           console.log(`Mot de passe généré pour ${email}: ${password}`)
 
-          results.push({ email, status: 'created', userId, compagnyId: idCompagny })
+          results.push({ email, status: 'created', userId, compagnyId: id_company })
         }
       }
 
@@ -201,14 +226,26 @@ export default class ApprenticeMastersController {
    */
   public async getTrainingDiaryByEmail({ request, response }: HttpContext) {
     try {
-      const { email } = request.only(['email'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { email, token } = data
 
-      const existingUser = await db.from('users').where('email', email).first()
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
+
+      const existingUser = await findUserByEmail(email)
 
       if (existingUser) {
-        const apprentice = await db.from('apprentices').where('id', existingUser.idUser).first()
+        const apprentice = await db.from('apprentices').where('id', existingUser.id_user).first()
 
-        if (!apprentice || !apprentice.idTrainingDiary) {
+        if (!apprentice || !apprentice.id_training_diary) {
           return response.status(404).json({
             status: 'not found',
             message: 'Training diary not found for this user',
@@ -217,7 +254,7 @@ export default class ApprenticeMastersController {
 
         const trainingDiary = await db
           .from('training_diaries')
-          .where('idTrainingDiary', apprentice.idTrainingDiary)
+          .where('id_training_diary', apprentice.id_training_diary)
           .first()
 
         if (!trainingDiary) {
@@ -244,12 +281,24 @@ export default class ApprenticeMastersController {
 
   public async getApprenticeInfoByEmail({ request, response }: HttpContext) {
     try {
-      const { email } = request.only(['email'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { email, token } = data
 
-      const existingUser = await db.from('users').where('email', email).first()
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
+
+      const existingUser = await findUserByEmail(email)
 
       if (existingUser) {
-        const apprentice = await db.from('apprentices').where('id', existingUser.idUser).first()
+        const apprentice = await db.from('apprentices').where('id', existingUser.id_user).first()
 
         return response.status(200).json({ apprentice })
       } else {
@@ -266,9 +315,20 @@ export default class ApprenticeMastersController {
     }
   }
 
-  async getApprenticesByMasterEmail({ request, response }: HttpContext) {
+  public async getApprenticesByMasterEmail({ request, response }: HttpContext) {
     try {
-      const { email } = request.input('data')
+      const { data } = request.input('data')
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { email, token } = data
+      // Vérifier si l'admin existe et si le token est valide
+      if (! await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
 
       if (!email) {
         return response.status(400).json({ error: 'Email is required' })
@@ -288,8 +348,8 @@ export default class ApprenticeMastersController {
       // Trouver les apprentis associés à ce tuteur
       const apprentices = await db
         .from('apprentices')
-        .join('users', 'apprentices.id', 'users.idUser')
-        .where('apprentices.idApprenticeMaster', master.idUser)
+        .join('users', 'apprentices.id', 'users.id_user')
+        .where('apprentices.id_apprentice_master', master.id_user)
         .select('users.email', 'users.name', 'users.lastName')
 
       // Formater les données des apprentis

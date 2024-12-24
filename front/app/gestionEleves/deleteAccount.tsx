@@ -37,9 +37,21 @@ function DeleteAccount() {
     formDataJson['email'] = formData.email;
 
     try {
-      const response = await postRequest('admin/deleteUser', JSON.stringify(formDataJson));
-      console.log('User deleted successfully:', response);
-      alert('Utilisateur supprimé avec succès');
+      const data = {
+        email: formData.email,
+        token: 'token'
+      };
+      
+      postRequest('admin/deleteUser', JSON.stringify({ data: data }))
+        .then(response => {
+          console.log('User deleted successfully:', response);
+          alert('Utilisateur supprimé avec succès');
+          //Here can get return opf response 
+          // exemple : const { somthing } = response;
+        })
+      //const response = await postRequest('admin/deleteUser', JSON.stringify(formDataJson));
+      //console.log('User deleted successfully:', response);
+      //alert('Utilisateur supprimé avec succès');
     } catch (error) {
       console.error('Error delete user:', error);
       alert('Erreur lors de la suppression de l\'utilisateur');

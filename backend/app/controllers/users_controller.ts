@@ -1,6 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
+import { findUserByEmail, isUserTableEmpty, isValidTokenAndRole } from 'app/utils/apiUtils.js'
 
 /**
  * @class UsersController
@@ -9,55 +10,6 @@ import bcrypt from 'bcrypt'
  * Ce contrôleur fournit des méthodes pour créer, récupérer et gérer les utilisateurs dans l'application.
  */
 export default class UsersController {
-  /**
-   * @brief Récupère un utilisateur par son identifiant.
-   *
-   * Cette méthode vérifie si la table des utilisateurs est vide, puis tente de récupérer un utilisateur
-   * en fonction de l'identifiant fourni dans les paramètres. Si l'utilisateur est trouvé, il renvoie ses détails.
-   *
-   * @param {HttpContext} context - Le contexte HTTP contenant les paramètres et la réponse.
-   * @param {Object} context.params - Les paramètres de la requête, y compris l'identifiant de l'utilisateur.
-   * @param {Object} context.response - L'objet de réponse HTTP utilisé pour renvoyer des réponses au client.
-   *
-   * @throws {NotFound} Si la table des utilisateurs est vide ou si l'utilisateur n'est pas trouvé.
-   * @throws {InternalServerError} En cas d'erreur lors du traitement de la récupération de l'utilisateur.
-   *
-   * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et les détails de l'utilisateur.
-   */
-  async getUserById({ params, response }: HttpContext) {
-    console.log('getUserById')
-    try {
-      // check if table 'users' empty
-      const acteurCount = await db.from('users').count('* as total')
-      if (acteurCount[0].total === 0) {
-        console.log('User table empty')
-        return response.status(400).json({
-          status: 'error',
-          message: 'No users table found/users table empty',
-        })
-      }
-      //Table Not Empty
-      const getUserById = await db.from('users').where('id', params.id).select('*').first()
-      if (getUserById !== null) {
-        return response.status(200).json({
-          status: 'success',
-          users: getUserById,
-        })
-      } else {
-        return response.status(400).json({
-          status: 'error',
-          message: 'No users table found',
-        })
-      }
-    } catch (error) {
-      console.log(error)
-      return response.status(500).json({
-        status: 'error',
-        message: 'Erreur in getUserByID',
-      })
-    }
-  }
-
   /**
    * @brief Récupère les emails des utilisateurs en fonction du rôle spécifié.
    *
@@ -73,15 +25,26 @@ export default class UsersController {
    *
    * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et la liste des emails des utilisateurs.
    */
-  async getUserEmails({ request, response }: HttpContext) {
-    console.log('getUserEmails')
+  async getUserEmailsByRole({ request, response }: HttpContext) {
+    console.log('getUserEmailsByRole')
     try {
       // Récupérer le rôle depuis les paramètres de la requête
-      const role = request.input('role')
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { role, token } = data
+
+      //Need to check token
+      if (!await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
 
       // Vérifier si la table 'users' est vide
-      const userCount = await db.from('users').count('* as total')
-      if (userCount[0].total === 0) {
+      if (await isUserTableEmpty()) {
         console.log('User table empty')
         return response.status(400).json({
           status: 'error',
@@ -111,7 +74,7 @@ export default class UsersController {
       console.log(error)
       return response.status(500).json({
         status: 'error',
-        message: 'Erreur dans getUserEmails',
+        message: 'Erreur dans getUserEmailsByRole',
       })
     }
   }
@@ -134,22 +97,30 @@ export default class UsersController {
   async createUser({ request, response }: HttpContext) {
     console.log('createUser')
     try {
-      const { email, password, name, lastName, telephone, role } = request.only([
-        'email',
-        'password',
-        'name',
-        'lastName',
-        'telephone',
-        'role',
-      ])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { email, password, name, lastName, telephone, role, token } = data
 
-      const getEmail = await db.from('users').where('email', email).count('* as total')
-      if (getEmail[0].total > 0) {
+      //Need to check token
+      if (!await isValidTokenAndRole(token, 'admins')) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role, token, or token has expired',
+        })
+      }
+
+      //Check if Email Existe
+      const emailDB = await db.from('users').where('email', email).count('* as total')
+      if (emailDB[0].total > 0) {
         return response.status(400).json({
           status: 'error',
           message: `email: ${email} already existe in DB`,
         })
       }
+
+      //Create User
       const hashedPassword = await bcrypt.hash(password, 10)
       const createUser = await db
         .table('users')
@@ -159,8 +130,7 @@ export default class UsersController {
       //assigne Role
       let id = createUser
       console.log('role', role)
-      // eslint-disable-next-line eqeqeq
-      if (role != null) {
+      if (role && role !== '') {
         await db.table(role).insert({ id })
       } else {
         return response.status(200).json({
@@ -205,46 +175,43 @@ export default class UsersController {
     console.log('Connexion')
     try {
       const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
       const { email, password } = data
 
       console.log(`email: ${email}`)
       console.log(`password: ${password}`)
 
-      // check if table 'users' empty
-      const userCount = await db.from('users').count('* as total')
-      if (userCount[0].total === 0) {
+      // Vérifier si la table 'users' est vide
+      if (await isUserTableEmpty()) {
         console.log('User table empty')
         return response.status(400).json({
           status: 'error',
-          message: 'No User table found/table users empty',
+          message: 'No users table found/users table empty',
         })
       }
 
       // Found User by Email
-      const userDb = await db.from('users').where('email', email).select('*').first()
+      const userDb = await findUserByEmail(email)
       if (!userDb) {
         return response.status(401).json({
           status: 'error',
-          message: 'Email not found',
+          message: 'Email not found in User',
         })
       }
 
       const isPasswordValid = await bcrypt.compare(password, userDb.password)
       //const isPasswordValid = password
       if (isPasswordValid) {
-        // Creation Token
-        const token = `${userDb.idUser}_${Date.now()}`
-        response.cookie('access_token', token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production', // Utilisez true en production avec HTTPS
-          maxAge: 2 * 60 * 60 * 1000, // 2 heures en millisecondes
-        })
+        //TODO
+        // Gerer Token => Inserte Token In BDD if user can connect 
+        // Maybe add 1-2sec delay if password Wrong 
         return response.status(200).json({
           status: 'success',
           password: true,
           role: userDb.role,
           email: userDb.email,
-          cookieToken: token,
         })
       } else {
         return response.status(401).json({
@@ -274,12 +241,37 @@ export default class UsersController {
    * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et un message indiquant que 
                                la déconnexion a réussi.
    */
-  async logoutUser({ response }: HttpContext) {
-    response.clearCookie('access_token')
-    return response.status(200).json({
-      status: 'success',
-      message: 'Logout succesfull',
+  async logoutUser({ request, response }: HttpContext) {
+    const { data } = request.only(['data'])
+    if (!data) {
+      return response.status(400).json({ error: 'Data is required' })
+    }
+    const { token } = data
+
+    const users = await db
+      .from('users')
+      .select('token')
+
+    for (const user of users) {
+      const isTokenMatch = await bcrypt.compare(token, user.token)
+      if (isTokenMatch) {
+        await db.from('users')
+        .where('id_user', user.id_user)
+        .update({ 
+          token: null, // Optionnel : réinitialiser le token après utilisation
+          expired_date: null // Optionnel : réinitialiser la date d'expiration
+        })
+        return response.status(200).json({
+          status: 'success',
+          message: 'Logout succesfull',
+        })
+      }
+    }
+    return response.status(400).json({
+      status: 'faill',
+      message: 'Faill to Logout',
     })
+    
   }
 
   /**
@@ -302,39 +294,45 @@ export default class UsersController {
    */
   async changePassword({ request, response }: HttpContext) {
     try {
-      const { email, oldPassword, newPassword } = request.only([
-        'email',
-        'oldPassword',
-        'newPassword',
-      ])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { email, oldPassword, newPassword, token } = data
 
-      const userCount = await db.from('users').count('* as total')
-      if (userCount[0].total === 0) {
+      // Vérifier si la table 'users' est vide
+      if (await isUserTableEmpty()) {
         console.log('User table empty')
         return response.status(400).json({
           status: 'error',
-          message: 'No User table found/table users empty',
+          message: 'No users table found/users table empty',
         })
       }
 
       // Found User by Email
-      const userDb = await db.from('users').where('email', email).select('*').first()
+      const userDb = await findUserByEmail(email)
       if (!userDb) {
+        return response.status(401).json({
+          status: 'error',
+          message: 'Email not found in User',
+        })
+      }
+
+      if(!await isValidTokenAndRole(token, userDb.role)){
         return response.status(400).json({
           status: 'error',
-          message: 'Email not found',
+          message: 'Invalid token, or token has expired',
         })
       }
 
       const bddPassword = userDb.password
-      console.log(`Oldpassword : ${oldPassword}`)
-      if (bddPassword === newPassword) {
+      if (await bcrypt.compare(newPassword, bddPassword)) {
         return response.status(422).json({
           status: 'error',
           Message: 'The new password is the same the old one',
         })
-      } else if (bddPassword !== oldPassword) {
-        // Not same user (wrong password)
+      } else if (!await bcrypt.compare(oldPassword, bddPassword)) {
+        //Old Password not the same as the one in BDD
         return response.status(401).json({
           status: 'Unauthorized',
           messsage: 'Identification with password is wrong',

@@ -1,6 +1,6 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
-import { isValidTokenAndRole } from 'app/utils/apiUtils.js'
+import { isValidRole } from 'app/utils/apiUtils.js'
 
 export default class ApprenticeshipCoordinatorsController {
   public async linkApprentice({ request, response }: HttpContext) {
@@ -12,7 +12,7 @@ export default class ApprenticeshipCoordinatorsController {
 
       const { peopleData, token } = data
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidTokenAndRole(token, 'admins')) {
+      if (! await isValidRole(token, 'admins')) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',

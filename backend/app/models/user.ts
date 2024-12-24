@@ -23,10 +23,4 @@ export default class User extends BaseModel {
 
   @column()
   declare role: string
-
-  @column()
-  declare token: string | null
-
-  @column.dateTime()
-  declare expired_date: DateTime | null
 }

@@ -1,7 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
-import { findUserByEmail, isValidTokenAndRole } from 'app/utils/apiUtils.js'
+import { findUserByEmail, isValidRole } from 'app/utils/apiUtils.js'
 
 export default class ApprenticeMastersController {
   /**
@@ -47,7 +47,7 @@ export default class ApprenticeMastersController {
       const { masterId, apprenticeIds, token } = data
 
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidTokenAndRole(token, 'admins')) {
+      if (! await isValidRole(token, 'admins')) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -108,7 +108,7 @@ export default class ApprenticeMastersController {
       const { peopleData, token } = data
 
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidTokenAndRole(token, 'admins')) {
+      if (! await isValidRole(token, 'admins')) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -233,7 +233,7 @@ export default class ApprenticeMastersController {
       const { email, token } = data
 
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidTokenAndRole(token, 'admins')) {
+      if (! await isValidRole(token, 'admins')) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -288,7 +288,7 @@ export default class ApprenticeMastersController {
       const { email, token } = data
 
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidTokenAndRole(token, 'admins')) {
+      if (! await isValidRole(token, 'admins')) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -323,7 +323,7 @@ export default class ApprenticeMastersController {
       }
       const { email, token } = data
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidTokenAndRole(token, 'admins')) {
+      if (! await isValidRole(token, 'admins')) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',

@@ -23,6 +23,7 @@ server.errorHandler(() => import('#exceptions/handler'))
  * the request URL.
  */
 server.use([
+  () => import('@adonisjs/core/bodyparser_middleware'),
   () => import('#middleware/container_bindings_middleware'),
   () => import('#middleware/force_json_response_middleware'),
   () => import('@adonisjs/cors/cors_middleware'),
@@ -33,5 +34,5 @@ server.use([
  * requests with a registered route.
  */
 router.use([
-  () => import('#middleware/auth'),
+  // Ajoutez ici les middlewares spécifiques aux routes si nécessaire
 ])

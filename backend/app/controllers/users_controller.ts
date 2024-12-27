@@ -1,7 +1,8 @@
 import db from '@adonisjs/lucid/services/db'
 import { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
-import { findUserByEmail, isUserTableEmpty, isValidRole } from 'app/utils/apiUtils.js'
+import { findUserByEmail, isUserTableEmpty, isValidRole } from '../utils/api_utils.js'
+import jwt from 'jsonwebtoken'
 
 /**
  * @class UsersController
@@ -36,7 +37,7 @@ export default class UsersController {
       const { role, token } = data
 
       //Need to check token
-      if (!await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(token, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -104,7 +105,7 @@ export default class UsersController {
       const { email, password, name, lastName, telephone, role, token } = data
 
       //Need to check token
-      if (!await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(token, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -175,13 +176,10 @@ export default class UsersController {
     console.log('Connexion')
     try {
       const { data } = request.only(['data'])
-      if (!data) {
-        return response.status(400).json({ error: 'Data is required' })
+      if (!data || !data.email || !data.password) {
+        return response.status(400).json({ error: 'Email and password are required' })
       }
       const { email, password } = data
-
-      console.log(`email: ${email}`)
-      console.log(`password: ${password}`)
 
       // Vérifier si la table 'users' est vide
       if (await isUserTableEmpty()) {
@@ -202,16 +200,20 @@ export default class UsersController {
       }
 
       const isPasswordValid = await bcrypt.compare(password, userDb.password)
-      //const isPasswordValid = password
       if (isPasswordValid) {
         //TODO
-        // Gerer Token => Inserte Token In BDD if user can connect 
+        // Gerer Token => Inserte Token In BDD if user can connect
         // Maybe add 1-2sec delay if password Wrong
-        const token = await auth.use('api').attempt(email, password)
+        const token = jwt.sign(
+          { id: userDb.id_user, email: userDb.email, role: userDb.role },
+          process.env.APP_KEY,
+          {
+            expiresIn: '1h',
+          }
+        )
         return response.status(200).json({
           status: 'success',
-          token: token.token,
-          user: token.user,
+          token: token,
         })
       } else {
         return response.status(401).json({
@@ -223,7 +225,7 @@ export default class UsersController {
       console.log(error)
       return response.status(500).json({
         status: 'error',
-        message: 'Erreur in users connetion',
+        message: 'Erreur in users connection',
       })
     }
   }
@@ -247,18 +249,14 @@ export default class UsersController {
     }
     const { token } = data
 
-    const users = await db
-      .from('users')
-      .select('token')
+    const users = await db.from('users').select('token')
 
     for (const user of users) {
       const isTokenMatch = await bcrypt.compare(token, user.token)
       if (isTokenMatch) {
-        await db.from('users')
-        .where('id_user', user.id_user)
-        .update({ 
+        await db.from('users').where('id_user', user.id_user).update({
           token: null, // Optionnel : réinitialiser le token après utilisation
-          expired_date: null // Optionnel : réinitialiser la date d'expiration
+          expired_date: null, // Optionnel : réinitialiser la date d'expiration
         })
         return response.status(200).json({
           status: 'success',
@@ -270,7 +268,6 @@ export default class UsersController {
       status: 'faill',
       message: 'Faill to Logout',
     })
-    
   }
 
   /**
@@ -317,7 +314,7 @@ export default class UsersController {
         })
       }
 
-      if(!await isValidRole(token, userDb.role)){
+      if (!(await isValidRole(token, userDb.role))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid token, or token has expired',
@@ -330,7 +327,7 @@ export default class UsersController {
           status: 'error',
           Message: 'The new password is the same the old one',
         })
-      } else if (!await bcrypt.compare(oldPassword, bddPassword)) {
+      } else if (!(await bcrypt.compare(oldPassword, bddPassword))) {
         //Old Password not the same as the one in BDD
         return response.status(401).json({
           status: 'Unauthorized',

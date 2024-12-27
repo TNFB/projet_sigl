@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { postRequest } from '@/api/api';
 import bcrypt from 'bcryptjs';
+import { jwtDecode } from 'jwt-decode';
 
 const Page = () => {
   const router = useRouter();
@@ -17,27 +18,30 @@ const Page = () => {
   const [isSignup, setIsSignup] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
 
-  useEffect(() => {
-    /*const token = localStorage.getItem('token');
-        if (token) {
-            router.push('/');
-        }*/
-  }, [router]);
-
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
     const data = {
       email: email,
       password: password
     };
-    
     postRequest('connection', JSON.stringify({ data: data }))
       .then(response => {
         console.log('Success:', response);
-        const { role } = response;
-        localStorage.setItem('role', role);
-        localStorage.setItem('email', email);
-        console.log(role);
-        console.log(email);
+        const { token } = response;
+        console.log('Token:', token);
+
+        const decodedToken = jwtDecode(token);
+        console.log('Decoded Token:', decodedToken);
+
+        // Stocker le token JWT et les informations du user dans le localStorage
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', decodedToken.role);
+        localStorage.setItem('email', decodedToken.email);
+
+        console.log('Token:', localStorage.getItem('token'));
+        console.log('Role:', localStorage.getItem('role'));
+        console.log('Email:', localStorage.getItem('email'));
+
         router.push('/');
       })
       .catch(error => {

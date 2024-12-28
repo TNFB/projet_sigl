@@ -6,8 +6,15 @@ import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { postRequest } from '@/api/api';
-import bcrypt from 'bcryptjs';
 import { jwtDecode } from 'jwt-decode';
+
+interface CustomJwtPayload {
+  id: number;
+  email: string;
+  role: string;
+  iat: number;
+  exp: number;
+}
 
 const Page = () => {
   const router = useRouter();
@@ -30,7 +37,7 @@ const Page = () => {
         const { token } = response;
         console.log('Token:', token);
 
-        const decodedToken = jwtDecode(token);
+        const decodedToken = jwtDecode<CustomJwtPayload>(token);
         console.log('Decoded Token:', decodedToken);
 
         // Stocker le token JWT et les informations du user dans le localStorage

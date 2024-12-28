@@ -11,7 +11,9 @@ const GestionEntreprises = () => {
 
   useEffect(() => {
     const role = localStorage.getItem('role');
-    if (role !== 'apprenticeship_coordinators') {
+    const token = localStorage.getItem('token');
+    if ( !token && role !== 'admins') {
+      localStorage.clear();
       router.push('/Login');
     } else {
       setIsLoading(false);

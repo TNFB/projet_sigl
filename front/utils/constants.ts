@@ -47,14 +47,6 @@ export const SIDEBAR_ADMIN_ITEMS = [
     url: "/blocNote",
     icon: "BookOpen",
   },
-]
-
-export const SIDEBAR_CA_ITEMS = [
-  {
-    title: "Accueil",
-    url: "/",
-    icon: "Home",
-  },
   {
     title: "Maîtres d'apprentissage",
     url: "/gestionMaitresApp",

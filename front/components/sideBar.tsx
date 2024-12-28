@@ -4,7 +4,7 @@ import { Home, CheckSquare, FileText, BookOpen, Clipboard } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader } from "@/components/ui/sidebar"
 import Image from 'next/image'
 import Link from 'next/link'
-import { SIDEBAR_ITEMS, SIDEBAR_ADMIN_ITEMS, SIDEBAR_CA_ITEMS } from '@/utils/constants'
+import { SIDEBAR_ITEMS, SIDEBAR_ADMIN_ITEMS } from '@/utils/constants'
 import { ICONS } from '@/utils/iconMapping'
 import { postRequest } from '@/api/api';
 
@@ -33,8 +33,6 @@ const SideBar = () => {
           const apprentices = response.apprentis
           setStudents(apprentices)
           console.log('Success:', response)
-          //Here can get return opf response 
-          // exemple : const { somthing } = response;
         })
     } catch (error) {
       console.error('Error:', error)
@@ -60,7 +58,7 @@ const SideBar = () => {
 
 
   useEffect(() => {
-    const userRole = localStorage.getItem('role') as 'apprentices' | 'admins' | 'apprenticeship_coordinators' | 'apprentice_masters' | 'educational_tutors' | null
+    const userRole = localStorage.getItem('role') as 'apprentices' | 'admins' | 'apprentice_masters' | 'educational_tutors' | null
     const storedEmail = localStorage.getItem('email')
     setEmail(storedEmail)
     setUserType(userRole ?? 'apprentices')
@@ -110,8 +108,6 @@ const SideBar = () => {
       case 'admins':
         return SIDEBAR_ADMIN_ITEMS
       case 'apprenticeship_coordinators':
-        return SIDEBAR_CA_ITEMS
-      case 'apprentices':
         return SIDEBAR_ITEMS
       case 'apprentice_masters':
         return transformStudentsToSidebarItems(students)

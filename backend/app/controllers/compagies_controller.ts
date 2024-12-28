@@ -1,6 +1,6 @@
 import { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
-import { isValidRole } from 'app/utils/apiUtils.js'
+import { isValidRole } from '../utils/api_utils.js'
 
 export default class CompaniesController {
   /**

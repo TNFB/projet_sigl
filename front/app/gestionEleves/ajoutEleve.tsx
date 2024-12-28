@@ -30,14 +30,14 @@ function AjoutEleve() {
     email: string;
     password: string;
     name: string;
-    lastName: string;
+    last_name: string;
     telephone: string;
     role: string;
   }>({
     email: '',
     password: '',
     name: '',
-    lastName: '',
+    last_name: '',
     telephone: '',
     role: '',
   });
@@ -59,9 +59,9 @@ function AjoutEleve() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { email, password, name, lastName, telephone, role } = formData;
+    const { email, password, name, last_name, telephone, role } = formData;
 
-    if (!email || !password || !name || !lastName || !telephone || !role) {
+    if (!email || !password || !name || !last_name || !telephone || !role) {
       console.error('All fields are required');
       return;
     }
@@ -93,8 +93,8 @@ function AjoutEleve() {
       type: 'input',
       label: 'Prénom',
       inputType: 'text',
-      name: 'lastName',
-      value: formData.lastName,
+      name: 'last_name',
+      value: formData.last_name,
       onChange: handleChange,
     },
     {
@@ -137,7 +137,7 @@ function AjoutEleve() {
     },
   ];
 
-  const fieldsOrder = ['email', 'password', 'name', 'lastName', 'telephone', 'role'];
+  const fieldsOrder = ['email', 'password', 'name', 'last_name', 'telephone', 'role'];
 
   return (
     <BaseForm title="Ajout d'un utilisateur" submitLabel="Ajouter" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="min-w-80" />

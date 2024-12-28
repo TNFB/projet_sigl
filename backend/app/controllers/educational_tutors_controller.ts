@@ -1,7 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
-import { isValidRole } from 'app/utils/apiUtils.js'
+import { isValidRole } from '../utils/api_utils.js'
 
 export default class EducationalTutorsController {
   /**
@@ -258,14 +258,14 @@ export default class EducationalTutorsController {
       const results = []
 
       for (const person of peopleData) {
-        const { name, lastName, email } = person
+        const { name, last_name, email } = person
 
         // Vérifier si l'utilisateur existe déjà
         const existingUser = await db.from('users').where('email', email).first()
 
         if (existingUser) {
           // Mettre à jour les informations de l'utilisateur existant
-          await db.from('users').where('email', email).update({ name, lastName })
+          await db.from('users').where('email', email).update({ name, last_name })
 
           // Vérifier si l'entrée existe dans educational_tutors
           const existingTutor = await db
@@ -295,7 +295,7 @@ export default class EducationalTutorsController {
             .insert({
               email,
               name,
-              lastName,
+              last_name,
               password: hashedPassword,
               role: 'educational_tutors',
             })
@@ -362,13 +362,13 @@ export default class EducationalTutorsController {
         .from('apprentices')
         .join('users', 'apprentices.id', 'users.id_user')
         .where('apprentices.id_educational_tutor', tutor.id_user)
-        .select('users.email', 'users.name', 'users.lastName')
+        .select('users.email', 'users.name', 'users.last_name')
 
       // Formater les données des apprentis
       const formattedApprentices = apprentices.map((apprentice) => ({
         email: apprentice.email,
         nom: apprentice.name,
-        prenom: apprentice.lastName,
+        prenom: apprentice.last_name,
       }))
 
       // Créer l'objet JSON de réponse
@@ -376,7 +376,7 @@ export default class EducationalTutorsController {
         tuteur: {
           email: tutor.email,
           nom: tutor.name,
-          prenom: tutor.lastName,
+          prenom: tutor.last_name,
         },
         apprentis: formattedApprentices,
       }

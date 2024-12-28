@@ -1,7 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
-import { findUserByEmail, isValidRole } from 'app/utils/apiUtils.js'
+import { findUserByEmail, isValidRole } from '../utils/api_utils.js'
 
 export default class ApprenticeMastersController {
   /**
@@ -92,7 +92,7 @@ export default class ApprenticeMastersController {
    * @param {HttpContext} context - Le contexte HTTP de la requête.
    *
    * @property {string} name - Le nom de l'utilisateur.
-   * @property {string} lastName - Le nom de famille de l'utilisateur.
+   * @property {string} last_name - Le nom de famille de l'utilisateur.
    * @property {string} email - L'email de l'utilisateur.
    * @property {number} id_company - L'ID de l'entreprise de l'utilisateur.
    *
@@ -124,19 +124,19 @@ export default class ApprenticeMastersController {
       const results = []
 
       for (const person of peopleData) {
-        const { name, lastName, email, companyName } = person
+        const { name, last_name, email, companyName } = person
 
         // Vérifier si l'entreprise existe, sinon la créer
-        let idCompany = 0
+        let id_company = 0
         let company = await db.from('companies').where('name', companyName).first()
         if (!company) {
-          const newidCompany = await db
+          const newid_company = await db
             .table('companies')
             .insert({ name: companyName })
             .returning('id_company')
-          idCompany = newidCompany[0]
+          id_company = newid_company[0]
         } else {
-          idCompany = company.idCompany
+          id_company = company.id_company
         }
 
         // Vérifier si l'utilisateur existe déjà
@@ -144,7 +144,7 @@ export default class ApprenticeMastersController {
 
         if (existingUser) {
           // Mettre à jour les informations de l'utilisateur existant
-          await db.from('users').where('email', email).update({ name, lastName })
+          await db.from('users').where('email', email).update({ name, last_name })
 
           // Vérifier si l'entrée existe dans apprentice_masters
           const existingMaster = await db
@@ -182,7 +182,7 @@ export default class ApprenticeMastersController {
             .insert({
               email,
               name,
-              lastName,
+              last_name,
               password: hashedPassword,
               role: 'apprentice_masters',
             })
@@ -356,13 +356,13 @@ export default class ApprenticeMastersController {
         .from('apprentices')
         .join('users', 'apprentices.id', 'users.id_user')
         .where('apprentices.id_apprentice_master', master.id_user)
-        .select('users.email', 'users.name', 'users.lastName')
+        .select('users.email', 'users.name', 'users.last_name')
 
       // Formater les données des apprentis
       const formattedApprentices = apprentices.map((apprentice) => ({
         email: apprentice.email,
         nom: apprentice.name,
-        prenom: apprentice.lastName,
+        prenom: apprentice.last_name,
       }))
 
       // Créer l'objet JSON de réponse
@@ -370,7 +370,7 @@ export default class ApprenticeMastersController {
         tuteur: {
           email: master.email,
           nom: master.name,
-          prenom: master.lastName,
+          prenom: master.last_name,
         },
         apprentis: formattedApprentices,
       }

@@ -1,6 +1,6 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
-import { isValidRole } from 'app/utils/apiUtils.js'
+import { isValidRole } from '../utils/api_utils.js'
 
 export default class ApprenticeshipCoordinatorsController {
   public async linkApprentice({ request, response }: HttpContext) {

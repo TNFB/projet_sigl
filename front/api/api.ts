@@ -92,7 +92,7 @@ export const postRequestCreateUser = async (url: string, userData: {
   email: string;
   password: string;
   name: string;
-  lastName: string;
+  last_name: string;
   telephone: string;
   role: string;
 }) => {

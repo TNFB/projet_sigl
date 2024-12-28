@@ -40,7 +40,7 @@ const GestionTuteurs = () => {
       const data = {
         peopleData: rows.map(row => ({
           name: row.prenom,
-          lastName: row.nom,
+          last_name: row.nom,
           email: row.email
         }))
       };
@@ -61,7 +61,7 @@ const GestionTuteurs = () => {
     const formattedData = {
       data: rows.map(row => ({
         name: row.prenom,
-        lastName: row.nom,
+        last_name: row.nom,
         email: row.email
       }))
     };

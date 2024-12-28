@@ -45,8 +45,7 @@ const NewLivrable = () => {
     e.preventDefault();
     try {
       const data = {
-        deposit: formData.deposit,
-        token: 'token'
+        deposit: formData.deposit
       };
       
       postRequest('deposit/addDeposit', JSON.stringify({ data: data }))

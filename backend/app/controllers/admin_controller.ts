@@ -1,7 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
-import { findUserByEmail, isUserTableEmpty, isValidRole } from 'app/utils/apiUtils.js'
+import { findUserByEmail, isUserTableEmpty, isValidRole } from '../utils/api_utils.js'
 
 /**
  * @class AdminController
@@ -38,10 +38,6 @@ export default class AdminController {
       }
       const { user, email, newPassword } = data
 
-      //TO Remove?
-      console.log(`email: ${email}`)
-      console.log(`password: ${newPassword}`)
-  
       if (await isUserTableEmpty()) {
         console.log('User table empty')
         return response.status(400).json({
@@ -49,19 +45,19 @@ export default class AdminController {
           message: 'No User table found/table users empty',
         })
       }
-      
-      // HASH TOKEN?
+
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (!await isValidRole(user, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
         })
       }
-  
+
       const userDb = await findUserByEmail(email)
 
-      if(!userDb) {
+      if (!userDb) {
         return response.status(404).json({
           status: 'error',
           message: 'User not found',
@@ -76,23 +72,20 @@ export default class AdminController {
           message: 'The new password is the same as the old one',
         })
       }
-  
+
       //Hasher le nouveau mot de passe
       const hashedPassword = await bcrypt.hash(newPassword, 10)
       // Mettre à jour le mot de passe
-      await db.from('users')
-        .where('id_user', userDb.id_user)
-        .update({ 
-          password: hashedPassword,
-          token: null, // Optionnel : réinitialiser le token après utilisation
-          expired_date: null // Optionnel : réinitialiser la date d'expiration
-        })
-  
+      await db.from('users').where('id_user', userDb.id_user).update({
+        password: hashedPassword,
+        token: null, // Optionnel : réinitialiser le token après utilisation
+        expired_date: null, // Optionnel : réinitialiser la date d'expiration
+      })
+
       return response.status(200).json({
         status: 'success',
         message: 'Password changed successfully',
       })
-  
     } catch (error) {
       console.log(error)
       return response.status(500).json({
@@ -101,7 +94,6 @@ export default class AdminController {
       })
     }
   }
-  
 
   /**
    * @method deleteUserByEmail
@@ -136,9 +128,9 @@ export default class AdminController {
         })
       }
 
-      // HASH TOKEN?
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -147,7 +139,7 @@ export default class AdminController {
 
       // Found User by Email
       const userDb = await findUserByEmail(email)
-      
+
       if (!userDb) {
         return response.status(400).json({
           status: 'error',

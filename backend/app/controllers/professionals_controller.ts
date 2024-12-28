@@ -1,7 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
-import { isValidRole } from 'app/utils/apiUtils.js'
+import { isValidRole } from '../utils/api_utils.js'
 
 export default class ProfessionalsController {
   /**
@@ -11,7 +11,7 @@ export default class ProfessionalsController {
    * @param {HttpContext} context - Le contexte HTTP de la requête.
    *
    * @property {string} name - Le nom de l'utilisateur.
-   * @property {string} lastName - Le nom de famille de l'utilisateur.
+   * @property {string} last_name - Le nom de famille de l'utilisateur.
    * @property {string} email - L'email de l'utilisateur.
    * @property {string} companyName - Le nom de l'entreprise du professionnel.
    *
@@ -27,8 +27,9 @@ export default class ProfessionalsController {
       }
       const { peopleData, token } = data
 
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -42,7 +43,7 @@ export default class ProfessionalsController {
       const results = []
 
       for (const person of peopleData) {
-        const { name, lastName, email, companyName } = person
+        const { name, last_name, email, companyName } = person
 
         // Vérifier si l'entreprise existe, sinon la créer
         let id_company = 0
@@ -62,7 +63,7 @@ export default class ProfessionalsController {
 
         if (existingUser) {
           // Mettre à jour les informations de l'utilisateur existant
-          await db.from('users').where('email', email).update({ name, lastName })
+          await db.from('users').where('email', email).update({ name, last_name })
 
           // Vérifier si l'entrée existe dans professionals
           const existingMaster = await db
@@ -100,7 +101,7 @@ export default class ProfessionalsController {
             .insert({
               email,
               name,
-              lastName,
+              last_name,
               password: hashedPassword,
               role: 'professionals',
             })

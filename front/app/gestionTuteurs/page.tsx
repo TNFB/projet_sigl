@@ -13,7 +13,9 @@ const GestionTuteurs = () => {
 
   useEffect(() => {
     const role = localStorage.getItem('role');
-    if (role !== 'apprenticeship_coordinators') {
+    const token = localStorage.getItem('token');
+    if ( !token && role !== 'admins') {
+      localStorage.clear();
       router.push('/Login');
     } else {
       setIsLoading(false);
@@ -38,10 +40,9 @@ const GestionTuteurs = () => {
       const data = {
         peopleData: rows.map(row => ({
           name: row.prenom,
-          lastName: row.nom,
+          last_name: row.nom,
           email: row.email
-        })),
-        token: 'token'
+        }))
       };
       
       postRequest('educationalTutor/createOrUpdateEducationalTutor', JSON.stringify({ data: data }))
@@ -60,7 +61,7 @@ const GestionTuteurs = () => {
     const formattedData = {
       data: rows.map(row => ({
         name: row.prenom,
-        lastName: row.nom,
+        last_name: row.nom,
         email: row.email
       }))
     };

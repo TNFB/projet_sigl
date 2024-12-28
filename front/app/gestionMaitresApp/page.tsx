@@ -13,7 +13,9 @@ const GestionMaitresApp = () => {
 
   useEffect(() => {
     const role = localStorage.getItem('role');
-    if (role !== 'apprenticeship_coordinators') {
+    const token = localStorage.getItem('token');
+    if ( !token && role !== 'admins') {
+      localStorage.clear();
       router.push('/Login');
     } else {
       setIsLoading(false);
@@ -37,11 +39,10 @@ const GestionMaitresApp = () => {
       const data = {
         peopleData: rows.map(row => ({
           name: row.prenom,
-          lastName: row.nom,
+          last_name: row.nom,
           email: row.email,
           companyName: row.entreprise
-        })),
-        token: 'token'
+        }))
       };
       
       postRequest('apprenticeMaster/createOrUpdateApprenticeMaster', JSON.stringify({ data: data }))
@@ -61,7 +62,7 @@ const GestionMaitresApp = () => {
     const formattedData = {
       data: rows.map(row => ({
         name: row.prenom,
-        lastName: row.nom,
+        last_name: row.nom,
         email: row.email,
         companyName: row.entreprise
       }))

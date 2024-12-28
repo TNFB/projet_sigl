@@ -11,7 +11,9 @@ const GestionEntreprises = () => {
 
   useEffect(() => {
     const role = localStorage.getItem('role');
-    if (role !== 'apprenticeship_coordinators') {
+    const token = localStorage.getItem('token');
+    if ( !token && role !== 'admins') {
+      localStorage.clear();
       router.push('/Login');
     } else {
       setIsLoading(false);
@@ -35,8 +37,7 @@ const GestionEntreprises = () => {
     e.preventDefault();
     try {
       const data = {
-        companiesData: rows.map(row => ({ name: row.name })),
-        token: 'token'
+        companiesData: rows.map(row => ({ name: row.name }))
       };
       
       postRequest('company/createCompany', JSON.stringify({ data: data }))

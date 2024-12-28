@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react'
 import BaseForm from '@/components/BaseForm'
 import { postRequest } from '@/api/api'
-import bcrypt from 'bcryptjs'
 
 interface FormData {
   email: string;
@@ -39,8 +38,7 @@ function ModifMDP() {
     const fetchEmails = async () => {
       try {
         const data = {
-          role: 'role',
-          token: 'token'
+          role: null
         };
         
         postRequest('user/getUserEmailsByRole', JSON.stringify({ data: data }))
@@ -90,11 +88,9 @@ function ModifMDP() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const hashedPassword = await bcrypt.hash(formData.password, 10);
       const data = {
         email: formData.email,
-        newPassword: hashedPassword,
-        token: 'token'
+        newPassword: formData.password,
       };
       
       postRequest('admin/overritePassword', JSON.stringify({ data: data }))

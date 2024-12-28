@@ -8,6 +8,7 @@
         "#models/*": ["app/Models/*"],
         "#controllers/*": ["app/Controllers/Http/*"],
         "#providers/*": ["providers/*"],
+        "#utils/*": ["./app/utils/*"]
       },
   }
 }

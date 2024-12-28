@@ -13,7 +13,9 @@ const GestionEquipes = () => {
 
   useEffect(() => {
     const role = localStorage.getItem('role');
-    if (role !== 'apprenticeship_coordinators') {
+    const token = localStorage.getItem('token');
+    if ( !token && role !== 'admins') {
+      localStorage.clear();
       router.push('/Login');
     } else {
       setIsLoading(false);
@@ -39,8 +41,7 @@ const GestionEquipes = () => {
           apprenticeEmail: row.alternant,
           masterEmail: row.maitre_apprentissage,
           tutorEmail: row.tuteur
-        })),
-        token: 'token'
+        }))
       };
       
       postRequest('ApprenticeshipCoordinator/linkApprentice', JSON.stringify({ data: data }))

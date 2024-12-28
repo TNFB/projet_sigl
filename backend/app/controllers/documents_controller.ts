@@ -118,7 +118,7 @@ export default class DocumentsController {
       const results = []
 
       for (const row of data) {
-        const { email, name, lastName, apprenticeMasters, educationalTutors } = row
+        const { email, name, last_name, apprenticeMasters, educationalTutors } = row
 
         // Vérifier si l'utilisateur existe déjà
         let user = await db.from('users').where('email', email).first()
@@ -131,12 +131,12 @@ export default class DocumentsController {
             .insert({
               email,
               name,
-              lastName,
+              last_name,
               role,
             })
             .returning('*') // Récupérer toutes les colonnes
 
-          user = { id_user: result[0], email, name, lastName }
+          user = { id_user: result[0], email, name, last_name }
         }
 
         // Créer un journal de formation (training diary)

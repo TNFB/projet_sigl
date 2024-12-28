@@ -36,7 +36,7 @@ function GestionEleves() {
     );
   }
 
-  /*return (
+  return (
     <Home>
       <div className="flex space-x-4 p-4 w-fit">
         <AjoutEleve />
@@ -50,15 +50,6 @@ function GestionEleves() {
         </div>
          <div className="flex flex-col space-y-5">
           <CreationJF />
-        </div>
-      </div>
-    </Home>
-  );*/
-  return (
-    <Home>
-      <div className="flex space-x-4 p-4 w-fit">
-        <div className="flex flex-col space-y-5">
-          <ModifMDP />
         </div>
       </div>
     </Home>

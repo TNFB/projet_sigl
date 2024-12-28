@@ -18,6 +18,7 @@
 export const postRequest = async (url: string, body?: string) => {
   const token = localStorage.getItem('token');
   console.log('token:', token);
+  console.log('body:', body);
   const response = await fetch( `${process.env.NEXT_PUBLIC_API_URL }/${url}`, {
     method: 'POST',
     headers: {
@@ -104,7 +105,7 @@ export const postRequestCreateUser = async (url: string, userData: {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {
     method: 'POST',
     headers,
-    body: JSON.stringify(userData),
+    body: JSON.stringify({ data: userData}),
   });
 
   if (!response.ok) {

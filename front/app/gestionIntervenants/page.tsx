@@ -41,8 +41,7 @@ const GestionIntervenants = () => {
             lastName: row.nom,
             email: row.email,
             companyName: row.entreprise
-          })),
-          token: 'token'
+          }))
         };
         
         postRequest('professional/createOrUpdateProfessionals', JSON.stringify({ data: data }))

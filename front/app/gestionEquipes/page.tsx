@@ -41,8 +41,7 @@ const GestionEquipes = () => {
           apprenticeEmail: row.alternant,
           masterEmail: row.maitre_apprentissage,
           tutorEmail: row.tuteur
-        })),
-        token: 'token'
+        }))
       };
       
       postRequest('ApprenticeshipCoordinator/linkApprentice', JSON.stringify({ data: data }))

@@ -3,18 +3,19 @@ import jwt from 'jsonwebtoken'
 
 export default class Auth {
   public async handle({ request, response }: HttpContextContract, next: () => Promise<void>) {
-    console.log('Auth middleware: Checking token')
+    if (request.url() === '/connection') {
+      await next()
+      return
+    }
     const token = request.header('Authorization')?.replace('Bearer ', '')
 
     if (!token) {
-      console.log('Auth middleware: No token provided')
       return response.unauthorized({ message: 'Token is required' })
     }
 
     try {
       const decoded = jwt.verify(token, process.env.APP_KEY)
       request.user = decoded
-      console.log('Auth middleware: Token is valid')
       await next()
     } catch (error) {
       console.log('Auth middleware: Invalid token', error)

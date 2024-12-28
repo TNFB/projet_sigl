@@ -57,8 +57,9 @@ export default class EducationalTutorsController {
       }
       const { tutorId, apprenticeIds, token } = data
 
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -123,8 +124,9 @@ export default class EducationalTutorsController {
       }
       const { email, token } = data
 
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -184,8 +186,9 @@ export default class EducationalTutorsController {
       }
       const { email, token } = data
 
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -239,8 +242,9 @@ export default class EducationalTutorsController {
       }
       const { peopleData, token } = data
 
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -329,8 +333,9 @@ export default class EducationalTutorsController {
       }
       const { email, token } = data
 
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',

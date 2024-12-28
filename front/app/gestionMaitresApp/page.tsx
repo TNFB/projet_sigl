@@ -42,8 +42,7 @@ const GestionMaitresApp = () => {
           lastName: row.nom,
           email: row.email,
           companyName: row.entreprise
-        })),
-        token: 'token'
+        }))
       };
       
       postRequest('apprenticeMaster/createOrUpdateApprenticeMaster', JSON.stringify({ data: data }))

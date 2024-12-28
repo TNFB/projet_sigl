@@ -46,8 +46,9 @@ export default class ApprenticeMastersController {
       }
       const { masterId, apprenticeIds, token } = data
 
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -107,8 +108,9 @@ export default class ApprenticeMastersController {
       }
       const { peopleData, token } = data
 
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -125,16 +127,16 @@ export default class ApprenticeMastersController {
         const { name, lastName, email, companyName } = person
 
         // Vérifier si l'entreprise existe, sinon la créer
-        let id_company = 0
+        let idCompany = 0
         let company = await db.from('companies').where('name', companyName).first()
         if (!company) {
-          const newid_company = await db
+          const newidCompany = await db
             .table('companies')
             .insert({ name: companyName })
             .returning('id_company')
-          id_company = newid_company[0]
+          idCompany = newidCompany[0]
         } else {
-          id_company = company.id_company
+          idCompany = company.idCompany
         }
 
         // Vérifier si l'utilisateur existe déjà
@@ -232,8 +234,9 @@ export default class ApprenticeMastersController {
       }
       const { email, token } = data
 
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -287,8 +290,9 @@ export default class ApprenticeMastersController {
       }
       const { email, token } = data
 
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -322,8 +326,10 @@ export default class ApprenticeMastersController {
         return response.status(400).json({ error: 'Data is required' })
       }
       const { email, token } = data
+
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',

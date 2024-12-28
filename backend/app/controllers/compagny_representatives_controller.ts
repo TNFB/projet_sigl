@@ -52,8 +52,9 @@ export default class CompanyRepresentativesController {
       }
       const { apprentiEmail, mission, token } = data
 
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -61,7 +62,11 @@ export default class CompanyRepresentativesController {
       }
 
       // check apprentice exist
-      const apprentice = await db.from('apprentices').where('email', apprentiEmail).select('id', 'list_mission').first()
+      const apprentice = await db
+        .from('apprentices')
+        .where('email', apprentiEmail)
+        .select('id', 'list_mission')
+        .first()
       if (!apprentice) {
         return response.status(400).json({ message: 'Apprentice not found' })
       }

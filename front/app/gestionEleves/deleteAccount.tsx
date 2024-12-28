@@ -38,8 +38,7 @@ function DeleteAccount() {
 
     try {
       const data = {
-        email: formData.email,
-        token: 'token'
+        email: formData.email
       };
       
       postRequest('admin/deleteUser', JSON.stringify({ data: data }))

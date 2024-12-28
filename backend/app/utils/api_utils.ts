@@ -21,13 +21,9 @@ export async function isUserTableEmpty(): Promise<boolean> {
   return count?.total === 0
 }
 
-interface UserA {
-  email: string
-}
-
-export async function isValidRole(user: UserA, requiredRole: string): Promise<boolean> {
+export async function isValidRole(email: string, requiredRole: string): Promise<boolean> {
   try {
-    const userRole = await db.from('users').where('email', user.email).select('role')
+    const userRole = await db.from('users').where('email', email).select('role')
 
     return userRole[0]?.role === requiredRole
   } catch (error) {

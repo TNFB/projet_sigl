@@ -43,8 +43,9 @@ export default class CompaniesController {
       }
       const { companiesData, token } = data
 
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -79,10 +80,10 @@ export default class CompaniesController {
         }
 
         // Add new Company
-        const [id_company] = await db.table('companies').insert({ name }).returning('id_company')
+        const [idCompany] = await db.table('companies').insert({ name }).returning('id_company')
 
         // Create response
-        const company = await db.from('companies').where('id_company', id_company).first()
+        const company = await db.from('companies').where('id_company', idCompany).first()
 
         results.push({ ...company, status: 'success', message: 'Company created successfully' })
       }
@@ -127,14 +128,16 @@ export default class CompaniesController {
         return response.status(400).json({ error: 'Data is required' })
       }
       const { token } = data
+
+      const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
-      if (! await isValidRole(token, 'admins')) {
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
         })
       }
-      
+
       // Récupérer tous les noms de compagnies
       const companies = await db.from('companies').select('name')
 

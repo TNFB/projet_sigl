@@ -24,8 +24,7 @@ const SideBar = () => {
     
     try {
       const data = {
-        email: email,
-        token: 'token'
+        email: email
       };
       
       postRequest(url, JSON.stringify({ data: data }))

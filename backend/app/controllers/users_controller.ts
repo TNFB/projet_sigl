@@ -27,17 +27,18 @@ export default class UsersController {
    * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et la liste des emails des utilisateurs.
    */
   async getUserEmailsByRole({ request, response }: HttpContext) {
-    console.log('getUserEmailsByRole')
     try {
       // Récupérer le rôle depuis les paramètres de la requête
       const { data } = request.only(['data'])
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { role, token } = data
 
-      //Need to check token
-      if (!(await isValidRole(token, 'admins'))) {
+      const role = data.role
+
+      const emailUser = request.user.email
+      // Vérifier si l'admin existe et si le token est valide
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -102,10 +103,11 @@ export default class UsersController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, password, name, lastName, telephone, role, token } = data
+      const { email, password, name, last_name, telephone, role, token } = data
 
-      //Need to check token
-      if (!(await isValidRole(token, 'admins'))) {
+      const emailUser = request.user.email
+      // Vérifier si l'admin existe et si le token est valide
+      if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role, token, or token has expired',
@@ -125,7 +127,7 @@ export default class UsersController {
       const hashedPassword = await bcrypt.hash(password, 10)
       const createUser = await db
         .table('users')
-        .insert({ email, password: hashedPassword, name, lastName, telephone, role })
+        .insert({ email, password: hashedPassword, name, last_name, telephone, role })
       console.log(`User created: ${createUser}`)
 
       //assigne Role
@@ -311,13 +313,6 @@ export default class UsersController {
         return response.status(401).json({
           status: 'error',
           message: 'Email not found in User',
-        })
-      }
-
-      if (!(await isValidRole(token, userDb.role))) {
-        return response.status(400).json({
-          status: 'error',
-          message: 'Invalid token, or token has expired',
         })
       }
 

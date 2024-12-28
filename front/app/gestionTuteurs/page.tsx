@@ -42,8 +42,7 @@ const GestionTuteurs = () => {
           name: row.prenom,
           lastName: row.nom,
           email: row.email
-        })),
-        token: 'token'
+        }))
       };
       
       postRequest('educationalTutor/createOrUpdateEducationalTutor', JSON.stringify({ data: data }))

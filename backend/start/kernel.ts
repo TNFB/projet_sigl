@@ -35,4 +35,5 @@ server.use([
  */
 router.use([
   // Ajoutez ici les middlewares spécifiques aux routes si nécessaire
+  () => import('#middleware/auth'),
 ])

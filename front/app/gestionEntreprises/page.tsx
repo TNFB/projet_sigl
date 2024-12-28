@@ -37,8 +37,7 @@ const GestionEntreprises = () => {
     e.preventDefault();
     try {
       const data = {
-        companiesData: rows.map(row => ({ name: row.name })),
-        token: 'token'
+        companiesData: rows.map(row => ({ name: row.name }))
       };
       
       postRequest('company/createCompany', JSON.stringify({ data: data }))

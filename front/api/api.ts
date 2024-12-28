@@ -1,4 +1,4 @@
-export const uploadFile = async (file: File, documentType: string) => {
+/*export const uploadFile = async (file: File, documentType: string) => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('documentType', documentType);
@@ -13,13 +13,16 @@ export const uploadFile = async (file: File, documentType: string) => {
   }
 
   return response.json();
-};
+};*/
 
 export const postRequest = async (url: string, body?: string) => {
+  const token = localStorage.getItem('token');
+  console.log('token:', token);
   const response = await fetch( `${process.env.NEXT_PUBLIC_API_URL }/${url}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
     },
     body: body,
   });
@@ -33,6 +36,7 @@ export const postRequest = async (url: string, body?: string) => {
 
 
 export const postRequestDropDocument = async (url: string, data: FormData | { [key: string]: string | Blob }) => {
+  const token = localStorage.getItem('token');
   let body: BodyInit;
 
   if (data instanceof FormData) {
@@ -50,6 +54,9 @@ export const postRequestDropDocument = async (url: string, data: FormData | { [k
 
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {
     method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
     body,
   });
 
@@ -62,8 +69,12 @@ export const postRequestDropDocument = async (url: string, data: FormData | { [k
 };
 
 export const postRequestImportUser = async (url: string, formData: FormData) => {
+  const token = localStorage.getItem('token');
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {
     method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
     body: formData,
   });
 
@@ -84,8 +95,10 @@ export const postRequestCreateUser = async (url: string, userData: {
   telephone: string;
   role: string;
 }) => {
+  const token = localStorage.getItem('token');
   const headers: HeadersInit = {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
   };
 
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {

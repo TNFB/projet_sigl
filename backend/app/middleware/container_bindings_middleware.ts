@@ -11,6 +11,7 @@ import type { NextFn } from '@adonisjs/core/types/http'
  */
 export default class ContainerBindingsMiddleware {
   handle(ctx: HttpContext, next: NextFn) {
+    console.log('ContainerBindingsMiddleware middleware')
     ctx.containerResolver.bindValue(HttpContext, ctx)
     ctx.containerResolver.bindValue(Logger, ctx.logger)
 

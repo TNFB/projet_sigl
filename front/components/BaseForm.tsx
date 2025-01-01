@@ -1,47 +1,61 @@
-import React from 'react';
+import React from 'react'
 
 interface InputField {
-  type: 'input';
-  label: string;
-  inputType: string;
-  name: string;
-  value: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  type: 'input'
+  label: string
+  inputType: string
+  name: string
+  value: string
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 interface SelectField {
-  type: 'select';
-  label: string;
-  name: string;
-  value: string;
-  options: { value: string; label: string }[];
-  onChange: (value: string) => void;
+  type: 'select'
+  label: string
+  name: string
+  value: string
+  options: { value: string; label: string }[]
+  onChange: (value: string) => void
 }
 
-type Field = InputField | SelectField;
+type Field = InputField | SelectField
 
 interface BaseFormProps {
-  title: string;
-  submitLabel: string;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  fields: Field[];
-  fieldsOrder: string[];
-  className?: string;
-  children?: React.ReactNode;
+  title: string
+  submitLabel: string
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
+  fields: Field[]
+  fieldsOrder: string[]
+  className?: string
+  children?: React.ReactNode
 }
 
-const BaseForm: React.FC<BaseFormProps> = ({ title, submitLabel, onSubmit, fields, fieldsOrder, className, children }) => {
+const BaseForm: React.FC<BaseFormProps> = ({
+  title,
+  submitLabel,
+  onSubmit,
+  fields,
+  fieldsOrder,
+  className,
+  children,
+}) => {
   return (
-    <form onSubmit={onSubmit} className={`p-4 bg-white rounded-lg shadow-md ${className}`}>
+    <form
+      onSubmit={onSubmit}
+      className={`p-4 bg-white rounded-lg shadow-md ${className}`}
+    >
       <h2 className="text-xl font-bold mb-4">{title}</h2>
       {fieldsOrder.map((fieldName, index) => {
-        const field = fields.find(f => f.name === fieldName);
-        if (!field) return null;
+        const field = fields.find((f) => f.name === fieldName)
+        if (!field) return null
 
         if (field.type === 'input') {
           return (
             <div key={index} className="mb-4">
-              <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor={field.name}
+                className="block text-sm font-medium text-gray-700"
+              >
                 {field.label}
               </label>
               <input
@@ -53,13 +67,16 @@ const BaseForm: React.FC<BaseFormProps> = ({ title, submitLabel, onSubmit, field
                 className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
-          );
+          )
         }
 
         if (field.type === 'select') {
           return (
             <div key={index} className="mb-4">
-              <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor={field.name}
+                className="block text-sm font-medium text-gray-700"
+              >
                 {field.label}
               </label>
               <select
@@ -76,10 +93,10 @@ const BaseForm: React.FC<BaseFormProps> = ({ title, submitLabel, onSubmit, field
                 ))}
               </select>
             </div>
-          );
+          )
         }
 
-        return null;
+        return null
       })}
       {children}
       <button
@@ -89,7 +106,7 @@ const BaseForm: React.FC<BaseFormProps> = ({ title, submitLabel, onSubmit, field
         {submitLabel}
       </button>
     </form>
-  );
-};
+  )
+}
 
-export default BaseForm;
+export default BaseForm

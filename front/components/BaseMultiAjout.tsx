@@ -1,51 +1,74 @@
 'use client'
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react'
 
 interface BaseMultiAjoutProps {
-  title: string;
-  typeAjout: string;
-  submitLabel: string;
-  rows: { [key: string]: string }[];
-  onChange: (event: React.ChangeEvent<HTMLInputElement>, rowIndex: number, fieldName: string) => void;
-  addRow: () => void;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  className?: string;
+  title: string
+  typeAjout: string
+  submitLabel: string
+  rows: { [key: string]: string }[]
+  onChange: (
+    event: React.ChangeEvent<HTMLInputElement>,
+    rowIndex: number,
+    fieldName: string,
+  ) => void
+  addRow: () => void
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
+  className?: string
 }
 
-const BaseMultiAjout: React.FC<BaseMultiAjoutProps> = ({ title, typeAjout, submitLabel, rows, onChange, addRow, onSubmit, className }) => {
-  const scrollableContainerRef = useRef<HTMLDivElement>(null);
+const BaseMultiAjout: React.FC<BaseMultiAjoutProps> = ({
+  title,
+  typeAjout,
+  submitLabel,
+  rows,
+  onChange,
+  addRow,
+  onSubmit,
+  className,
+}) => {
+  const scrollableContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (scrollableContainerRef.current) {
-      scrollableContainerRef.current.scrollTop = scrollableContainerRef.current.scrollHeight;
+      scrollableContainerRef.current.scrollTop =
+        scrollableContainerRef.current.scrollHeight
     }
-  }, [rows]);
+  }, [rows])
 
   const getInputSize = (fieldName: string) => {
     switch (fieldName) {
       case 'nom':
-        return 8;
+        return 8
       case 'prenom':
-        return 10;
+        return 10
       case 'email':
-        return 25;
+        return 25
       default:
-        return 20;
+        return 20
     }
-  };
+  }
 
   return (
-    <form onSubmit={onSubmit} className={`p-4 bg-white rounded-lg shadow-md ${className}`}>
+    <form
+      onSubmit={onSubmit}
+      className={`p-4 bg-white rounded-lg shadow-md ${className}`}
+    >
       <h2 className="text-xl font-bold mb-4">{title}</h2>
       <div ref={scrollableContainerRef} className="max-h-96 overflow-y-auto">
         {rows.map((row, rowIndex) => (
-          <div key={rowIndex} className="flex space-x-4 mb-4 p-2 border-b-2 items-center">
+          <div
+            key={rowIndex}
+            className="flex space-x-4 mb-4 p-2 border-b-2 items-center"
+          >
             <div className="flex items-center">
               <span className="font-bold pt-5">{`${typeAjout} ${rowIndex + 1} :`}</span>
             </div>
             {Object.keys(row).map((fieldName, fieldIndex) => (
               <div key={fieldIndex} className="flex-1">
-                <label htmlFor={`${fieldName}-${rowIndex}`} className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor={`${fieldName}-${rowIndex}`}
+                  className="block text-sm font-medium text-gray-700"
+                >
                   {fieldName}
                 </label>
                 <input
@@ -76,7 +99,7 @@ const BaseMultiAjout: React.FC<BaseMultiAjoutProps> = ({ title, typeAjout, submi
         {submitLabel}
       </button>
     </form>
-  );
-};
+  )
+}
 
-export default BaseMultiAjout;
+export default BaseMultiAjout

@@ -1,28 +1,28 @@
 'use client'
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Home from '@/components/Home';
-import AjoutEleve from './ajoutEleve';
-import ModifMDP from './modifMDP';
-import DeleteAccount from './deleteAccount';
-import NewLivrable from './newLivrable';
-import AddDoc from './addDoc';
-import CreationJF from './creationJF';
+import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Home from '@/components/Home'
+import AjoutEleve from './ajoutEleve'
+import ModifMDP from './modifMDP'
+import DeleteAccount from './deleteAccount'
+import NewLivrable from './newLivrable'
+import AddDoc from './addDoc'
+import CreationJF from './creationJF'
 
 function GestionEleves() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const role = localStorage.getItem('role');
-    const token = localStorage.getItem('token');
-    if ( !token && role !== 'admins') {
-      localStorage.clear();
-      router.push('/Login');
+    const role = localStorage.getItem('role')
+    const token = localStorage.getItem('token')
+    if (!token && role !== 'admins') {
+      localStorage.clear()
+      router.push('/Login')
     } else {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, [router]);
+  }, [router])
 
   if (isLoading) {
     return (
@@ -33,7 +33,7 @@ function GestionEleves() {
           <div className="w-8 h-8 bg-blue-400 rounded-full"></div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -48,12 +48,12 @@ function GestionEleves() {
           <NewLivrable />
           <AddDoc />
         </div>
-         <div className="flex flex-col space-y-5">
+        <div className="flex flex-col space-y-5">
           <CreationJF />
         </div>
       </div>
     </Home>
-  );
+  )
 }
 
-export default GestionEleves;
+export default GestionEleves

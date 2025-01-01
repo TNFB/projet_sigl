@@ -7,5 +7,5 @@ export default function Evaluations() {
     <Home>
       <p>Contenu de la page des evaluations</p>
     </Home>
-  );
+  )
 }

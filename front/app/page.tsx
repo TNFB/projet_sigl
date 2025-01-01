@@ -1,10 +1,10 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'
 import Home from '@/components/Home'
 import { Responsive, WidthProvider } from 'react-grid-layout'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -17,28 +17,28 @@ const initialLayout = [
 ]
 
 export default function Accueil() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const role = localStorage.getItem('role');
-    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role')
+    const token = localStorage.getItem('token')
     if (!token && role !== 'apprentices') {
-      localStorage.clear();
-      router.push('/Login');
+      localStorage.clear()
+      router.push('/Login')
     } else {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, [router]);
+  }, [router])
 
   const [layout, setLayout] = useState(initialLayout)
 
   interface LayoutItem {
-    i: string;
-    x: number;
-    y: number;
-    w: number;
-    h: number;
+    i: string
+    x: number
+    y: number
+    w: number
+    h: number
   }
 
   const handleLayoutChange = (newLayout: LayoutItem[]) => {
@@ -54,7 +54,7 @@ export default function Accueil() {
   }
 
   if (isLoading) {
-    return (  
+    return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="flex space-x-2 animate-pulse">
           <div className="w-8 h-8 bg-blue-400 rounded-full"></div>
@@ -62,13 +62,15 @@ export default function Accueil() {
           <div className="w-8 h-8 bg-blue-400 rounded-full"></div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
     <Home>
       <div className="p-4 h-[calc(100vh-64px)] overflow-auto">
-        <Button onClick={() => setLayout(initialLayout)}>Réinitialiser la grille</Button>
+        <Button onClick={() => setLayout(initialLayout)}>
+          Réinitialiser la grille
+        </Button>
         <ResponsiveGridLayout
           className="layout"
           layouts={{ lg: layout }}

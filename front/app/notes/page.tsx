@@ -7,5 +7,5 @@ export default function Notes() {
     <Home>
       <p>Contenu de la page des notes par période</p>
     </Home>
-  );
+  )
 }

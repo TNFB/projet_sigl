@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Home, CheckSquare, FileText, BookOpen, Clipboard } from "lucide-react"
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader } from "@/components/ui/sidebar"
+import { Home, CheckSquare, FileText, BookOpen, Clipboard } from 'lucide-react'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarHeader,
+} from '@/components/ui/sidebar'
 import Image from 'next/image'
 import Link from 'next/link'
 import { SIDEBAR_ITEMS, SIDEBAR_ADMIN_ITEMS } from '@/utils/constants'
 import { ICONS } from '@/utils/iconMapping'
-import { postRequest } from '@/api/api';
+import { postRequest } from '@/api/api'
 
 interface Student {
   prenom: string
@@ -15,29 +25,34 @@ interface Student {
 }
 
 const SideBar = () => {
-  const [activeItem, setActiveItem] = useState("Accueil")
-  const [userType, setUserType] = useState<'apprentices' | 'admins' | 'apprenticeship_coordinators' | 'apprentice_masters' | 'educational_tutors'>('apprentices')
+  const [activeItem, setActiveItem] = useState('Accueil')
+  const [userType, setUserType] = useState<
+    | 'apprentices'
+    | 'admins'
+    | 'apprenticeship_coordinators'
+    | 'apprentice_masters'
+    | 'educational_tutors'
+  >('apprentices')
   const [email, setEmail] = useState<string | null>(null)
   const [students, setStudents] = useState<Student[]>([])
 
-  const fetchStudents = React.useCallback(async (url: string) => {
-    
-    try {
-      const data = {
-        email: email
-      };
-      
-      postRequest(url, JSON.stringify({ data: data }))
-        .then(response => {
+  const fetchStudents = React.useCallback(
+    async (url: string) => {
+      try {
+        const data = {
+          email: email,
+        }
+
+        postRequest(url, JSON.stringify({ data: data })).then((response) => {
           const apprentices = response.apprentis
           setStudents(apprentices)
           console.log('Success:', response)
         })
-    } catch (error) {
-      console.error('Error:', error)
-    }
+      } catch (error) {
+        console.error('Error:', error)
+      }
 
-    /*
+      /*
     const formattedData = {
       data: {
         email: email
@@ -53,11 +68,17 @@ const SideBar = () => {
         console.error('Error:', error)
       })
         */
-  }, [email])
-
+    },
+    [email],
+  )
 
   useEffect(() => {
-    const userRole = localStorage.getItem('role') as 'apprentices' | 'admins' | 'apprentice_masters' | 'educational_tutors' | null
+    const userRole = localStorage.getItem('role') as
+      | 'apprentices'
+      | 'admins'
+      | 'apprentice_masters'
+      | 'educational_tutors'
+      | null
     const storedEmail = localStorage.getItem('email')
     setEmail(storedEmail)
     setUserType(userRole ?? 'apprentices')
@@ -94,11 +115,11 @@ const SideBar = () => {
     }))
     return [
       {
-        title: "Accueil",
-        url: "/",
-        icon: "Home",
+        title: 'Accueil',
+        url: '/',
+        icon: 'Home',
       },
-      ...items
+      ...items,
     ]
   }
 
@@ -121,29 +142,34 @@ const SideBar = () => {
 
   return (
     <Sidebar className="bg-[#fafafa] ml-2 mt-2 rounded-lg shadow-lg">
-      <SidebarHeader className='mb-12'>
-        <Image src="/images/logo_eseo/ESEO-logo-couleur-positif.png" alt="logo" width={200} height={1} />
+      <SidebarHeader className="mb-12">
+        <Image
+          src="/images/logo_eseo/ESEO-logo-couleur-positif.png"
+          alt="logo"
+          width={200}
+          height={1}
+        />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>General</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className='p-2 border-b-2 border-gray-300'>
+            <SidebarMenu className="p-2 border-b-2 border-gray-300">
               {items.map((item) => {
                 const Icon = ICONS[item.icon as keyof typeof ICONS]
-                return(
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link 
-                      href={item.url}
-                      className={`flex items-center space-x-2 p-2 rounded-lg ${activeItem === item.url ? 'bg-blue-500 text-white' : 'text-gray-700'}`}
-                      onClick={() => setActiveItem(item.title)}
-                    >
-                      <Icon className="w-5 h-5" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link
+                        href={item.url}
+                        className={`flex items-center space-x-2 p-2 rounded-lg ${activeItem === item.url ? 'bg-blue-500 text-white' : 'text-gray-700'}`}
+                        onClick={() => setActiveItem(item.title)}
+                      >
+                        <Icon className="w-5 h-5" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 )
               })}
             </SidebarMenu>

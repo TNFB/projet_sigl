@@ -21,7 +21,7 @@ export const SIDEBAR_ITEMS = [
   },
   {
     title: 'Notes',
-    url: '/notes',
+    url: '/blocNote',
     icon: 'FileText',
   },
   {

@@ -49,7 +49,7 @@ export const SIDEBAR_ADMIN_ITEMS = [
   },
   {
     label: 'Gestion des livrables',
-    href: '/blocNote',
+    href: '/',
     icon: 'BookOpen',
   },
   {

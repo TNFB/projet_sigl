@@ -129,12 +129,11 @@ const Home = ({ children }: HomeProps) => {
             <>
               <Logo open={open} />
             </>
-            <AnimatePresence
-              initial={{ x: '-100%', opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: '-100%', opacity: 0 }}
-            >
-              <div
+            <AnimatePresence>
+              <motion.div
+                initial={{ x: '-100%', opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: '-100%', opacity: 0 }}
                 className={cn(
                   'mt-8 flex flex-col gap-2',
                   open ? 'ml-4' : 'items-center',
@@ -143,7 +142,7 @@ const Home = ({ children }: HomeProps) => {
                 {links.map((link, idx) => (
                   <SidebarLink key={idx} link={link} />
                 ))}
-              </div>
+              </motion.div>
             </AnimatePresence>
           </div>
         </SidebarBody>

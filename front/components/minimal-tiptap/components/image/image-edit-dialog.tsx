@@ -26,18 +26,18 @@ const ImageEditDialog = ({ editor, size, variant }: ImageEditDialogProps) => {
       <DialogTrigger asChild>
         <ToolbarButton
           isActive={editor.isActive('image')}
-          tooltip="Image"
-          aria-label="Image"
+          tooltip='Image'
+          aria-label='Image'
           size={size}
           variant={variant}
         >
-          <ImageIcon className="size-5" />
+          <ImageIcon className='size-5' />
         </ToolbarButton>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className='sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle>Select image</DialogTitle>
-          <DialogDescription className="sr-only">
+          <DialogDescription className='sr-only'>
             Upload an image from your computer
           </DialogDescription>
         </DialogHeader>

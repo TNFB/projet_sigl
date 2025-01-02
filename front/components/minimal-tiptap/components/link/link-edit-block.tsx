@@ -23,12 +23,14 @@ export const LinkEditBlock = React.forwardRef<HTMLDivElement, LinkEditorProps>(
       (e: React.FormEvent) => {
         e.preventDefault()
         if (formRef.current) {
-          const isValid = Array.from(formRef.current.querySelectorAll('input')).every(input => input.checkValidity())
+          const isValid = Array.from(
+            formRef.current.querySelectorAll('input'),
+          ).every((input) => input.checkValidity())
 
           if (isValid) {
             onSave(url, text, isNewTab)
           } else {
-            formRef.current.querySelectorAll('input').forEach(input => {
+            formRef.current.querySelectorAll('input').forEach((input) => {
               if (!input.checkValidity()) {
                 input.reportValidity()
               }
@@ -36,7 +38,7 @@ export const LinkEditBlock = React.forwardRef<HTMLDivElement, LinkEditorProps>(
           }
         }
       },
-      [onSave, url, text, isNewTab]
+      [onSave, url, text, isNewTab],
     )
 
     React.useImperativeHandle(ref, () => formRef.current as HTMLDivElement)
@@ -44,30 +46,41 @@ export const LinkEditBlock = React.forwardRef<HTMLDivElement, LinkEditorProps>(
     return (
       <div ref={formRef}>
         <div className={cn('space-y-4', className)}>
-          <div className="space-y-1">
+          <div className='space-y-1'>
             <Label>URL</Label>
-            <Input type="url" required placeholder="Enter URL" value={url} onChange={e => setUrl(e.target.value)} />
+            <Input
+              type='url'
+              required
+              placeholder='Enter URL'
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+            />
           </div>
 
-          <div className="space-y-1">
+          <div className='space-y-1'>
             <Label>Display Text (optional)</Label>
-            <Input type="text" placeholder="Enter display text" value={text} onChange={e => setText(e.target.value)} />
+            <Input
+              type='text'
+              placeholder='Enter display text'
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+            />
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className='flex items-center space-x-2'>
             <Label>Open in New Tab</Label>
             <Switch checked={isNewTab} onCheckedChange={setIsNewTab} />
           </div>
 
-          <div className="flex justify-end space-x-2">
-            <Button type="button" onClick={handleSave}>
+          <div className='flex justify-end space-x-2'>
+            <Button type='button' onClick={handleSave}>
               Save
             </Button>
           </div>
         </div>
       </div>
     )
-  }
+  },
 )
 
 LinkEditBlock.displayName = 'LinkEditBlock'

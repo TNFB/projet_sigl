@@ -17,11 +17,19 @@ export const Link = TiptapLink.extend({
    * - <a> elements with an href attribute that contains 'javascript:'
    */
   parseHTML() {
-    return [{ tag: 'a[href]:not([data-type="button"]):not([href *= "javascript:" i])' }]
+    return [
+      {
+        tag: 'a[href]:not([data-type="button"]):not([href *= "javascript:" i])',
+      },
+    ]
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['a', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0]
+    return [
+      'a',
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      0,
+    ]
   },
 
   addOptions() {
@@ -29,8 +37,8 @@ export const Link = TiptapLink.extend({
       ...this.parent?.(),
       openOnClick: false,
       HTMLAttributes: {
-        class: 'link'
-      }
+        class: 'link',
+      },
     }
   },
 
@@ -79,11 +87,11 @@ export const Link = TiptapLink.extend({
             const transaction = tr.setSelection(new TextSelection($start, $end))
 
             view.dispatch(transaction)
-          }
-        }
-      })
+          },
+        },
+      }),
     ]
-  }
+  },
 })
 
 export default Link

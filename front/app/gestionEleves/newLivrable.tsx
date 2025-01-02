@@ -82,11 +82,11 @@ const NewLivrable = () => {
   return (
     <BaseForm
       title="Ajout d'un nouveau livrable"
-      submitLabel="Ajouter"
+      submitLabel='Ajouter'
       onSubmit={handleSubmit}
       fields={fields}
       fieldsOrder={fieldsOrder}
-      className="h-fit"
+      className='h-fit'
     />
   )
 }

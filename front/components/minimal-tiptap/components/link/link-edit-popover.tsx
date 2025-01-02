@@ -2,7 +2,11 @@ import * as React from 'react'
 import type { Editor } from '@tiptap/react'
 import type { VariantProps } from 'class-variance-authority'
 import type { toggleVariants } from '@/components/ui/toggle'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { Link2Icon } from '@radix-ui/react-icons'
 import { ToolbarButton } from '../toolbar-button'
 import { LinkEditBlock } from './link-edit-block'
@@ -31,17 +35,17 @@ const LinkEditPopover = ({ editor, size, variant }: LinkEditPopoverProps) => {
               type: 'link',
               attrs: {
                 href: url,
-                target: openInNewTab ? '_blank' : ''
-              }
-            }
-          ]
+                target: openInNewTab ? '_blank' : '',
+              },
+            },
+          ],
         })
         .setLink({ href: url })
         .run()
 
       editor.commands.enter()
     },
-    [editor]
+    [editor],
   )
 
   return (
@@ -49,16 +53,16 @@ const LinkEditPopover = ({ editor, size, variant }: LinkEditPopoverProps) => {
       <PopoverTrigger asChild>
         <ToolbarButton
           isActive={editor.isActive('link')}
-          tooltip="Link"
-          aria-label="Insert link"
+          tooltip='Link'
+          aria-label='Insert link'
           disabled={editor.isActive('codeBlock')}
           size={size}
           variant={variant}
         >
-          <Link2Icon className="size-5" />
+          <Link2Icon className='size-5' />
         </ToolbarButton>
       </PopoverTrigger>
-      <PopoverContent className="w-full min-w-80" align="end" side="bottom">
+      <PopoverContent className='w-full min-w-80' align='end' side='bottom'>
         <LinkEditBlock onSave={onSetLink} defaultText={text} />
       </PopoverContent>
     </Popover>

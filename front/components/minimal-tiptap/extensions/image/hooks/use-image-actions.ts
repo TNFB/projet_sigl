@@ -18,7 +18,12 @@ export type ImageActionHandlers = {
   onRemoveImg?: () => void
 }
 
-export const useImageActions = ({ editor, node, src, onViewClick }: UseImageActionsProps) => {
+export const useImageActions = ({
+  editor,
+  node,
+  src,
+  onViewClick,
+}: UseImageActionsProps) => {
   const isLink = React.useMemo(() => isUrl(src), [src])
 
   const onView = React.useCallback(() => {

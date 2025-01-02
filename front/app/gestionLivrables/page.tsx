@@ -70,12 +70,12 @@ const Page = () => {
     <Home>
       empty
       <BaseForm
-        title="Gestion des Livrables"
-        submitLabel="Ajouter"
+        title='Gestion des Livrables'
+        submitLabel='Ajouter'
         onSubmit={handleSubmit}
         fields={fields}
         fieldsOrder={fieldsOrder}
-        className="h-fit"
+        className='h-fit'
       />
     </Home>
   )

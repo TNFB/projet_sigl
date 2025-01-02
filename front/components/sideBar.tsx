@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 import { Home, CheckSquare, FileText, BookOpen, Clipboard } from 'lucide-react'
 import {
   Sidebar,
@@ -141,11 +141,11 @@ const SideBar = () => {
   const items = getSidebarItems(userType)
 
   return (
-    <Sidebar className="bg-[#fafafa] ml-2 mt-2 rounded-lg shadow-lg">
-      <SidebarHeader className="mb-12">
+    <Sidebar className='bg-[#fafafa] ml-2 mt-2 rounded-lg shadow-lg'>
+      <SidebarHeader className='mb-12'>
         <Image
-          src="/images/logo_eseo/ESEO-logo-couleur-positif.png"
-          alt="logo"
+          src='/images/logo_eseo/ESEO-logo-couleur-positif.png'
+          alt='logo'
           width={200}
           height={1}
         />
@@ -154,7 +154,7 @@ const SideBar = () => {
         <SidebarGroup>
           <SidebarGroupLabel>General</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="p-2 border-b-2 border-gray-300">
+            <SidebarMenu className='p-2 border-b-2 border-gray-300'>
               {items.map((item) => {
                 const Icon = ICONS[item.icon as keyof typeof ICONS]
                 return (
@@ -165,7 +165,7 @@ const SideBar = () => {
                         className={`flex items-center space-x-2 p-2 rounded-lg ${activeItem === item.url ? 'bg-blue-500 text-white' : 'text-gray-700'}`}
                         onClick={() => setActiveItem(item.title)}
                       >
-                        <Icon className="w-5 h-5" />
+                        <Icon className='w-5 h-5' />
                         <span>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>

@@ -35,13 +35,13 @@ const Header = () => {
     }
   }, [])
   return (
-    <div className="flex items-center justify-between p-4 border-b border-gray-300">
-      <div className="flex items-center space-x-4">
+    <div className='flex items-center justify-between p-4 border-b border-gray-300'>
+      <div className='flex items-center space-x-4'>
         <SidebarTrigger />
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/">Journal de formation</BreadcrumbLink>
+              <BreadcrumbLink href='/'>Journal de formation</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -57,23 +57,23 @@ const Header = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <div className="flex items-center space-x-4">
-        <button className="p-2 bg-white rounded-full shadow">
-          <Search className="w-5 h-5 text-gray-600" />
+      <div className='flex items-center space-x-4'>
+        <button className='p-2 bg-white rounded-full shadow'>
+          <Search className='w-5 h-5 text-gray-600' />
         </button>
-        <div className="h-6 border-l border-gray-300"></div>
-        <button className="p-2 bg-white rounded-full shadow">
-          <Bell className="w-5 h-5 text-gray-600" />
+        <div className='h-6 border-l border-gray-300'></div>
+        <button className='p-2 bg-white rounded-full shadow'>
+          <Bell className='w-5 h-5 text-gray-600' />
         </button>
-        <div className="h-6 border-l border-gray-300"></div>
+        <div className='h-6 border-l border-gray-300'></div>
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center">
-            <Avatar className="mr-2">
-              <AvatarImage src="https://github.com/shadcn.png" />
+          <DropdownMenuTrigger className='flex items-center'>
+            <Avatar className='mr-2'>
+              <AvatarImage src='https://github.com/shadcn.png' />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             User
-            <ChevronDown className="size-4" />
+            <ChevronDown className='size-4' />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuLabel>Mon Compte</DropdownMenuLabel>
@@ -86,11 +86,11 @@ const Header = () => {
                 onClick={() => {
                   localStorage.clear()
                 }}
-                href="/Login"
-                className="flex items-center"
+                href='/Login'
+                className='flex items-center'
               >
                 Logout
-                <LogOut className="ml-2 size-4" />
+                <LogOut className='ml-2 size-4' />
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>

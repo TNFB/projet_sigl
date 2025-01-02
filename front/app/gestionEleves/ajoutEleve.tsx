@@ -147,11 +147,11 @@ function AjoutEleve() {
   return (
     <BaseForm
       title="Ajout d'un utilisateur"
-      submitLabel="Ajouter"
+      submitLabel='Ajouter'
       onSubmit={handleSubmit}
       fields={fields}
       fieldsOrder={fieldsOrder}
-      className="min-w-80"
+      className='min-w-80'
     />
   )
 }

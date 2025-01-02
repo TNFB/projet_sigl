@@ -10,12 +10,12 @@ interface HomeProps {
 
 const Home = ({ children }: HomeProps) => {
   return (
-    <SidebarProvider className="bg-[#f2f2f2]">
-      <div className="flex w-screen h-screen">
+    <SidebarProvider className='bg-[#f2f2f2]'>
+      <div className='flex w-screen h-screen'>
         <SideBar />
-        <div className="flex-1 ml-4 mt-2">
+        <div className='flex-1 ml-4 mt-2'>
           <Header />
-          <main className="p-4">{children}</main>
+          <main className='p-4'>{children}</main>
         </div>
       </div>
     </SidebarProvider>

@@ -9,8 +9,14 @@ interface MeasuredContainerProps<T extends React.ElementType> {
 
 export const MeasuredContainer = React.forwardRef(
   <T extends React.ElementType>(
-    { as: Component, name, children, style = {}, ...props }: MeasuredContainerProps<T> & React.ComponentProps<T>,
-    ref: React.Ref<HTMLElement>
+    {
+      as: Component,
+      name,
+      children,
+      style = {},
+      ...props
+    }: MeasuredContainerProps<T> & React.ComponentProps<T>,
+    ref: React.Ref<HTMLElement>,
   ) => {
     const innerRef = React.useRef<HTMLElement>(null)
     const rect = useContainerSize(innerRef.current)
@@ -19,7 +25,7 @@ export const MeasuredContainer = React.forwardRef(
 
     const customStyle = {
       [`--${name}-width`]: `${rect.width}px`,
-      [`--${name}-height`]: `${rect.height}px`
+      [`--${name}-height`]: `${rect.height}px`,
     }
 
     return (
@@ -27,7 +33,7 @@ export const MeasuredContainer = React.forwardRef(
         {children}
       </Component>
     )
-  }
+  },
 )
 
 MeasuredContainer.displayName = 'MeasuredContainer'

@@ -105,62 +105,62 @@ function Documents() {
     <Home>
       <BaseForm
         title="Ajout d'un document"
-        submitLabel="Ajouter"
+        submitLabel='Ajouter'
         onSubmit={handleSubmit}
         fields={fields}
         fieldsOrder={fieldsOrder}
-        className="h-fit w-fit"
+        className='h-fit w-fit'
       >
-        <div className="mb-4">
+        <div className='mb-4'>
           <label
-            htmlFor="file"
-            className="block text-sm font-medium text-gray-700"
+            htmlFor='file'
+            className='block text-sm font-medium text-gray-700'
           >
             Charger un fichier
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <p className='text-red-500 text-sm'>{error}</p>}
           </label>
           <input
-            type="file"
-            id="file"
-            name="file"
-            accept=".pdf,.docx,.xlsx,.xls,.odt,.txt,.mdj" // Extensions autorisées
+            type='file'
+            id='file'
+            name='file'
+            accept='.pdf,.docx,.xlsx,.xls,.odt,.txt,.mdj' // Extensions autorisées
             onChange={(e) => {
               const selectedFile = e.target.files?.[0]
               if (selectedFile) {
                 setFile(selectedFile)
               }
             }}
-            className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className='mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
           />
         </div>
-        <div className="mb-4">
+        <div className='mb-4'>
           <label
-            htmlFor="documentName"
-            className="block text-sm font-medium text-gray-700"
+            htmlFor='documentName'
+            className='block text-sm font-medium text-gray-700'
           >
             Nom du document
           </label>
           <input
-            type="text"
-            id="documentName"
-            name="documentName"
+            type='text'
+            id='documentName'
+            name='documentName'
             onChange={(e) => setDocumentName(e.target.value)}
-            className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className='mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
           />
         </div>
-        <div className="mb-4">
+        <div className='mb-4'>
           <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
+            htmlFor='email'
+            className='block text-sm font-medium text-gray-700'
           >
             Email
           </label>
           <input
-            type="email"
-            id="email"
-            name="email"
+            type='email'
+            id='email'
+            name='email'
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className='mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
           />
         </div>
       </BaseForm>

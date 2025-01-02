@@ -21,20 +21,29 @@ type FileInput = File | { src: string | File; alt?: string; title?: string }
 
 export const isClient = (): boolean => typeof window !== 'undefined'
 export const isServer = (): boolean => !isClient()
-export const isMacOS = (): boolean => isClient() && window.navigator.platform === 'MacIntel'
+export const isMacOS = (): boolean =>
+  isClient() && window.navigator.platform === 'MacIntel'
 
 const shortcutKeyMap: Record<string, ShortcutKeyResult> = {
-  mod: isMacOS() ? { symbol: '⌘', readable: 'Command' } : { symbol: 'Ctrl', readable: 'Control' },
-  alt: isMacOS() ? { symbol: '⌥', readable: 'Option' } : { symbol: 'Alt', readable: 'Alt' },
-  shift: { symbol: '⇧', readable: 'Shift' }
+  mod: isMacOS()
+    ? { symbol: '⌘', readable: 'Command' }
+    : { symbol: 'Ctrl', readable: 'Control' },
+  alt: isMacOS()
+    ? { symbol: '⌥', readable: 'Option' }
+    : { symbol: 'Alt', readable: 'Alt' },
+  shift: { symbol: '⇧', readable: 'Shift' },
 }
 
 export const getShortcutKey = (key: string): ShortcutKeyResult =>
   shortcutKeyMap[key.toLowerCase()] || { symbol: key, readable: key }
 
-export const getShortcutKeys = (keys: string[]): ShortcutKeyResult[] => keys.map(getShortcutKey)
+export const getShortcutKeys = (keys: string[]): ShortcutKeyResult[] =>
+  keys.map(getShortcutKey)
 
-export const getOutput = (editor: Editor, format: MinimalTiptapProps['output']): object | string => {
+export const getOutput = (
+  editor: Editor,
+  format: MinimalTiptapProps['output'],
+): object | string => {
   switch (format) {
     case 'json':
       return editor.getJSON()
@@ -47,16 +56,24 @@ export const getOutput = (editor: Editor, format: MinimalTiptapProps['output']):
 
 export const isUrl = (
   text: string,
-  options: { requireHostname: boolean; allowBase64?: boolean } = { requireHostname: false }
+  options: { requireHostname: boolean; allowBase64?: boolean } = {
+    requireHostname: false,
+  },
 ): boolean => {
   if (text.includes('\n')) return false
 
   try {
     const url = new URL(text)
-    const blockedProtocols = ['javascript:', 'file:', 'vbscript:', ...(options.allowBase64 ? [] : ['data:'])]
+    const blockedProtocols = [
+      'javascript:',
+      'file:',
+      'vbscript:',
+      ...(options.allowBase64 ? [] : ['data:']),
+    ]
 
     if (blockedProtocols.includes(url.protocol)) return false
-    if (options.allowBase64 && url.protocol === 'data:') return /^data:image\/[a-z]+;base64,/.test(text)
+    if (options.allowBase64 && url.protocol === 'data:')
+      return /^data:image\/[a-z]+;base64,/.test(text)
     if (url.hostname) return true
 
     return (
@@ -71,16 +88,20 @@ export const isUrl = (
 
 export const sanitizeUrl = (
   url: string | null | undefined,
-  options: { allowBase64?: boolean } = {}
+  options: { allowBase64?: boolean } = {},
 ): string | undefined => {
   if (!url) return undefined
 
   if (options.allowBase64 && url.startsWith('data:image')) {
-    return isUrl(url, { requireHostname: false, allowBase64: true }) ? url : undefined
+    return isUrl(url, { requireHostname: false, allowBase64: true })
+      ? url
+      : undefined
   }
 
-  return isUrl(url, { requireHostname: false, allowBase64: options.allowBase64 }) ||
-    /^(\/|#|mailto:|sms:|fax:|tel:)/.test(url)
+  return isUrl(url, {
+    requireHostname: false,
+    allowBase64: options.allowBase64,
+  }) || /^(\/|#|mailto:|sms:|fax:|tel:)/.test(url)
     ? url
     : `https://${url}`
 }
@@ -125,7 +146,7 @@ const validateFileOrBase64 = <T extends FileInput>(
   options: FileValidationOptions,
   originalFile: T,
   validFiles: T[],
-  errors: FileError[]
+  errors: FileError[],
 ): void => {
   const { isValidType, isValidSize } = checkTypeAndSize(input, options)
 
@@ -139,10 +160,11 @@ const validateFileOrBase64 = <T extends FileInput>(
 
 const checkTypeAndSize = (
   input: File | string,
-  { allowedMimeTypes, maxFileSize }: FileValidationOptions
+  { allowedMimeTypes, maxFileSize }: FileValidationOptions,
 ): { isValidType: boolean; isValidSize: boolean } => {
   const mimeType = input instanceof File ? input.type : base64MimeType(input)
-  const size = input instanceof File ? input.size : atob(input.split(',')[1]).length
+  const size =
+    input instanceof File ? input.size : atob(input.split(',')[1]).length
 
   const isValidType =
     allowedMimeTypes.length === 0 ||
@@ -176,11 +198,14 @@ const isBase64 = (str: string): boolean => {
   }
 }
 
-export const filterFiles = <T extends FileInput>(files: T[], options: FileValidationOptions): [T[], FileError[]] => {
+export const filterFiles = <T extends FileInput>(
+  files: T[],
+  options: FileValidationOptions,
+): [T[], FileError[]] => {
   const validFiles: T[] = []
   const errors: FileError[] = []
 
-  files.forEach(file => {
+  files.forEach((file) => {
     const actualFile = 'src' in file ? file.src : file
 
     if (actualFile instanceof File) {

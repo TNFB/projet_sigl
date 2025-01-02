@@ -73,12 +73,12 @@ function DeleteAccount() {
 
   return (
     <BaseForm
-      title="Supprimer un compte"
-      submitLabel="Supprimer"
+      title='Supprimer un compte'
+      submitLabel='Supprimer'
       onSubmit={handleSubmit}
       fields={fields}
       fieldsOrder={fieldsOrder}
-      className="h-fit"
+      className='h-fit'
     />
   )
 }

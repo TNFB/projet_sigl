@@ -89,27 +89,27 @@ function CreationJF() {
 
   return (
     <BaseForm
-      title="Création des journaux de formations"
-      submitLabel="Créer"
+      title='Création des journaux de formations'
+      submitLabel='Créer'
       onSubmit={handleSubmit}
       fields={fields}
       fieldsOrder={fieldsOrder}
-      className="h-fit"
+      className='h-fit'
     >
-      <div className="mb-4">
+      <div className='mb-4'>
         <label
-          htmlFor="file"
-          className="block text-sm font-medium text-gray-700"
+          htmlFor='file'
+          className='block text-sm font-medium text-gray-700'
         >
           Charger le fichier
         </label>
         <input
-          type="file"
-          id="file"
-          name="file"
-          accept=".xlsx"
+          type='file'
+          id='file'
+          name='file'
+          accept='.xlsx'
           onChange={handleFileChange}
-          className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          className='mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
         />
       </div>
     </BaseForm>

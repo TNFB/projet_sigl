@@ -77,11 +77,11 @@ const GestionEntreprises = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="flex space-x-2 animate-pulse">
-          <div className="w-8 h-8 bg-blue-400 rounded-full"></div>
-          <div className="w-8 h-8 bg-blue-400 rounded-full"></div>
-          <div className="w-8 h-8 bg-blue-400 rounded-full"></div>
+      <div className='flex items-center justify-center min-h-screen bg-gray-100'>
+        <div className='flex space-x-2 animate-pulse'>
+          <div className='w-8 h-8 bg-blue-400 rounded-full'></div>
+          <div className='w-8 h-8 bg-blue-400 rounded-full'></div>
+          <div className='w-8 h-8 bg-blue-400 rounded-full'></div>
         </div>
       </div>
     )
@@ -89,16 +89,16 @@ const GestionEntreprises = () => {
 
   return (
     <Home>
-      <div className="flex space-x-4 p-4 w-fit">
+      <div className='flex space-x-4 p-4 w-fit'>
         <BaseMultiAjout
           title="Ajout d'entreprise(s)"
-          typeAjout="Entreprise n°"
-          submitLabel="Ajouter"
+          typeAjout='Entreprise n°'
+          submitLabel='Ajouter'
           rows={rows}
           onChange={handleChange}
           addRow={addRow}
           onSubmit={handleSubmit}
-          className="mx-auto mt-8"
+          className='mx-auto mt-8'
         />
       </div>
     </Home>

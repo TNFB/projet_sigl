@@ -11,6 +11,18 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+  .bg-accent-foreground\/15 {
+    background-color: rgba(0, 0, 0, 0.15);
+  }
+  .outline-muted-foreground {
+    outline-color: rgba(0, 0, 0, 0.4);
+  }
+  .bg-primary\/25 {
+    background-color: rgba(0, 0, 255, 0.25);
+  }
+  .text-primary {
+    color: #1d7afc;
+  }
 }
 
 @layer base {

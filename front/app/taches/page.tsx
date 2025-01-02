@@ -7,5 +7,5 @@ export default function Taches() {
     <Home>
       <p>Contenu de la page des tâches</p>
     </Home>
-  );
+  )
 }

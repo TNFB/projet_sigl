@@ -4,35 +4,34 @@ import BaseForm from '@/components/BaseForm'
 import { postRequestCreateUser } from '@/api/api'
 import bcrypt from 'bcryptjs'
 
-// Définissez ces interfaces avant de les utiliser
 interface InputField {
-  type: 'input';
-  label: string;
-  inputType: string;
-  name: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  type: 'input'
+  label: string
+  inputType: string
+  name: string
+  value: string
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 interface SelectField {
-  type: 'select';
-  label: string;
-  name: string;
-  value: string;
-  options: { value: string; label: string }[];
-  onChange: (value: string) => void;
+  type: 'select'
+  label: string
+  name: string
+  value: string
+  options: { value: string; label: string }[]
+  onChange: (value: string) => void
 }
 
-type Field = InputField | SelectField;
+type Field = InputField | SelectField
 
 function AjoutEleve() {
   const [formData, setFormData] = useState<{
-    email: string;
-    password: string;
-    name: string;
-    last_name: string;
-    telephone: string;
-    role: string;
+    email: string
+    password: string
+    name: string
+    last_name: string
+    telephone: string
+    role: string
   }>({
     email: '',
     password: '',
@@ -40,46 +39,46 @@ function AjoutEleve() {
     last_name: '',
     telephone: '',
     role: '',
-  });
+  })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     setFormData({
       ...formData,
       [name]: value,
-    });
-  };
+    })
+  }
 
   const handleRoleChange = (value: string) => {
     setFormData({
       ...formData,
       role: value,
-    });
-  };
+    })
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const { email, password, name, last_name, telephone, role } = formData;
+    e.preventDefault()
+    const { email, password, name, last_name, telephone, role } = formData
 
     if (!email || !password || !name || !last_name || !telephone || !role) {
-      console.error('All fields are required');
-      return;
+      console.error('All fields are required')
+      return
     }
 
     try {
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10)
       const response = await postRequestCreateUser('user/createUser', {
         ...formData,
         password: hashedPassword,
-      });
-      console.log('User created successfully:', response);
-      alert('Utilisateur ajouté avec succès');
+      })
+      console.log('User created successfully:', response)
+      alert('Utilisateur ajouté avec succès')
     } catch (error) {
-      console.error('Error creating user:', error);
-      alert('Erreur lors de l\'ajout de l\'utilisateur');
+      console.error('Error creating user:', error)
+      alert("Erreur lors de l'ajout de l'utilisateur")
     }
-  };
-  
+  }
+
   const fields: Field[] = [
     {
       type: 'input',
@@ -129,19 +128,32 @@ function AjoutEleve() {
       options: [
         { value: 'admins', label: 'Administrateur' },
         { value: 'apprentices', label: 'Apprenti' },
-        { value: 'apprentice_masters', label: 'Maitre d\'apprentissage' },
+        { value: 'apprentice_masters', label: "Maitre d'apprentissage" },
         { value: 'educational_tutors', label: 'Tuteur pédagogique' },
-        { value: 'apprenticeship_coordinators', label: 'Coordinatrice alternance' },
       ],
       onChange: handleRoleChange,
     },
-  ];
+  ]
 
-  const fieldsOrder = ['email', 'password', 'name', 'last_name', 'telephone', 'role'];
+  const fieldsOrder = [
+    'email',
+    'password',
+    'name',
+    'last_name',
+    'telephone',
+    'role',
+  ]
 
   return (
-    <BaseForm title="Ajout d'un utilisateur" submitLabel="Ajouter" onSubmit={handleSubmit} fields={fields} fieldsOrder={fieldsOrder} className="min-w-80" />
-  );
+    <BaseForm
+      title="Ajout d'un utilisateur"
+      submitLabel='Ajouter'
+      onSubmit={handleSubmit}
+      fields={fields}
+      fieldsOrder={fieldsOrder}
+      className='min-w-80'
+    />
+  )
 }
 
-export default AjoutEleve;
+export default AjoutEleve

@@ -1,70 +1,150 @@
 'use client'
-import { useState, useEffect } from "react";
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import TextStyle from "@tiptap/extension-text-style";
-import Color from "@tiptap/extension-color";
-import Underline from "@tiptap/extension-underline";
-import Home from "@/components/Home";
-import "@fortawesome/fontawesome-free/css/all.min.css";
+import Home from '@/components/Home'
+import { useEffect, useState, useRef } from 'react'
+import { Content } from '@tiptap/react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import NoteEditor from './noteEditor'
+
+interface Note {
+  id: number
+  title: string
+  content: Content
+}
 
 const NotePad = () => {
-  const [content, setContent] = useState("");
-  const [isClient, setIsClient] = useState(false);
+  const [notes, setNotes] = useState<Note[]>([])
+  const [selectedNoteId, setSelectedNoteId] = useState<number | null>(null)
+  const [newNoteTitle, setNewNoteTitle] = useState('')
+  const [isAddingNote, setIsAddingNote] = useState(false)
+  const isMounted = useRef(false)
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      TextStyle,
-      Color,
-      Underline,
-    ],
-    content: "<p>Commencez ici...</p>",
-    onUpdate: ({ editor }) => setContent(editor.getHTML()),
-  });
+    if (!isMounted.current) {
+      const savedNotes = localStorage.getItem('notes')
+      console.log('savedNotes', savedNotes)
+      if (savedNotes) {
+        setNotes(JSON.parse(savedNotes))
+      }
+      isMounted.current = true
+    }
+  }, [])
 
   useEffect(() => {
-    const saveContent = () => {
-      localStorage.setItem("noteContent", content);
-    };
+    if (isMounted.current) {
+      localStorage.setItem('notes', JSON.stringify(notes))
+    }
+  }, [notes])
 
-    const interval = setInterval(saveContent, 10000);
-    return () => clearInterval(interval);
-  }, [content]);
-
-  const setColor = (color: string) => {
-    editor?.chain().focus().setColor(color).run();
-  };
-
-  if (!isClient) {
-    return null;
+  const handleSave = (content: Content) => {
+    if (selectedNoteId !== null) {
+      setNotes((prevNotes) =>
+        prevNotes.map((note) =>
+          note.id === selectedNoteId ? { ...note, content } : note,
+        ),
+      )
+      alert('La note a été sauvegardée')
+    }
   }
+
+  const handleClear = () => {
+    if (selectedNoteId !== null) {
+      setNotes((prevNotes) =>
+        prevNotes.filter((note) => note.id !== selectedNoteId),
+      )
+      setSelectedNoteId(null)
+      alert('La note a été effacée de la sauvegarde')
+    }
+  }
+
+  const handleAddNote = () => {
+    if (newNoteTitle.trim() !== '') {
+      const newNote: Note = {
+        id: Date.now(),
+        title: newNoteTitle,
+        content: '',
+      }
+      setNotes((prevNotes) => [...prevNotes, newNote])
+      setNewNoteTitle('')
+      setIsAddingNote(false)
+      setSelectedNoteId(newNote.id)
+    }
+  }
+
+  const handleSelectNote = (id: number) => {
+    setSelectedNoteId(id)
+  }
+
+  const handleTitleChange = (title: string) => {
+    if (selectedNoteId !== null) {
+      setNotes((prevNotes) =>
+        prevNotes.map((note) =>
+          note.id === selectedNoteId ? { ...note, title } : note,
+        ),
+      )
+    }
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleAddNote()
+    }
+  }
+
+  const selectedNote = notes.find((note) => note.id === selectedNoteId)
 
   return (
     <Home>
-      <div className="w-full max-w-4xl mx-auto mt-10">
-        <div className="flex items-center bg-gray-100 p-4 border-b border-gray-300">
-          <button onClick={() => editor?.chain().focus().toggleBold().run()} className={`p-2 mr-2 ${editor?.isActive('bold') ? 'bg-gray-300' : ''}`}>
-            <i className="fas fa-bold"></i>
-          </button>
-          <button onClick={() => editor?.chain().focus().toggleItalic().run()} className={`p-2 mr-2 ${editor?.isActive('italic') ? 'bg-gray-300' : ''}`}>
-            <i className="fas fa-italic"></i>
-          </button>
-          <button onClick={() => editor?.chain().focus().toggleUnderline().run()} className={`p-2 mr-2 ${editor?.isActive('underline') ? 'bg-gray-300' : ''}`}>
-            <i className="fas fa-underline"></i>
-          </button>
-          <input type="color" onChange={(e) => setColor(e.target.value)} className="mr-5" />
+      <div className='flex'>
+        <div className='w-1/4 p-4 border-r'>
+          <h2 className='text-lg font-bold'>Notes</h2>
+          <ul>
+            {notes.map((note) => (
+              <li
+                key={note.id}
+                className={`cursor-pointer p-2 ${
+                  note.id === selectedNoteId ? 'bg-gray-200' : ''
+                }`}
+                onClick={() => handleSelectNote(note.id)}
+              >
+                {note.title}
+              </li>
+            ))}
+            <li
+              className='cursor-pointer p-2 text-blue-500'
+              onClick={() => setIsAddingNote(true)}
+            >
+              + Nouvelle note
+            </li>
+            {isAddingNote && (
+              <li className='p-2'>
+                <Input
+                  value={newNoteTitle}
+                  onChange={(e) => setNewNoteTitle(e.target.value)}
+                  onKeyUp={handleKeyPress}
+                  placeholder='Titre de la nouvelle note'
+                  className='text-black border-secondary_blue placeholder-gray-400 focus:border-secondary_blue mb-2'
+                  autoFocus
+                />
+              </li>
+            )}
+          </ul>
         </div>
-        <div className="editor-container border border-gray-300 rounded-md p-4 bg-white h-96 overflow-y-auto">
-          <EditorContent editor={editor} className="h-full"/>
+        <div className='w-3/4 p-4'>
+          {selectedNote ? (
+            <NoteEditor
+              note={selectedNote}
+              onSave={handleSave}
+              onClear={handleClear}
+              onTitleChange={handleTitleChange}
+            />
+          ) : (
+            <p>Sélectionnez une note pour commencer à écrire</p>
+          )}
         </div>
       </div>
     </Home>
-  );
-};
+  )
+}
 
-export default NotePad;
+export default NotePad

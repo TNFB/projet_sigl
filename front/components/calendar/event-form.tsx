@@ -17,9 +17,9 @@ interface EventFormProps {
   event?: MyEvent | null
   open: boolean
   onClose: () => void
-  onSave: (event: Omit<MyEvent, 'id'>) => void
+  onSave: (event: MyEvent) => void
   selectedDate?: Date
-  selectedEndDate?: Date // Add this prop for multiple date selection
+  selectedEndDate?: Date
 }
 
 const defaultFormData = {
@@ -83,42 +83,48 @@ export function EventForm({
     const start = new Date(`${formData.startDate}T${formData.startTime}`)
     const end = new Date(`${formData.endDate}T${formData.endTime}`)
 
-    onSave({
+    const newEvent: MyEvent = {
+      id: event?.id || String(Date.now()),
       title: formData.title,
       description: formData.description,
       location: formData.location,
       start,
       end,
-    })
+    }
+
+    onSave(newEvent)
     onClose()
   }
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-[500px]'>
+      <DialogContent
+        className='sm:max-w-[500px]'
+        aria-describedby='event-description'
+      >
         <DialogHeader>
           <DialogTitle className='text-xl'>
-            {event ? 'Edit Event' : 'Create New Event'}
+            {event ? "Modifier l'événement" : 'Créer un événement'}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className='space-y-6 mt-4'>
           <div className='space-y-2'>
-            <Label htmlFor='title'>Event Title</Label>
+            <Label htmlFor='title'>Nom de l&apos;événement</Label>
             <Input
               id='title'
               value={formData.title}
               onChange={(e) =>
                 setFormData({ ...formData, title: e.target.value })
               }
-              className='w-full'
-              placeholder='Enter event title'
+              className='w-full bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2 placeholder-gray-500'
+              placeholder="Entrer le nom de l'événement"
               required
             />
           </div>
 
           <div className='grid grid-cols-2 gap-4'>
             <div className='space-y-2'>
-              <Label>Start Date</Label>
+              <Label>Date début</Label>
               <div className='space-y-2'>
                 <Input
                   type='date'
@@ -127,6 +133,7 @@ export function EventForm({
                     setFormData({ ...formData, startDate: e.target.value })
                   }
                   required
+                  className='w-full bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2 placeholder-gray-500'
                 />
                 <Input
                   type='time'
@@ -135,11 +142,12 @@ export function EventForm({
                     setFormData({ ...formData, startTime: e.target.value })
                   }
                   required
+                  className='w-full bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2 placeholder-gray-500'
                 />
               </div>
             </div>
             <div className='space-y-2'>
-              <Label>End Date</Label>
+              <Label>Date fin</Label>
               <div className='space-y-2'>
                 <Input
                   type='date'
@@ -148,6 +156,7 @@ export function EventForm({
                     setFormData({ ...formData, endDate: e.target.value })
                   }
                   required
+                  className='w-full bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2 placeholder-gray-500'
                 />
                 <Input
                   type='time'
@@ -156,13 +165,14 @@ export function EventForm({
                     setFormData({ ...formData, endTime: e.target.value })
                   }
                   required
+                  className='w-full bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2 placeholder-gray-500'
                 />
               </div>
             </div>
           </div>
 
           <div className='space-y-2'>
-            <Label htmlFor='location'>Location (Optional)</Label>
+            <Label htmlFor='location'>Emplacement (Optionnel)</Label>
             <Input
               id='location'
               value={formData.location}
@@ -170,11 +180,12 @@ export function EventForm({
                 setFormData({ ...formData, location: e.target.value })
               }
               placeholder='Enter location'
+              className='w-full bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2 placeholder-gray-500'
             />
           </div>
 
-          <div className='space-y-2'>
-            <Label htmlFor='description'>Description (Optional)</Label>
+          <div className='space-y-2' id='event-description'>
+            <Label htmlFor='description'>Description (Optionnel)</Label>
             <Textarea
               id='description'
               value={formData.description}
@@ -182,17 +193,16 @@ export function EventForm({
                 setFormData({ ...formData, description: e.target.value })
               }
               rows={3}
-              placeholder='Add description'
+              placeholder='Ajouter description'
+              className='w-full bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2 placeholder-gray-500'
             />
           </div>
 
           <div className='flex justify-end space-x-2'>
             <Button type='button' variant='outline' onClick={onClose}>
-              Cancel
+              Annuler
             </Button>
-            <Button type='submit'>
-              {event ? 'Update Event' : 'Create Event'}
-            </Button>
+            <Button type='submit'>{event ? 'Mettre à jour' : 'Créer'}</Button>
           </div>
         </form>
       </DialogContent>

@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   Home,
   CheckSquare,
@@ -75,6 +74,11 @@ export const SIDEBAR_ADMIN_ITEMS = [
   {
     label: 'Équipes tutorales',
     href: '/gestionEquipes',
+    icon: 'UsersRound',
+  },
+  {
+    label: 'test',
+    href: '/test',
     icon: 'UsersRound',
   },
 ]

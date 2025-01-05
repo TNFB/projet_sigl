@@ -38,6 +38,7 @@ function ModifMDP() {
       try {
         const data = {
           role: null,
+          detailed: 'false',
         }
 
         postRequest(

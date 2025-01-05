@@ -35,6 +35,8 @@ export default class UsersController {
       }
 
       const role = data.role
+      const detailed = data.detailed
+      console.log(detailed)
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
@@ -55,23 +57,35 @@ export default class UsersController {
       }
 
       // Préparer la requête
-      let query = db.from('users').select('email')
+      let query = db.from('users')
 
       // Si un rôle est spécifié, filtrer par ce rôle
       if (role) {
         query = query.where('role', role)
       }
 
+      // Sélectionner les colonnes en fonction du paramètre 'detailed'
+      if (detailed === 'true') {
+        query = query.select('id_user', 'email', 'name', 'last_name', 'role')
+      } else {
+        query = query.select('email')
+      }
+
       // Exécuter la requête
       const users = await query
 
-      // Extraire uniquement les emails
-      const emails = users.map((user) => user.email)
-
-      return response.status(200).json({
-        status: 'success',
-        emails: emails,
-      })
+      if (detailed === 'true') {
+        return response.status(200).json({
+          status: 'success',
+          users: users,
+        })
+      } else {
+        const emails = users.map((user) => user.email)
+        return response.status(200).json({
+          status: 'success',
+          emails: emails,
+        })
+      }
     } catch (error) {
       console.log(error)
       return response.status(500).json({

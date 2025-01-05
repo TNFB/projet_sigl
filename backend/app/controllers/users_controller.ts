@@ -36,7 +36,6 @@ export default class UsersController {
 
       const role = data.role
       const detailed = data.detailed
-      console.log(detailed)
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide

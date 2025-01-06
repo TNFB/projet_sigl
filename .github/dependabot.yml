@@ -4,9 +4,9 @@ updates:
     directory: "/front"
     schedule:
       interval: "daily"
-    target-branch: "develop"
+    target-branch: "build"
   - package-ecosystem: "npm"
     directory: "/backend"
     schedule:
       interval: "daily"
-    target-branch: "develop"
+    target-branch: "build"

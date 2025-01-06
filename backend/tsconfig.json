@@ -6,7 +6,7 @@
       "baseUrl": ".",
       "paths": {
         "#models/*": ["app/Models/*"],
-        "#controllers/*": ["app/Controllers/Http/*"],
+        "#controllers/*": ["./app/controllers/*"],
         "#providers/*": ["providers/*"],
         "#utils/*": ["./app/utils/*"]
       },

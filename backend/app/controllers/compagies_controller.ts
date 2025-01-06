@@ -1,6 +1,6 @@
 import db from '@adonisjs/lucid/services/db'
 import { isValidRole } from '../utils/api_utils.js'
-import { CustomHttpContext } from '../../types/custom_types.js'
+import { HttpContext } from '@adonisjs/core/http'
 
 export default class CompaniesController {
   /**
@@ -30,12 +30,12 @@ export default class CompaniesController {
    *
    * // Exemple de réponse réussie
    * {
-   *   "id_company": 1,
+   *   "idCompany": 1,
    *   "name": "Acme Corporation",
    *   "message": "Company created successfully"
    * }
    */
-  public async createCompany({ request, response }: CustomHttpContext) {
+  public async createCompany({ request, response }: HttpContext) {
     try {
       const { data } = request.only(['data'])
       if (!data) {
@@ -43,7 +43,10 @@ export default class CompaniesController {
       }
       const { companiesData } = data
 
-      const emailUser = request.user.email
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
@@ -80,10 +83,10 @@ export default class CompaniesController {
         }
 
         // Add new Company
-        const [idCompany] = await db.table('companies').insert({ name }).returning('id_company')
+        const [idCompany] = await db.table('companies').insert({ name }).returning('idCompany')
 
         // Create response
-        const company = await db.from('companies').where('id_company', idCompany).first()
+        const company = await db.from('companies').where('idCompany', idCompany).first()
 
         results.push({ ...company, status: 'success', message: 'Company created successfully' })
       }
@@ -121,9 +124,12 @@ export default class CompaniesController {
    *   "companyNames": ["Acme Corporation", "Globex Corporation", "Soylent Corp"]
    * }
    */
-  public async getAllCompanyNames({ request, response }: CustomHttpContext) {
+  public async getAllCompanyNames({ request, response }: HttpContext) {
     try {
-      const emailUser = request.user.email
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({

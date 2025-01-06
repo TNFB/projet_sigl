@@ -1,8 +1,17 @@
-import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { HttpContext } from '@adonisjs/core/http'
 import jwt from 'jsonwebtoken'
 
+// Étendre l'interface Request pour inclure la propriété user
+declare module '@adonisjs/core/http' {
+  interface Request {
+    user?: {
+      email: string
+    }
+  }
+}
+
 export default class Auth {
-  public async handle({ request, response }: HttpContextContract, next: () => Promise<void>) {
+  public async handle({ request, response }: HttpContext, next: () => Promise<void>) {
     if (request.url() === '/connection') {
       await next()
       return
@@ -14,7 +23,7 @@ export default class Auth {
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.APP_KEY)
+      const decoded = jwt.verify(token, process.env.APP_KEY as string) as { email: string }
       request.user = decoded
       await next()
     } catch (error) {

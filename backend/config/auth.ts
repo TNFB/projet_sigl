@@ -1,23 +1,16 @@
-import { AuthConfig } from '@ioc:Adonis/Addons/Auth'
-
-const authConfig: AuthConfig = {
+const authConfig = {
   guard: 'api',
   guards: {
     api: {
-      driver: 'jwt',
+      driver: 'oat',
       tokenProvider: {
-        type: 'jwt',
-        driver: 'jwt',
-        secret: process.env.APP_KEY,
-        options: {
-          expiresIn: '1h',
-        },
+        driver: 'database',
       },
       provider: {
         driver: 'lucid',
-        identifierKey: 'id_user',
+        identifierKey: 'idUser',
         uids: ['email'],
-        model: () => import('App/Models/User'),
+        model: () => import('#models/user'),
       },
     },
   },

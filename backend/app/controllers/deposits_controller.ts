@@ -1,4 +1,4 @@
-import { CustomHttpContext } from '../../types/custom_types.js'
+import { HttpContext } from '@adonisjs/core/http'
 import Database from '@adonisjs/lucid/services/db'
 import { isValidRole } from '../utils/api_utils.js'
 
@@ -13,9 +13,12 @@ export default class DepositsController {
    * @param {HttpContext} context - Le contexte HTTP de la requête.
    * @returns {Promise<JSON>} Une réponse JSON contenant tous les dépôts ou une erreur.
    */
-  public async getAllDeposits({ request, response }: CustomHttpContext) {
+  public async getAllDeposits({ request, response }: HttpContext) {
     try {
-      const emailUser = request.user.email
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
@@ -36,7 +39,7 @@ export default class DepositsController {
    * @param {HttpContext} context - Le contexte HTTP de la requête.
    * @returns {Promise<JSON>} Une réponse JSON indiquant le succès ou l'échec de l'opération.
    */
-  public async addDeposit({ request, response }: CustomHttpContext) {
+  public async addDeposit({ request, response }: HttpContext) {
     try {
       const { data } = request.only(['data'])
       if (!data) {
@@ -44,7 +47,10 @@ export default class DepositsController {
       }
       const { deposit } = data
 
-      const emailUser = request.user.email
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
@@ -77,7 +83,7 @@ export default class DepositsController {
    * @param {HttpContext} context - Le contexte HTTP de la requête.
    * @returns {Promise<JSON>} Une réponse JSON indiquant le succès ou l'échec de l'opération.
    */
-  public async deleteDeposit({ request, response }: CustomHttpContext) {
+  public async deleteDeposit({ request, response }: HttpContext) {
     try {
       const { data } = request.only(['data'])
       if (!data) {
@@ -85,7 +91,10 @@ export default class DepositsController {
       }
       const { deposit } = data
 
-      const emailUser = request.user.email
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({

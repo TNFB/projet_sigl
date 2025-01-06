@@ -9,7 +9,7 @@ export default class extends BaseSchema {
         .integer('id')
         .primary()
         .unsigned()
-        .references('id_user')
+        .references('idUser')
         .inTable('users')
         .onDelete('CASCADE')
       table
@@ -37,9 +37,9 @@ export default class extends BaseSchema {
         .inTable('training_diaries')
         .onDelete('CASCADE')
       table
-        .integer('id_company')
+        .integer('idCompany')
         .unsigned()
-        .references('id_company')
+        .references('idCompany')
         .inTable('companies')
         .onDelete('CASCADE')
       table.json('list_missions')

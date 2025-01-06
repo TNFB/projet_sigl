@@ -52,7 +52,7 @@
     "clsx": "^2.1.1",
     "cross-spawn": "^7.0.5",
     "embla-carousel-react": "^8.3.1",
-    "gh-pages": "^6.1.1",
+    "gh-pages": "^6.3.0",
     "jwt-decode": "^4.0.0",
     "lowlight": "^3.3.0",
     "lucide-react": "^0.451.0",

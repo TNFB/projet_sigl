@@ -19,7 +19,6 @@ export default class DepositsController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { token } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
@@ -48,7 +47,7 @@ export default class DepositsController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { deposit, token } = data
+      const { deposit } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
@@ -89,7 +88,7 @@ export default class DepositsController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { deposit, token } = data
+      const { deposit } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide

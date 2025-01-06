@@ -10,7 +10,7 @@ export default class MonthluNotesController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, title, content, token } = data
+      const { email, title, content } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide

@@ -103,7 +103,7 @@ export default class UsersController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, password, name, last_name, telephone, role, token } = data
+      const { email, password, name, lastName, telephone, role } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
@@ -127,7 +127,7 @@ export default class UsersController {
       const hashedPassword = await bcrypt.hash(password, 10)
       const createUser = await db
         .table('users')
-        .insert({ email, password: hashedPassword, name, last_name, telephone, role })
+        .insert({ email, password: hashedPassword, name, lastName, telephone, role })
       console.log(`User created: ${createUser}`)
 
       //assigne Role
@@ -207,7 +207,7 @@ export default class UsersController {
         // Gerer Token => Inserte Token In BDD if user can connect
         // Maybe add 1-2sec delay if password Wrong
         const token = jwt.sign(
-          { id: userDb.id_user, email: userDb.email, role: userDb.role },
+          { id: userDb.idUser, email: userDb.email, role: userDb.role },
           process.env.APP_KEY,
           {
             expiresIn: '1h',
@@ -256,7 +256,7 @@ export default class UsersController {
     for (const user of users) {
       const isTokenMatch = await bcrypt.compare(token, user.token)
       if (isTokenMatch) {
-        await db.from('users').where('id_user', user.id_user).update({
+        await db.from('users').where('idUser', user.idUser).update({
           token: null, // Optionnel : réinitialiser le token après utilisation
           expired_date: null, // Optionnel : réinitialiser la date d'expiration
         })
@@ -296,7 +296,7 @@ export default class UsersController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, oldPassword, newPassword, token } = data
+      const { email, oldPassword, newPassword } = data
 
       // Vérifier si la table 'users' est vide
       if (await isUserTableEmpty()) {

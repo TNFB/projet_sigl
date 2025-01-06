@@ -30,7 +30,7 @@ export default class CompaniesController {
    *
    * // Exemple de réponse réussie
    * {
-   *   "id_company": 1,
+   *   "idCompany": 1,
    *   "name": "Acme Corporation",
    *   "message": "Company created successfully"
    * }
@@ -41,7 +41,7 @@ export default class CompaniesController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { companiesData, token } = data
+      const { companiesData } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
@@ -80,10 +80,10 @@ export default class CompaniesController {
         }
 
         // Add new Company
-        const [idCompany] = await db.table('companies').insert({ name }).returning('id_company')
+        const [idCompany] = await db.table('companies').insert({ name }).returning('idCompany')
 
         // Create response
-        const company = await db.from('companies').where('id_company', idCompany).first()
+        const company = await db.from('companies').where('idCompany', idCompany).first()
 
         results.push({ ...company, status: 'success', message: 'Company created successfully' })
       }
@@ -127,7 +127,6 @@ export default class CompaniesController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { token } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide

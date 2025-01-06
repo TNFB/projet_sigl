@@ -1,11 +1,12 @@
+version: 2
 updates:
-  - package-ecosystem: "pnpm"
+  - package-ecosystem: "npm"
     directory: "/front"
     schedule:
       interval: "daily"
-      target-branch: "develop"
-  - package-ecosystem: "pnpm"
+    target-branch: "develop"
+  - package-ecosystem: "npm"
     directory: "/backend"
     schedule:
       interval: "daily"
-      target-branch: "develop"
+    target-branch: "develop"

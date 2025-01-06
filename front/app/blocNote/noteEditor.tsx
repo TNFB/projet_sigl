@@ -52,7 +52,7 @@ const NoteEditor = ({
         value={title}
         onChange={handleTitleChange}
         placeholder='Titre de la note'
-        className='text-black border-gray-300 placeholder-gray-400 focus:border-secondary_blue mb-2'
+        className='text-black border-gray-300 placeholder-gray-400 focus:border-secondary_blue mb-2 rounded-none'
       />
       <TooltipProvider>
         <MinimalTiptapEditor
@@ -62,7 +62,7 @@ const NoteEditor = ({
           className='w-full'
           editorContentClassName='p-5'
           output='html'
-          placeholder='Type your description here...'
+          placeholder='Entrez votre note ici...'
           immediatelyRender={false}
         />
         <div className='mt-4 flex space-x-2'>

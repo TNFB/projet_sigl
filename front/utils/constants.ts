@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   Home,
   CheckSquare,
@@ -10,71 +9,76 @@ import {
 
 export const SIDEBAR_ITEMS = [
   {
-    title: 'Accueil',
-    url: '/',
+    label: 'Accueil',
+    href: '/',
     icon: 'Home',
   },
   {
-    title: 'Mes tâches',
-    url: '/taches',
+    label: 'Mes tâches',
+    href: '/taches',
     icon: 'CheckSquare',
   },
   {
-    title: 'Notes',
-    url: '/blocNote',
+    label: 'Notes',
+    href: '/blocNote',
     icon: 'FileText',
   },
   {
-    title: 'Documents',
-    url: '/documents',
+    label: 'Documents',
+    href: '/documents',
     icon: 'BookOpen',
   },
   {
-    title: 'Évaluations',
-    url: '/evaluations',
+    label: 'Évaluations',
+    href: '/evaluations',
     icon: 'Clipboard',
   },
 ]
 
 export const SIDEBAR_ADMIN_ITEMS = [
   {
-    title: 'Accueil',
-    url: '/',
+    label: 'Accueil',
+    href: '/',
     icon: 'Home',
   },
   {
-    title: 'Gestion des élèves',
-    url: '/gestionEleves',
+    label: 'Gestion des élèves',
+    href: '/gestionEleves',
     icon: 'UsersRound',
   },
   {
-    title: 'Gestion des livrables',
-    url: '/blocNote',
+    label: 'Gestion des livrables',
+    href: '/',
     icon: 'BookOpen',
   },
   {
-    title: "Maîtres d'apprentissage",
-    url: '/gestionMaitresApp',
+    label: "Maîtres d'apprentissage",
+    href: '/gestionMaitresApp',
     icon: 'UsersRound',
   },
   {
-    title: 'Tuteurs pédagogiques',
-    url: '/gestionTuteurs',
+    label: 'Tuteurs pédagogiques',
+    href: '/gestionTuteurs',
     icon: 'UsersRound',
   },
   {
-    title: 'Intervenants extérieurs',
-    url: '/gestionIntervenants',
+    label: 'Intervenants extérieurs',
+    href: '/gestionIntervenants',
     icon: 'UsersRound',
   },
   {
-    title: 'Entreprises partenaires',
-    url: '/gestionEntreprises',
+    label: 'Entreprises partenaires',
+    href: '/gestionEntreprises',
     icon: 'UsersRound',
   },
   {
-    title: 'Équipes tutorales',
-    url: '/gestionEquipes',
+    label: 'Équipes tutorales',
+    href: '/gestionEquipes',
+    icon: 'UsersRound',
+  },
+  {
+    label: 'test',
+    href: '/test',
     icon: 'UsersRound',
   },
 ]

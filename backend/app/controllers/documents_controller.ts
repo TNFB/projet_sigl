@@ -1,7 +1,8 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
-import xlsx from 'xlsx'
+import * as XLSX from 'xlsx'
 import fs from 'node:fs'
+import path from 'node:path'
 
 /**
  * @class DocumentsController
@@ -54,7 +55,7 @@ export default class DocumentsController {
         })
       }
       //Path
-      const basePath = `/${userDb.id_user}`
+      const basePath = `/${userDb.idUser}`
       const fileUrl = `${basePath}/${documentName}.${file.extname}`
       // Save to disk
       await file.moveToDisk(fileUrl, {
@@ -109,16 +110,25 @@ export default class DocumentsController {
       }
 
       const filePath = `${Date.now()}-${file.clientName}`
+      const fullPath = path.join(process.cwd(), 'tmp', filePath)
+      console.log(`Full path: ${fullPath}`) // Log the full path
+
       await file.move(process.cwd() + '/tmp', { name: filePath })
 
+      // Vérifier si le fichier a été déplacé avec succès
+      if (!fs.existsSync(fullPath)) {
+        console.error('File move failed') // Log the error
+        return response.badRequest({ message: 'File move failed' })
+      }
+      XLSX.set_fs(fs)
       // Lecture du fichier Excel
-      const workbook = xlsx.readFile(`tmp/${filePath}`)
+      const workbook = XLSX.readFile(fullPath)
       const sheetName = workbook.SheetNames[0]
-      let data: any[] = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName])
+      let data: any[] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName])
       const results = []
-
+      console.log(data)
       for (const row of data) {
-        const { email, name, last_name, apprenticeMasters, educationalTutors } = row
+        const { email, name, lastName, apprenticeMasters, educationalTutors } = row
 
         // Vérifier si l'utilisateur existe déjà
         let user = await db.from('users').where('email', email).first()
@@ -131,12 +141,12 @@ export default class DocumentsController {
             .insert({
               email,
               name,
-              last_name,
+              lastName,
               role,
             })
             .returning('*') // Récupérer toutes les colonnes
 
-          user = { id_user: result[0], email, name, last_name }
+          user = { idUser: result[0], email, name, lastName }
         }
 
         // Créer un journal de formation (training diary)
@@ -166,27 +176,27 @@ export default class DocumentsController {
           .where('role', 'educational_tutors')
           .first()
 
-        const alreadyCreated = await db.from('apprentices').where('id', user.id_user).first()
+        const alreadyCreated = await db.from('apprentices').where('id', user.idUser).first()
 
         if (!alreadyCreated) {
           // Insérer dans la table apprentices
-          console.log(`create new User : ${user.id_user}`)
+          console.log(`create new User : ${user.idUser}`)
           await db.table('apprentices').insert({
-            id: user.id_user,
-            id_educational_tutor: educationalTutor ? educationalTutor.id_user : null,
-            id_apprentice_master: apprenticeMaster ? apprenticeMaster.id_user : null,
+            id: user.idUser,
+            id_educational_tutor: educationalTutor ? educationalTutor.idUser : null,
+            id_apprentice_master: apprenticeMaster ? apprenticeMaster.idUser : null,
             id_training_diary: trainingDiaryId,
             list_missions: JSON.stringify([]),
           })
         } else {
           // Mettre à jour l'enregistrement existant
-          console.log(`already existing user : ${user.id_user}`)
+          console.log(`already existing user : ${user.idUser}`)
           await db
             .from('apprentices')
-            .where('id', user.id_user)
+            .where('id', user.idUser)
             .update({
-              id_educational_tutor: educationalTutor ? educationalTutor.id_user : null,
-              id_apprentice_master: apprenticeMaster ? apprenticeMaster.id_user : null,
+              id_educational_tutor: educationalTutor ? educationalTutor.idUser : null,
+              id_apprentice_master: apprenticeMaster ? apprenticeMaster.idUser : null,
               id_training_diary: trainingDiaryId,
             })
         }

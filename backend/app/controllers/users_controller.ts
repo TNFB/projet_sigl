@@ -3,6 +3,7 @@ import { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
 import { findUserByEmail, isUserTableEmpty, isValidRole } from '../utils/api_utils.js'
 import jwt from 'jsonwebtoken'
+import { CustomHttpContext } from '../../types/custom_types.js'
 
 /**
  * @class UsersController
@@ -26,7 +27,7 @@ export default class UsersController {
    *
    * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et la liste des emails des utilisateurs.
    */
-  async getUserEmailsByRole({ request, response }: HttpContext) {
+  async getUserEmailsByRole({ request, response }: CustomHttpContext) {
     try {
       // Récupérer le rôle depuis les paramètres de la requête
       const { data } = request.only(['data'])
@@ -35,13 +36,14 @@ export default class UsersController {
       }
 
       const role = data.role
+      const detailed = data.detailed
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -55,23 +57,35 @@ export default class UsersController {
       }
 
       // Préparer la requête
-      let query = db.from('users').select('email')
+      let query = db.from('users')
 
       // Si un rôle est spécifié, filtrer par ce rôle
       if (role) {
         query = query.where('role', role)
       }
 
+      // Sélectionner les colonnes en fonction du paramètre 'detailed'
+      if (detailed === 'true') {
+        query = query.select('id_user', 'email', 'name', 'last_name', 'role')
+      } else {
+        query = query.select('email')
+      }
+
       // Exécuter la requête
       const users = await query
 
-      // Extraire uniquement les emails
-      const emails = users.map((user) => user.email)
-
-      return response.status(200).json({
-        status: 'success',
-        emails: emails,
-      })
+      if (detailed === 'true') {
+        return response.status(200).json({
+          status: 'success',
+          users: users,
+        })
+      } else {
+        const emails = users.map((user) => user.email)
+        return response.status(200).json({
+          status: 'success',
+          emails: emails,
+        })
+      }
     } catch (error) {
       console.log(error)
       return response.status(500).json({
@@ -96,21 +110,21 @@ export default class UsersController {
    *
    * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut, un message et les détails de l'utilisateur créé.
    */
-  async createUser({ request, response }: HttpContext) {
+  async createUser({ request, response }: CustomHttpContext) {
     console.log('createUser')
     try {
       const { data } = request.only(['data'])
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, password, name, last_name, telephone, role, token } = data
+      const { email, password, name, lastName, telephone, role } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -127,7 +141,7 @@ export default class UsersController {
       const hashedPassword = await bcrypt.hash(password, 10)
       const createUser = await db
         .table('users')
-        .insert({ email, password: hashedPassword, name, last_name, telephone, role })
+        .insert({ email, password: hashedPassword, name, lastName, telephone, role })
       console.log(`User created: ${createUser}`)
 
       //assigne Role
@@ -208,7 +222,7 @@ export default class UsersController {
         // Maybe add 1-2sec delay if password Wrong
         const token = jwt.sign(
           { id: userDb.id_user, email: userDb.email, role: userDb.role },
-          process.env.APP_KEY,
+          process.env.APP_KEY || 'default_secret_key',
           {
             expiresIn: '1h',
           }
@@ -256,7 +270,7 @@ export default class UsersController {
     for (const user of users) {
       const isTokenMatch = await bcrypt.compare(token, user.token)
       if (isTokenMatch) {
-        await db.from('users').where('id_user', user.id_user).update({
+        await db.from('users').where('idUser', user.idUser).update({
           token: null, // Optionnel : réinitialiser le token après utilisation
           expired_date: null, // Optionnel : réinitialiser la date d'expiration
         })
@@ -296,7 +310,7 @@ export default class UsersController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, oldPassword, newPassword, token } = data
+      const { email, oldPassword, newPassword } = data
 
       // Vérifier si la table 'users' est vide
       if (await isUserTableEmpty()) {

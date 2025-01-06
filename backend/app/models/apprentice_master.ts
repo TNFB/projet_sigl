@@ -5,5 +5,5 @@ export default class ApprenticeMaster extends BaseModel {
   declare id: number
 
   @column()
-  declare id_company: number
+  declare idCompany: number
 }

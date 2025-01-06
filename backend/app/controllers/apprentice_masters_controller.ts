@@ -2,6 +2,7 @@ import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
 import { findUserByEmail, isValidRole } from '../utils/api_utils.js'
+import { CustomHttpContext } from '../../types/custom_types.js'
 
 export default class ApprenticeMastersController {
   /**
@@ -37,21 +38,21 @@ export default class ApprenticeMastersController {
    *   "message": "Apprentices added successfully and master updated"
    * }
    */
-  async addApprentices({ request, response }: HttpContext) {
+  async addApprentices({ request, response }: CustomHttpContext) {
     console.log('addApprentices')
     try {
       const { data } = request.only(['data'])
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { masterId, apprenticeIds, token } = data
+      const { masterId, apprenticeIds } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -100,20 +101,20 @@ export default class ApprenticeMastersController {
    *
    * @returns {Promise<Object>} Une promesse qui résout avec un objet JSON contenant un message de succès ou d'erreur.
    */
-  async createOrUpdateApprenticeMaster({ request, response }: HttpContext) {
+  async createOrUpdateApprenticeMaster({ request, response }: CustomHttpContext) {
     try {
       const { data } = request.only(['data'])
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { peopleData, token } = data
+      const { peopleData } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -226,20 +227,20 @@ export default class ApprenticeMastersController {
    *
    * @returns {Promise<Object>} Une promesse qui résout avec le journal de formation de l'apprenti.
    */
-  public async getTrainingDiaryByEmail({ request, response }: HttpContext) {
+  public async getTrainingDiaryByEmail({ request, response }: CustomHttpContext) {
     try {
       const { data } = request.only(['data'])
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, token } = data
+      const { email } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -282,20 +283,20 @@ export default class ApprenticeMastersController {
     }
   }
 
-  public async getApprenticeInfoByEmail({ request, response }: HttpContext) {
+  public async getApprenticeInfoByEmail({ request, response }: CustomHttpContext) {
     try {
       const { data } = request.only(['data'])
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, token } = data
+      const { email } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -319,20 +320,20 @@ export default class ApprenticeMastersController {
     }
   }
 
-  public async getApprenticesByMasterEmail({ request, response }: HttpContext) {
+  public async getApprenticesByMasterEmail({ request, response }: CustomHttpContext) {
     try {
       const { data } = request.input('data')
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, token } = data
+      const { email } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 

@@ -45,7 +45,7 @@ const GestionMaitresApp = () => {
       const data = {
         peopleData: rows.map((row) => ({
           name: row.prenom,
-          last_name: row.nom,
+          lastName: row.nom,
           email: row.email,
           companyName: row.entreprise,
         })),
@@ -70,7 +70,7 @@ const GestionMaitresApp = () => {
     const formattedData = {
       data: rows.map(row => ({
         name: row.prenom,
-        last_name: row.nom,
+        lastName: row.nom,
         email: row.email,
         companyName: row.entreprise
       }))

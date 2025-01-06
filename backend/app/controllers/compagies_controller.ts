@@ -1,6 +1,6 @@
-import { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
 import { isValidRole } from '../utils/api_utils.js'
+import { CustomHttpContext } from '../../types/custom_types.js'
 
 export default class CompaniesController {
   /**
@@ -35,20 +35,20 @@ export default class CompaniesController {
    *   "message": "Company created successfully"
    * }
    */
-  public async createCompany({ request, response }: HttpContext) {
+  public async createCompany({ request, response }: CustomHttpContext) {
     try {
       const { data } = request.only(['data'])
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { companiesData, token } = data
+      const { companiesData } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -121,20 +121,14 @@ export default class CompaniesController {
    *   "companyNames": ["Acme Corporation", "Globex Corporation", "Soylent Corp"]
    * }
    */
-  public async getAllCompanyNames({ request, response }: HttpContext) {
+  public async getAllCompanyNames({ request, response }: CustomHttpContext) {
     try {
-      const { data } = request.only(['data'])
-      if (!data) {
-        return response.status(400).json({ error: 'Data is required' })
-      }
-      const { token } = data
-
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 

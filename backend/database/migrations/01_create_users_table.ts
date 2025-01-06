@@ -12,8 +12,6 @@ export default class extends BaseSchema {
       table.string('last_name')
       table.string('telephone')
       table.string('role')
-      table.string('token').nullable()
-      table.dateTime('expired_date').nullable()
     })
   }
 

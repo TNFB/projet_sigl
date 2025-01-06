@@ -12,8 +12,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'User',
         telephone: '1234567890',
         role: 'admins',
-        token: null,
-        expired_date: null,
       },
       {
         email: 'john@eseo.fr',
@@ -22,8 +20,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'Doe',
         telephone: '9876543210',
         role: 'apprentices',
-        token: null,
-        expired_date: null,
       },
       {
         email: 'orlando@eseo.fr',
@@ -32,8 +28,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'Pastorice',
         telephone: '6666666666',
         role: 'apprentices',
-        token: null,
-        expired_date: null,
       },
       {
         email: 'killian@eseo.fr',
@@ -42,8 +36,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'Surugyai',
         telephone: '7777777777',
         role: 'apprentices',
-        token: null,
-        expired_date: null,
       },
       {
         email: 'michel@eseo.fr',
@@ -52,8 +44,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'Chelmi',
         telephone: '1234567890',
         role: 'apprentice_masters',
-        token: null,
-        expired_date: null,
       },
       {
         email: 'dupont@eseo.fr',
@@ -62,8 +52,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'Pondut',
         telephone: '1234567890',
         role: 'apprentice_masters',
-        token: null,
-        expired_date: null,
       },
       {
         email: 'patrick@eseo.fr',
@@ -72,8 +60,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'Rickpat',
         telephone: '1234567890',
         role: 'apprentice_masters',
-        token: null,
-        expired_date: null,
       },
       {
         email: 'jon@eseo.fr',
@@ -82,8 +68,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'McGordon',
         telephone: '1234567890',
         role: 'educational_tutors',
-        token: null,
-        expired_date: null,
       },
       {
         email: 'maissa@eseo.fr',
@@ -92,8 +76,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'Samais',
         telephone: '1234567890',
         role: 'educational_tutors',
-        token: null,
-        expired_date: null,
       },
       {
         email: 'jerome@eseo.fr',
@@ -102,8 +84,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'Romeje',
         telephone: '1234567890',
         role: 'educational_tutors',
-        token: null,
-        expired_date: null,
       },
       {
         email: 'professionals1@eseo.fr',
@@ -112,8 +92,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'professionals1',
         telephone: '1234567890',
         role: 'professionals',
-        token: null,
-        expired_date: null,
       },
       {
         email: 'professionals2@eseo.fr',
@@ -122,8 +100,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'professionals2',
         telephone: '1234567890',
         role: 'professionals',
-        token: null,
-        expired_date: null,
       },
       {
         email: 'professionals3@eseo.fr',
@@ -132,8 +108,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'professionals3',
         telephone: '1234567890',
         role: 'professionals',
-        token: null,
-        expired_date: null,
       },
       {
         email: 'teachers1@eseo.fr',
@@ -142,8 +116,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'teachers1',
         telephone: '1234567890',
         role: 'teachers',
-        token: null,
-        expired_date: null,
       },
       {
         email: 'teachers2@eseo.fr',
@@ -152,8 +124,6 @@ export default class UserSeeder extends BaseSeeder {
         last_name: 'teachers2',
         telephone: '1234567890',
         role: 'teachers',
-        token: null,
-        expired_date: null,
       },
     ])
   }

@@ -6,15 +6,15 @@ export default class extends BaseSeeder {
     await ApprenticeMaster.createMany([
       {
         id: 5,
-        id_company: 1
+        id_company: 1,
       },
       {
         id: 6,
-        id_company: 2
+        id_company: 2,
       },
       {
         id: 7,
-        id_company: 3
+        id_company: 3,
       },
     ])
   }

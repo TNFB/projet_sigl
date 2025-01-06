@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Search, Bell, LogOut, ChevronDown } from 'lucide-react'
+import { Bell, LogOut, ChevronDown } from 'lucide-react'
 import { SIDEBAR_ITEMS, SIDEBAR_ADMIN_ITEMS } from '@/utils/constants'
-import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -37,7 +36,6 @@ const Header = () => {
   return (
     <div className='flex items-center justify-between p-4 border-b border-gray-300'>
       <div className='flex items-center space-x-4'>
-        <SidebarTrigger />
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -47,10 +45,10 @@ const Header = () => {
             <BreadcrumbItem>
               <BreadcrumbPage>
                 {SIDEBAR_ADMIN_ITEMS.map((item) =>
-                  url === item.url ? item.title : null,
+                  url === item.href ? item.label : null,
                 )}
                 {SIDEBAR_ITEMS.map((item) =>
-                  url === item.url ? item.title : null,
+                  url === item.href ? item.label : null,
                 )}
               </BreadcrumbPage>
             </BreadcrumbItem>
@@ -58,10 +56,10 @@ const Header = () => {
         </Breadcrumb>
       </div>
       <div className='flex items-center space-x-4'>
-        <button className='p-2 bg-white rounded-full shadow'>
+        {/*<button className='p-2 bg-white rounded-full shadow'>
           <Search className='w-5 h-5 text-gray-600' />
         </button>
-        <div className='h-6 border-l border-gray-300'></div>
+        <div className='h-6 border-l border-gray-300'></div>*/}
         <button className='p-2 bg-white rounded-full shadow'>
           <Bell className='w-5 h-5 text-gray-600' />
         </button>

@@ -1,5 +1,5 @@
 import db from '@adonisjs/lucid/services/db'
-import type { HttpContext } from '@adonisjs/core/http'
+import { CustomHttpContext } from '../../types/custom_types.js'
 import { isValidRole } from '../utils/api_utils.js'
 
 /**
@@ -26,27 +26,27 @@ export default class TrainingDiariesController {
    * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant un message de succès
    *                             et l'ID du journal d'entraînement créé ou une erreur en cas d'échec.
    */
-  async createTraningDiary({ request, response }: HttpContext) {
+  async createTraningDiary({ request, response }: CustomHttpContext) {
     console.log('createTraningDiary')
     try {
       const { data } = request.only(['data'])
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { idUser } = data
+      const { id_user } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
-      const user = await db.from('users').where('idUser', idUser).first()
+      const user = await db.from('users').where('id_user', id_user).first()
       if (user && user.role === 'apprentices') {
-        const apprentice = await db.from('apprentices').where('id', idUser).first()
+        const apprentice = await db.from('apprentices').where('id', id_user).first()
 
         if (apprentice && apprentice.id_training_diary) {
           return response.status(400).json({
@@ -62,7 +62,7 @@ export default class TrainingDiariesController {
 
         await db
           .from('apprentices')
-          .where('id', idUser)
+          .where('id', id_user)
           .update({ id_training_diary: newTrainingDiaryId })
 
         return response.status(200).json({

@@ -123,7 +123,7 @@ const NotePad = () => {
                   onChange={(e) => setNewNoteTitle(e.target.value)}
                   onKeyUp={handleKeyPress}
                   placeholder='Titre de la nouvelle note'
-                  className='text-black border-secondary_blue placeholder-gray-400 focus:border-secondary_blue mb-2'
+                  className='text-black rounded-none border-gray-300 placeholder-gray-400 focus:border-secondary_blue mb-2'
                   autoFocus
                 />
               </li>

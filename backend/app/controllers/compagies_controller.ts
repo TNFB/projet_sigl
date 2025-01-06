@@ -1,6 +1,6 @@
-import { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
 import { isValidRole } from '../utils/api_utils.js'
+import { CustomHttpContext } from '../../types/custom_types.js'
 
 export default class CompaniesController {
   /**
@@ -30,12 +30,12 @@ export default class CompaniesController {
    *
    * // Exemple de réponse réussie
    * {
-   *   "idCompany": 1,
+   *   "id_company": 1,
    *   "name": "Acme Corporation",
    *   "message": "Company created successfully"
    * }
    */
-  public async createCompany({ request, response }: HttpContext) {
+  public async createCompany({ request, response }: CustomHttpContext) {
     try {
       const { data } = request.only(['data'])
       if (!data) {
@@ -48,7 +48,7 @@ export default class CompaniesController {
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -80,10 +80,10 @@ export default class CompaniesController {
         }
 
         // Add new Company
-        const [idCompany] = await db.table('companies').insert({ name }).returning('idCompany')
+        const [idCompany] = await db.table('companies').insert({ name }).returning('id_company')
 
         // Create response
-        const company = await db.from('companies').where('idCompany', idCompany).first()
+        const company = await db.from('companies').where('id_company', idCompany).first()
 
         results.push({ ...company, status: 'success', message: 'Company created successfully' })
       }
@@ -121,19 +121,14 @@ export default class CompaniesController {
    *   "companyNames": ["Acme Corporation", "Globex Corporation", "Soylent Corp"]
    * }
    */
-  public async getAllCompanyNames({ request, response }: HttpContext) {
+  public async getAllCompanyNames({ request, response }: CustomHttpContext) {
     try {
-      const { data } = request.only(['data'])
-      if (!data) {
-        return response.status(400).json({ error: 'Data is required' })
-      }
-
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 

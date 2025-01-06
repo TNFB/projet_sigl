@@ -1,5 +1,5 @@
 import db from '@adonisjs/lucid/services/db'
-import type { HttpContext } from '@adonisjs/core/http'
+import { CustomHttpContext } from '../../types/custom_types.js'
 import bcrypt from 'bcrypt'
 import { isValidRole } from '../utils/api_utils.js'
 
@@ -48,7 +48,7 @@ export default class EducationalTutorsController {
    * }
    */
 
-  async addApprentices({ request, response }: HttpContext) {
+  async addApprentices({ request, response }: CustomHttpContext) {
     console.log('addApprentices')
     try {
       const { data } = request.only(['data'])
@@ -62,7 +62,7 @@ export default class EducationalTutorsController {
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -116,7 +116,7 @@ export default class EducationalTutorsController {
    *
    * @returns {Promise<Object>} Une promesse qui résout avec un objet JSON contenant le résultat de l'opération.
    */
-  public async assignEducationalTutorRole({ request, response }: HttpContext) {
+  public async assignEducationalTutorRole({ request, response }: CustomHttpContext) {
     try {
       const { data } = request.only(['data'])
       if (!data) {
@@ -129,7 +129,7 @@ export default class EducationalTutorsController {
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -147,15 +147,15 @@ export default class EducationalTutorsController {
       // Commencer une transaction
       await db.transaction(async (trx) => {
         // Mettre à jour le rôle de l'utilisateur
-        await trx.from('users').where('idUser', user.idUser).update({ role: 'educational_tutor' })
+        await trx.from('users').where('id_user', user.id_user).update({ role: 'educational_tutor' })
 
         // Insérer l'ID de l'utilisateur dans la table educational_tutors
-        await trx.table('educational_tutors').insert({ id: user.idUser })
+        await trx.table('educational_tutors').insert({ id: user.id_user })
       })
 
       return response.status(200).json({
         message: 'User successfully assigned as educational tutor',
-        userId: user.idUser,
+        userId: user.id_user,
       })
     } catch (error) {
       console.error(error)
@@ -178,7 +178,7 @@ export default class EducationalTutorsController {
    *
    * @returns {Promise<Object>} Une promesse qui résout avec le journal de formation de l'apprenti.
    */
-  public async getTrainingDiaryByEmail({ request, response }: HttpContext) {
+  public async getTrainingDiaryByEmail({ request, response }: CustomHttpContext) {
     try {
       const { data } = request.only(['data'])
       if (!data) {
@@ -191,14 +191,14 @@ export default class EducationalTutorsController {
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
       const existingUser = await db.from('users').where('email', email).first()
 
       if (existingUser) {
-        const apprentice = await db.from('apprentices').where('id', existingUser.idUser).first()
+        const apprentice = await db.from('apprentices').where('id', existingUser.id_user).first()
 
         if (!apprentice || !apprentice.id_training_diary) {
           return response.status(404).json({
@@ -234,7 +234,7 @@ export default class EducationalTutorsController {
     }
   }
 
-  public async createOrUpdateEducationalTutor({ request, response }: HttpContext) {
+  public async createOrUpdateEducationalTutor({ request, response }: CustomHttpContext) {
     try {
       const { data } = request.only(['data'])
       if (!data) {
@@ -247,7 +247,7 @@ export default class EducationalTutorsController {
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -258,32 +258,32 @@ export default class EducationalTutorsController {
       const results = []
 
       for (const person of peopleData) {
-        const { name, lastName, email } = person
+        const { name, last_name, email } = person
 
         // Vérifier si l'utilisateur existe déjà
         const existingUser = await db.from('users').where('email', email).first()
 
         if (existingUser) {
           // Mettre à jour les informations de l'utilisateur existant
-          await db.from('users').where('email', email).update({ name, lastName })
+          await db.from('users').where('email', email).update({ name, last_name })
 
           // Vérifier si l'entrée existe dans educational_tutors
           const existingTutor = await db
             .from('educational_tutors')
-            .where('id', existingUser.idUser)
+            .where('id', existingUser.id_user)
             .first()
 
           if (!existingTutor) {
             // Créer une nouvelle entrée dans educational_tutors si elle n'existe pas
             await db.table('educational_tutors').insert({
-              id: existingUser.idUser,
+              id: existingUser.id_user,
             })
           }
 
           results.push({
             email,
             status: 'updated',
-            userId: existingUser.idUser,
+            userId: existingUser.id_user,
           })
         } else {
           // Créer un nouvel utilisateur
@@ -295,11 +295,11 @@ export default class EducationalTutorsController {
             .insert({
               email,
               name,
-              lastName,
+              last_name,
               password: hashedPassword,
               role: 'educational_tutors',
             })
-            .returning('idUser')
+            .returning('id_user')
 
           // Créer l'entrée dans la table educational_tutors
           await db.table('educational_tutors').insert({
@@ -325,7 +325,7 @@ export default class EducationalTutorsController {
     }
   }
 
-  public async getApprenticesByTutorEmail({ request, response }: HttpContext) {
+  public async getApprenticesByTutorEmail({ request, response }: CustomHttpContext) {
     try {
       const { data } = request.only(['data'])
       if (!data) {
@@ -338,7 +338,7 @@ export default class EducationalTutorsController {
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -360,15 +360,15 @@ export default class EducationalTutorsController {
       // Trouver les apprentis associés à ce tuteur
       const apprentices = await db
         .from('apprentices')
-        .join('users', 'apprentices.id', 'users.idUser')
-        .where('apprentices.id_educational_tutor', tutor.idUser)
-        .select('users.email', 'users.name', 'users.lastName')
+        .join('users', 'apprentices.id', 'users.id_user')
+        .where('apprentices.id_educational_tutor', tutor.id_user)
+        .select('users.email', 'users.name', 'users.last_name')
 
       // Formater les données des apprentis
       const formattedApprentices = apprentices.map((apprentice) => ({
         email: apprentice.email,
         nom: apprentice.name,
-        prenom: apprentice.lastName,
+        prenom: apprentice.last_name,
       }))
 
       // Créer l'objet JSON de réponse
@@ -376,7 +376,7 @@ export default class EducationalTutorsController {
         tuteur: {
           email: tutor.email,
           nom: tutor.name,
-          prenom: tutor.lastName,
+          prenom: tutor.last_name,
         },
         apprentis: formattedApprentices,
       }

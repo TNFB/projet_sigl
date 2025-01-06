@@ -1,9 +1,9 @@
 import db from '@adonisjs/lucid/services/db'
-import type { HttpContext } from '@adonisjs/core/http'
+import { CustomHttpContext } from '../../types/custom_types.js'
 import { isValidRole } from '../utils/api_utils.js'
 
 export default class MonthluNotesController {
-  async createMonthlyNote({ request, response }: HttpContext) {
+  async createMonthlyNote({ request, response }: CustomHttpContext) {
     console.log('createMonthlyNote')
     try {
       const { data } = request.only(['data'])
@@ -17,7 +17,7 @@ export default class MonthluNotesController {
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 

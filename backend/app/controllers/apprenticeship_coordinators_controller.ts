@@ -1,9 +1,9 @@
 import db from '@adonisjs/lucid/services/db'
-import type { HttpContext } from '@adonisjs/core/http'
 import { isValidRole } from '../utils/api_utils.js'
+import { CustomHttpContext } from '../../types/custom_types.js'
 
 export default class ApprenticeshipCoordinatorsController {
-  public async linkApprentice({ request, response }: HttpContext) {
+  public async linkApprentice({ request, response }: CustomHttpContext) {
     try {
       const { data } = request.only(['data'])
       if (!data) {
@@ -17,7 +17,7 @@ export default class ApprenticeshipCoordinatorsController {
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -78,17 +78,17 @@ export default class ApprenticeshipCoordinatorsController {
         }
 
         // Mettre à jour l'enregistrement de l'apprenti pour lier les IDs
-        await db.from('apprentices').where('id', apprentice.idUser).update({
-          id_apprentice_master: apprenticeMaster.idUser,
-          id_educational_tutor: educationalTutor.idUser,
+        await db.from('apprentices').where('id', apprentice.id_user).update({
+          id_apprentice_master: apprenticeMaster.id_user,
+          id_educational_tutor: educationalTutor.id_user,
         })
 
         results.push({
           status: 'success',
           message: 'Liaison créée avec succès',
-          apprenticeId: apprentice.idUser,
-          masterId: apprenticeMaster.idUser,
-          tutorId: educationalTutor.idUser,
+          apprenticeId: apprentice.id_user,
+          masterId: apprenticeMaster.id_user,
+          tutorId: educationalTutor.id_user,
         })
       }
 

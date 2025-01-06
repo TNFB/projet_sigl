@@ -1,6 +1,6 @@
-import { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
 import { isValidRole } from '../utils/api_utils.js'
+import { CustomHttpContext } from '../../types/custom_types.js'
 
 export default class CompanyRepresentativesController {
   /**
@@ -43,7 +43,7 @@ export default class CompanyRepresentativesController {
    *   "message": "Mission added successfully to apprentice's list"
    * }
    */
-  public async addMissionToApprentice({ request, response }: HttpContext) {
+  public async addMissionToApprentice({ request, response }: CustomHttpContext) {
     console.log('addMissionToApprentice')
     try {
       const { data } = request.only(['data'])
@@ -57,7 +57,7 @@ export default class CompanyRepresentativesController {
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 

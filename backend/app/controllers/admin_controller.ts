@@ -1,7 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
-import { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
 import { findUserByEmail, isUserTableEmpty, isValidRole } from '../utils/api_utils.js'
+import { CustomHttpContext } from '../../types/custom_types.js'
 
 /**
  * @class AdminController
@@ -28,7 +28,7 @@ export default class AdminController {
    * @return {Promise<Object>} Une promesse qui résout un objet JSON contenant le statut et un message
    *                           indiquant le résultat de l'opération (succès ou type d'erreur).
    */
-  async overritePassword({ request, response }: HttpContext) {
+  async overritePassword({ request, response }: CustomHttpContext) {
     console.log('overritePassword')
     try {
       //Get JSON 'Data'
@@ -51,7 +51,7 @@ export default class AdminController {
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -76,7 +76,7 @@ export default class AdminController {
       //Hasher le nouveau mot de passe
       const hashedPassword = await bcrypt.hash(newPassword, 10)
       // Mettre à jour le mot de passe
-      await db.from('users').where('idUser', userDb.idUser).update({
+      await db.from('users').where('id_user', userDb.id_user).update({
         password: hashedPassword,
         token: null, // Optionnel : réinitialiser le token après utilisation
         expired_date: null, // Optionnel : réinitialiser la date d'expiration
@@ -109,7 +109,7 @@ export default class AdminController {
    * @throws {NotFound} Si l'utilisateur n'existe pas ou si la table des utilisateurs est vide.
    * @throws {InternalServerError} En cas d'erreur lors du traitement de la requête.
    */
-  async deleteUser({ request, response }: HttpContext) {
+  async deleteUser({ request, response }: CustomHttpContext) {
     console.log('deleteUser')
     try {
       //Get JSON 'Data'
@@ -133,7 +133,7 @@ export default class AdminController {
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 

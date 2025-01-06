@@ -33,7 +33,7 @@ export default class TrainingDiariesController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { id_user, token } = data
+      const { idUser } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
@@ -44,9 +44,9 @@ export default class TrainingDiariesController {
         })
       }
 
-      const user = await db.from('users').where('id_user', id_user).first()
+      const user = await db.from('users').where('idUser', idUser).first()
       if (user && user.role === 'apprentices') {
-        const apprentice = await db.from('apprentices').where('id', id_user).first()
+        const apprentice = await db.from('apprentices').where('id', idUser).first()
 
         if (apprentice && apprentice.id_training_diary) {
           return response.status(400).json({
@@ -62,7 +62,7 @@ export default class TrainingDiariesController {
 
         await db
           .from('apprentices')
-          .where('id', id_user)
+          .where('id', idUser)
           .update({ id_training_diary: newTrainingDiaryId })
 
         return response.status(200).json({

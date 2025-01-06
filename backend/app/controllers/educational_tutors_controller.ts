@@ -55,7 +55,7 @@ export default class EducationalTutorsController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { tutorId, apprenticeIds, token } = data
+      const { tutorId, apprenticeIds } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
@@ -122,7 +122,7 @@ export default class EducationalTutorsController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, token } = data
+      const { email } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
@@ -147,15 +147,15 @@ export default class EducationalTutorsController {
       // Commencer une transaction
       await db.transaction(async (trx) => {
         // Mettre à jour le rôle de l'utilisateur
-        await trx.from('users').where('id_user', user.id_user).update({ role: 'educational_tutor' })
+        await trx.from('users').where('idUser', user.idUser).update({ role: 'educational_tutor' })
 
         // Insérer l'ID de l'utilisateur dans la table educational_tutors
-        await trx.table('educational_tutors').insert({ id: user.id_user })
+        await trx.table('educational_tutors').insert({ id: user.idUser })
       })
 
       return response.status(200).json({
         message: 'User successfully assigned as educational tutor',
-        userId: user.id_user,
+        userId: user.idUser,
       })
     } catch (error) {
       console.error(error)
@@ -184,7 +184,7 @@ export default class EducationalTutorsController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, token } = data
+      const { email } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
@@ -198,7 +198,7 @@ export default class EducationalTutorsController {
       const existingUser = await db.from('users').where('email', email).first()
 
       if (existingUser) {
-        const apprentice = await db.from('apprentices').where('id', existingUser.id_user).first()
+        const apprentice = await db.from('apprentices').where('id', existingUser.idUser).first()
 
         if (!apprentice || !apprentice.id_training_diary) {
           return response.status(404).json({
@@ -240,7 +240,7 @@ export default class EducationalTutorsController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { peopleData, token } = data
+      const { peopleData } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
@@ -258,32 +258,32 @@ export default class EducationalTutorsController {
       const results = []
 
       for (const person of peopleData) {
-        const { name, last_name, email } = person
+        const { name, lastName, email } = person
 
         // Vérifier si l'utilisateur existe déjà
         const existingUser = await db.from('users').where('email', email).first()
 
         if (existingUser) {
           // Mettre à jour les informations de l'utilisateur existant
-          await db.from('users').where('email', email).update({ name, last_name })
+          await db.from('users').where('email', email).update({ name, lastName })
 
           // Vérifier si l'entrée existe dans educational_tutors
           const existingTutor = await db
             .from('educational_tutors')
-            .where('id', existingUser.id_user)
+            .where('id', existingUser.idUser)
             .first()
 
           if (!existingTutor) {
             // Créer une nouvelle entrée dans educational_tutors si elle n'existe pas
             await db.table('educational_tutors').insert({
-              id: existingUser.id_user,
+              id: existingUser.idUser,
             })
           }
 
           results.push({
             email,
             status: 'updated',
-            userId: existingUser.id_user,
+            userId: existingUser.idUser,
           })
         } else {
           // Créer un nouvel utilisateur
@@ -295,11 +295,11 @@ export default class EducationalTutorsController {
             .insert({
               email,
               name,
-              last_name,
+              lastName,
               password: hashedPassword,
               role: 'educational_tutors',
             })
-            .returning('id_user')
+            .returning('idUser')
 
           // Créer l'entrée dans la table educational_tutors
           await db.table('educational_tutors').insert({
@@ -331,7 +331,7 @@ export default class EducationalTutorsController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, token } = data
+      const { email } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
@@ -360,15 +360,15 @@ export default class EducationalTutorsController {
       // Trouver les apprentis associés à ce tuteur
       const apprentices = await db
         .from('apprentices')
-        .join('users', 'apprentices.id', 'users.id_user')
-        .where('apprentices.id_educational_tutor', tutor.id_user)
-        .select('users.email', 'users.name', 'users.last_name')
+        .join('users', 'apprentices.id', 'users.idUser')
+        .where('apprentices.id_educational_tutor', tutor.idUser)
+        .select('users.email', 'users.name', 'users.lastName')
 
       // Formater les données des apprentis
       const formattedApprentices = apprentices.map((apprentice) => ({
         email: apprentice.email,
         nom: apprentice.name,
-        prenom: apprentice.last_name,
+        prenom: apprentice.lastName,
       }))
 
       // Créer l'objet JSON de réponse
@@ -376,7 +376,7 @@ export default class EducationalTutorsController {
         tuteur: {
           email: tutor.email,
           nom: tutor.name,
-          prenom: tutor.last_name,
+          prenom: tutor.lastName,
         },
         apprentis: formattedApprentices,
       }

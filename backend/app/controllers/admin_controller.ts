@@ -36,7 +36,7 @@ export default class AdminController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { user, email, newPassword } = data
+      const { email, newPassword } = data
 
       if (await isUserTableEmpty()) {
         console.log('User table empty')
@@ -76,7 +76,7 @@ export default class AdminController {
       //Hasher le nouveau mot de passe
       const hashedPassword = await bcrypt.hash(newPassword, 10)
       // Mettre à jour le mot de passe
-      await db.from('users').where('id_user', userDb.id_user).update({
+      await db.from('users').where('idUser', userDb.idUser).update({
         password: hashedPassword,
         token: null, // Optionnel : réinitialiser le token après utilisation
         expired_date: null, // Optionnel : réinitialiser la date d'expiration
@@ -117,7 +117,7 @@ export default class AdminController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, token } = data
+      const { email } = data
 
       //Table User Vide ?
       if (await isUserTableEmpty()) {

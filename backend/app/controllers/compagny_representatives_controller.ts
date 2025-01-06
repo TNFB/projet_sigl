@@ -50,7 +50,7 @@ export default class CompanyRepresentativesController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { apprentiEmail, mission, token } = data
+      const { apprentiEmail, mission } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide

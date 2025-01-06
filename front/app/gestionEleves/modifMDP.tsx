@@ -44,7 +44,7 @@ function ModifMDP() {
           'user/getUserEmailsByRole',
           JSON.stringify({ data: data }),
         ).then((response) => {
-          console.log('get USers Emal by Roles successfull:', response)
+          console.log('get User Email by Roles successfull:', response)
           //Here can get return opf response
           // exemple : const { somthing } = response;
           const emailOptions = response.emails.map((email: string) => ({

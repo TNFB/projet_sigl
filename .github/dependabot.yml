@@ -1,6 +1,6 @@
 updates:
    package-ecosystem: "npm"
-    directory: "/"
-    schedule:
+   directory: "/"
+   schedule:
       interval: "daily"
-        target-branch: "develop"
+      target-branch: "develop"

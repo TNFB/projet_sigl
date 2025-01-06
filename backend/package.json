@@ -62,7 +62,7 @@
     "@azure/storage-blob": "^12.25.0",
     "@marsaud/smb2": "^0.18.0",
     "@types/bcrypt": "^5.0.2",
-    "@types/xlsx": "^0.0.35",
+    "@types/xlsx": "^0.0.36",
     "@vinejs/vine": "^2.1.0",
     "adonis-autoswagger": "^3.64.0",
     "bcrypt": "^5.1.1",

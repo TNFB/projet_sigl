@@ -59,7 +59,7 @@
     "@adonisjs/drive": "^3.2.0",
     "@adonisjs/lucid": "^21.4.0",
     "@adonisjs/session": "^7.5.0",
-    "@azure/storage-blob": "^12.25.0",
+    "@azure/storage-blob": "^12.26.0",
     "@marsaud/smb2": "^0.18.0",
     "@types/bcrypt": "^5.0.2",
     "@types/xlsx": "^0.0.35",

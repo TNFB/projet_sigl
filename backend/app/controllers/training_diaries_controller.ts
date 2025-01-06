@@ -1,5 +1,5 @@
 import db from '@adonisjs/lucid/services/db'
-import { CustomHttpContext } from '../../types/custom_types.js'
+import { HttpContext } from '../../types/custom.js'
 import { isValidRole } from '../utils/api_utils.js'
 
 /**
@@ -26,16 +26,19 @@ export default class TrainingDiariesController {
    * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant un message de succès
    *                             et l'ID du journal d'entraînement créé ou une erreur en cas d'échec.
    */
-  async createTraningDiary({ request, response }: CustomHttpContext) {
+  async createTraningDiary({ request, response }: HttpContext) {
     console.log('createTraningDiary')
     try {
       const { data } = request.only(['data'])
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { id_user } = data
+      const { idUser } = data
 
-      const emailUser = request.user.email
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
@@ -44,9 +47,9 @@ export default class TrainingDiariesController {
         })
       }
 
-      const user = await db.from('users').where('id_user', id_user).first()
+      const user = await db.from('users').where('idUser', idUser).first()
       if (user && user.role === 'apprentices') {
-        const apprentice = await db.from('apprentices').where('id', id_user).first()
+        const apprentice = await db.from('apprentices').where('id', idUser).first()
 
         if (apprentice && apprentice.id_training_diary) {
           return response.status(400).json({
@@ -62,7 +65,7 @@ export default class TrainingDiariesController {
 
         await db
           .from('apprentices')
-          .where('id', id_user)
+          .where('id', idUser)
           .update({ id_training_diary: newTrainingDiaryId })
 
         return response.status(200).json({

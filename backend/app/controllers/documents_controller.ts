@@ -176,7 +176,7 @@ export default class DocumentsController {
             id_educational_tutor: educationalTutor ? educationalTutor.idUser : null,
             id_apprentice_master: apprenticeMaster ? apprenticeMaster.idUser : null,
             id_training_diary: trainingDiaryId,
-            list_missions: JSON.stringify([]),
+            listMissions: JSON.stringify([]),
           })
         } else {
           // Mettre à jour l'enregistrement existant

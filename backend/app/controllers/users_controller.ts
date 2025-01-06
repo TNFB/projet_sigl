@@ -3,7 +3,6 @@ import { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
 import { findUserByEmail, isUserTableEmpty, isValidRole } from '../utils/api_utils.js'
 import jwt from 'jsonwebtoken'
-import { CustomHttpContext } from '../../types/custom_types.js'
 
 /**
  * @class UsersController
@@ -27,7 +26,7 @@ export default class UsersController {
    *
    * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et la liste des emails des utilisateurs.
    */
-  async getUserEmailsByRole({ request, response }: CustomHttpContext) {
+  async getUserEmailsByRole({ request, response }: HttpContext) {
     try {
       // Récupérer le rôle depuis les paramètres de la requête
       const { data } = request.only(['data'])
@@ -38,7 +37,10 @@ export default class UsersController {
       const role = data.role
       const detailed = data.detailed
 
-      const emailUser = request.user.email
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
@@ -66,7 +68,7 @@ export default class UsersController {
 
       // Sélectionner les colonnes en fonction du paramètre 'detailed'
       if (detailed === 'true') {
-        query = query.select('id_user', 'email', 'name', 'last_name', 'role')
+        query = query.select('idUser', 'email', 'name', 'lastName', 'role')
       } else {
         query = query.select('email')
       }
@@ -110,7 +112,7 @@ export default class UsersController {
    *
    * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut, un message et les détails de l'utilisateur créé.
    */
-  async createUser({ request, response }: CustomHttpContext) {
+  async createUser({ request, response }: HttpContext) {
     console.log('createUser')
     try {
       const { data } = request.only(['data'])
@@ -119,7 +121,10 @@ export default class UsersController {
       }
       const { email, password, name, lastName, telephone, role } = data
 
-      const emailUser = request.user.email
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
@@ -221,7 +226,7 @@ export default class UsersController {
         // Gerer Token => Inserte Token In BDD if user can connect
         // Maybe add 1-2sec delay if password Wrong
         const token = jwt.sign(
-          { id: userDb.id_user, email: userDb.email, role: userDb.role },
+          { id: userDb.idUser, email: userDb.email, role: userDb.role },
           process.env.APP_KEY || 'default_secret_key',
           {
             expiresIn: '1h',

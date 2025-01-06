@@ -1,6 +1,6 @@
 import db from '@adonisjs/lucid/services/db'
 import { isValidRole } from '../utils/api_utils.js'
-import { CustomHttpContext } from '../../types/custom_types.js'
+import { HttpContext } from '@adonisjs/core/http'
 
 export default class CompanyRepresentativesController {
   /**
@@ -8,7 +8,7 @@ export default class CompanyRepresentativesController {
    * @description Ajoute une nouvelle mission à la liste des missions d'un apprenti.
    *
    * Cette méthode prend les détails de la mission et l'ID de l'apprenti,
-   * puis ajoute la mission à la liste existante dans le champ JSON 'list_missions'.
+   * puis ajoute la mission à la liste existante dans le champ JSON 'listMissions'.
    *
    * @param {HttpContext} context - Le contexte HTTP de la requête.
    * @param {Object} context.request - L'objet de requête contenant les données.
@@ -43,7 +43,7 @@ export default class CompanyRepresentativesController {
    *   "message": "Mission added successfully to apprentice's list"
    * }
    */
-  public async addMissionToApprentice({ request, response }: CustomHttpContext) {
+  public async addMissionToApprentice({ request, response }: HttpContext) {
     console.log('addMissionToApprentice')
     try {
       const { data } = request.only(['data'])
@@ -52,7 +52,10 @@ export default class CompanyRepresentativesController {
       }
       const { apprentiEmail, mission } = data
 
-      const emailUser = request.user.email
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
@@ -77,10 +80,10 @@ export default class CompanyRepresentativesController {
       }
 
       // get current mission
-      let list_missions = apprentice.list_missions ? JSON.parse(apprentice.list_missions) : []
+      let listMissions = apprentice.listMissions ? JSON.parse(apprentice.listMissions) : []
 
       // add new mission
-      list_missions.push({
+      listMissions.push({
         'Titre mission': mission.titreMission,
         'Description Mission': mission.descriptionMission,
         'competances': mission.competences,
@@ -90,7 +93,7 @@ export default class CompanyRepresentativesController {
       await db
         .from('apprentices')
         .where('id', apprentice.id)
-        .update({ list_missions: JSON.stringify(list_missions) })
+        .update({ listMissions: JSON.stringify(listMissions) })
 
       return response
         .status(200)

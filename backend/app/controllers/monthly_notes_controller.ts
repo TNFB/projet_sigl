@@ -1,9 +1,9 @@
 import db from '@adonisjs/lucid/services/db'
-import { CustomHttpContext } from '../../types/custom_types.js'
+import { HttpContext } from '@adonisjs/core/http'
 import { isValidRole } from '../utils/api_utils.js'
 
 export default class MonthluNotesController {
-  async createMonthlyNote({ request, response }: CustomHttpContext) {
+  async createMonthlyNote({ request, response }: HttpContext) {
     console.log('createMonthlyNote')
     try {
       const { data } = request.only(['data'])
@@ -12,7 +12,10 @@ export default class MonthluNotesController {
       }
       const { email, title, content } = data
 
-      const emailUser = request.user.email
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({

@@ -1,7 +1,8 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
-import xlsx from 'xlsx'
+import * as XLSX from 'xlsx'
 import fs from 'node:fs'
+import path from 'node:path'
 
 /**
  * @class DocumentsController
@@ -109,14 +110,23 @@ export default class DocumentsController {
       }
 
       const filePath = `${Date.now()}-${file.clientName}`
+      const fullPath = path.join(process.cwd(), 'tmp', filePath)
+      console.log(`Full path: ${fullPath}`) // Log the full path
+
       await file.move(process.cwd() + '/tmp', { name: filePath })
 
+      // Vérifier si le fichier a été déplacé avec succès
+      if (!fs.existsSync(fullPath)) {
+        console.error('File move failed') // Log the error
+        return response.badRequest({ message: 'File move failed' })
+      }
+      XLSX.set_fs(fs)
       // Lecture du fichier Excel
-      const workbook = xlsx.readFile(`tmp/${filePath}`)
+      const workbook = XLSX.readFile(fullPath)
       const sheetName = workbook.SheetNames[0]
-      let data: any[] = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName])
+      let data: any[] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName])
       const results = []
-
+      console.log(data)
       for (const row of data) {
         const { email, name, lastName, apprenticeMasters, educationalTutors } = row
 

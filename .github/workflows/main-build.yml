@@ -37,7 +37,7 @@ jobs:
           docker push ghcr.io/tnfb/${{ github.event.repository.name }}/backend:${{ env.ARTIFACT_VERSION }}
           docker push ghcr.io/tnfb/${{ github.event.repository.name }}/backend:latest
       
-      - name: Trigger the deployment
+      - name: Trigger the deployment (ne fonctionne pas)
         run: |
           curl -X POST https://${{ secrets.WEBHOOK_CREDS }}@journaldeformation-bndwfxa2dafmh2hu.scm.francecentral-01.azurewebsites.net/api/registry/webhook
   
@@ -66,6 +66,6 @@ jobs:
           docker push ghcr.io/tnfb/${{ github.event.repository.name }}/front:${{ env.ARTIFACT_VERSION }}
           docker push ghcr.io/tnfb/${{ github.event.repository.name }}/front:latest
       
-      - name: Trigger the deployment
+      - name: Trigger the deployment (ne fonctionne pas)
         run: |
           curl -X POST https://${{ secrets.WEBHOOK_CREDS }}@backend-journaldeformation-g4hbd5bcb7gme4dv.scm.francecentral-01.azurewebsites.net/api/registry/webhook

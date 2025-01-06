@@ -2,13 +2,13 @@ const authConfig = {
   guard: 'api',
   guards: {
     api: {
-      driver: 'oat', // Utilisez 'oat' pour API ou 'jwt' si nécessaire
+      driver: 'oat',
       tokenProvider: {
-        driver: 'database', // Si vous utilisez des tokens stockés en base, sinon utilisez 'jwt'
+        driver: 'database',
       },
       provider: {
         driver: 'lucid',
-        identifierKey: 'idUser', // Assurez-vous que votre colonne utilisateur correspond
+        identifierKey: 'idUser',
         uids: ['email'],
         model: () => import('#models/user'),
       },

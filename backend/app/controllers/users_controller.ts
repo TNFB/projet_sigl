@@ -3,6 +3,7 @@ import { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
 import { findUserByEmail, isUserTableEmpty, isValidRole } from '../utils/api_utils.js'
 import jwt from 'jsonwebtoken'
+import { CustomHttpContext } from '../../types/custom_types.js'
 
 /**
  * @class UsersController
@@ -26,7 +27,7 @@ export default class UsersController {
    *
    * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et la liste des emails des utilisateurs.
    */
-  async getUserEmailsByRole({ request, response }: HttpContext) {
+  async getUserEmailsByRole({ request, response }: CustomHttpContext) {
     try {
       // Récupérer le rôle depuis les paramètres de la requête
       const { data } = request.only(['data'])
@@ -42,7 +43,7 @@ export default class UsersController {
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -109,21 +110,21 @@ export default class UsersController {
    *
    * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut, un message et les détails de l'utilisateur créé.
    */
-  async createUser({ request, response }: HttpContext) {
+  async createUser({ request, response }: CustomHttpContext) {
     console.log('createUser')
     try {
       const { data } = request.only(['data'])
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, password, name, last_name, telephone, role, token } = data
+      const { email, password, name, last_name, telephone, role } = data
 
       const emailUser = request.user.email
       // Vérifier si l'admin existe et si le token est valide
       if (!(await isValidRole(emailUser, 'admins'))) {
         return response.status(400).json({
           status: 'error',
-          message: 'Invalid role, token, or token has expired',
+          message: 'Invalid role',
         })
       }
 
@@ -221,7 +222,7 @@ export default class UsersController {
         // Maybe add 1-2sec delay if password Wrong
         const token = jwt.sign(
           { id: userDb.id_user, email: userDb.email, role: userDb.role },
-          process.env.APP_KEY,
+          process.env.APP_KEY || 'default_secret_key',
           {
             expiresIn: '1h',
           }
@@ -309,7 +310,7 @@ export default class UsersController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, oldPassword, newPassword, token } = data
+      const { email, oldPassword, newPassword } = data
 
       // Vérifier si la table 'users' est vide
       if (await isUserTableEmpty()) {

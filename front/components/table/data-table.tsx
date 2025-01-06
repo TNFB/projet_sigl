@@ -92,10 +92,7 @@ export function DataTable<TData, TValue>({
         />
         <div className='flex items-center gap-2'>
           {onDelete && selectedRows.length > 0 && (
-            <Button
-              variant='destructive'
-              onClick={handleDeleteUsers}
-            >
+            <Button variant='destructive' onClick={handleDeleteUsers}>
               <Trash2 className='mr-2 h-4 w-4' />
               Supprimer {selectedRows.length} élément(s)
             </Button>

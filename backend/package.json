@@ -67,14 +67,14 @@
     "@vinejs/vine": "^2.1.0",
     "adonis-autoswagger": "^3.64.0",
     "bcrypt": "^5.1.1",
-    "cookie": "^0.7.0",
+    "cookie": "^1.0.2",
     "csv-parse": "^5.6.0",
     "jsonwebtoken": "^9.0.2",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "luxon": "^3.5.0",
     "mysql2": "^3.11.4",
     "reflect-metadata": "^0.2.2",
-    "xlsx": "^0.18.5"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "hotHook": {
     "boundaries": [

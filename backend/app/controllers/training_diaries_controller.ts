@@ -1,5 +1,5 @@
 import db from '@adonisjs/lucid/services/db'
-import { HttpContext } from '../../types/custom.js'
+import { HttpContext } from '@adonisjs/core/http'
 import { isValidRole } from '../utils/api_utils.js'
 
 /**

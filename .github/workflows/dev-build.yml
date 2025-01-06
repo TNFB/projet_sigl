@@ -6,7 +6,7 @@ name: Build and deploy Node.js app to Azure Web App - journal-formation
 on:
   push:
     branches:
-      - Azure-CI-CD
+      - develop
 
 env:
   ARTIFACT_VERSION: v2.${{ github.run_number }}

@@ -66,7 +66,6 @@ export default class AdminController {
           message: 'User not found',
         })
       }
-
       // Check if same Password
       const isPasswordValid = await bcrypt.compare(newPassword, userDb.password)
       if (isPasswordValid) {
@@ -81,8 +80,6 @@ export default class AdminController {
       // Mettre à jour le mot de passe
       await db.from('users').where('idUser', userDb.idUser).update({
         password: hashedPassword,
-        token: null, // Optionnel : réinitialiser le token après utilisation
-        expired_date: null, // Optionnel : réinitialiser la date d'expiration
       })
 
       return response.status(200).json({

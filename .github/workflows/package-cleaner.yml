@@ -6,7 +6,7 @@ on:
       - package-cleaner
 
 jobs:
-  build_backend:
+  build_front:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,5 +22,5 @@ jobs:
       
       - name: Run the Dockerfile
         run: |
-          cd backend
+          cd front
           docker build .

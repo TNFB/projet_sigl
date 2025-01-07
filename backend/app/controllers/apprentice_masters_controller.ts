@@ -155,19 +155,19 @@ export default class ApprenticeMastersController {
           // Vérifier si l'entrée existe dans apprentice_masters
           const existingMaster = await db
             .from('apprentice_masters')
-            .where('id', existingUser.idUser)
+            .where('id', existingUser.id_user)
             .first()
 
           if (existingMaster) {
             // Mettre à jour l'entrée dans apprentice_masters si nécessaire
             await db
               .from('apprentice_masters')
-              .where('id', existingUser.idUser)
+              .where('id', existingUser.id_user)
               .update({ idCompany: idCompany })
           } else {
             // Créer une nouvelle entrée dans apprentice_masters si elle n'existe pas
             await db.table('apprentice_masters').insert({
-              id: existingUser.idUser,
+              id: existingUser.id_user,
               idCompany: idCompany,
             })
           }
@@ -175,7 +175,7 @@ export default class ApprenticeMastersController {
           results.push({
             email,
             status: 'updated',
-            userId: existingUser.idUser,
+            userId: existingUser.id_user,
             compagnyId: idCompany,
           })
         } else {
@@ -192,7 +192,7 @@ export default class ApprenticeMastersController {
               password: hashedPassword,
               role: 'apprentice_masters',
             })
-            .returning('idUser')
+            .returning('id_user')
 
           // Créer l'entrée dans la table apprentice_masters
           await db.table('apprentice_masters').insert({
@@ -255,7 +255,7 @@ export default class ApprenticeMastersController {
       const existingUser = await findUserByEmail(email)
 
       if (existingUser) {
-        const apprentice = await db.from('apprentices').where('id', existingUser.idUser).first()
+        const apprentice = await db.from('apprentices').where('id', existingUser.id_user).first()
 
         if (!apprentice || !apprentice.id_training_diary) {
           return response.status(404).json({
@@ -314,7 +314,7 @@ export default class ApprenticeMastersController {
       const existingUser = await findUserByEmail(email)
 
       if (existingUser) {
-        const apprentice = await db.from('apprentices').where('id', existingUser.idUser).first()
+        const apprentice = await db.from('apprentices').where('id', existingUser.id_user).first()
 
         return response.status(200).json({ apprentice })
       } else {
@@ -369,8 +369,8 @@ export default class ApprenticeMastersController {
       // Trouver les apprentis associés à ce tuteur
       const apprentices = await db
         .from('apprentices')
-        .join('users', 'apprentices.id', 'users.idUser')
-        .where('apprentices.id_apprentice_master', master.idUser)
+        .join('users', 'apprentices.id', 'users.id_user')
+        .where('apprentices.id_apprentice_master', master.id_user)
         .select('users.email', 'users.name', 'users.lastName')
 
       // Formater les données des apprentis

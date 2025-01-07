@@ -71,19 +71,19 @@ export default class ProfessionalsController {
           // Vérifier si l'entrée existe dans professionals
           const existingMaster = await db
             .from('professionals')
-            .where('id', existingUser.idUser)
+            .where('id', existingUser.id_user)
             .first()
 
           if (existingMaster) {
             // Mettre à jour l'entrée dans professionals si nécessaire
             await db
               .from('professionals')
-              .where('id', existingUser.idUser)
+              .where('id', existingUser.id_user)
               .update({ idCompany: idCompany })
           } else {
             // Créer une nouvelle entrée dans professionals si elle n'existe pas
             await db.table('professionals').insert({
-              id: existingUser.idUser,
+              id: existingUser.id_user,
               idCompany: idCompany,
             })
           }
@@ -91,7 +91,7 @@ export default class ProfessionalsController {
           results.push({
             email,
             status: 'updated',
-            userId: existingUser.idUser,
+            userId: existingUser.id_user,
             compagnyId: idCompany,
           })
         } else {
@@ -108,7 +108,7 @@ export default class ProfessionalsController {
               password: hashedPassword,
               role: 'professionals',
             })
-            .returning('idUser')
+            .returning('id_user')
 
           // Créer l'entrée dans la table professionals
           await db.table('professionals').insert({

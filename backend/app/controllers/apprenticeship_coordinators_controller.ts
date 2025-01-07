@@ -81,17 +81,17 @@ export default class ApprenticeshipCoordinatorsController {
         }
 
         // Mettre à jour l'enregistrement de l'apprenti pour lier les IDs
-        await db.from('apprentices').where('id', apprentice.idUser).update({
-          id_apprentice_master: apprenticeMaster.idUser,
-          id_educational_tutor: educationalTutor.idUser,
+        await db.from('apprentices').where('id', apprentice.id_user).update({
+          id_apprentice_master: apprenticeMaster.id_user,
+          id_educational_tutor: educationalTutor.id_user,
         })
 
         results.push({
           status: 'success',
           message: 'Liaison créée avec succès',
-          apprenticeId: apprentice.idUser,
-          masterId: apprenticeMaster.idUser,
-          tutorId: educationalTutor.idUser,
+          apprenticeId: apprentice.id_user,
+          masterId: apprenticeMaster.id_user,
+          tutorId: educationalTutor.id_user,
         })
       }
 

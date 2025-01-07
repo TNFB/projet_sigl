@@ -68,7 +68,7 @@ export default class UsersController {
 
       // Sélectionner les colonnes en fonction du paramètre 'detailed'
       if (detailed === 'true') {
-        query = query.select('idUser', 'email', 'name', 'lastName', 'role')
+        query = query.select('id_user', 'email', 'name', 'lastName', 'role')
       } else {
         query = query.select('email')
       }
@@ -201,7 +201,6 @@ export default class UsersController {
         return response.status(400).json({ error: 'Email and password are required' })
       }
       const { email, password } = data
-
       // Vérifier si la table 'users' est vide
       if (await isUserTableEmpty()) {
         console.log('User table empty')
@@ -210,7 +209,6 @@ export default class UsersController {
           message: 'No users table found/users table empty',
         })
       }
-
       // Found User by Email
       const userDb = await findUserByEmail(email)
       if (!userDb) {
@@ -219,14 +217,14 @@ export default class UsersController {
           message: 'Email not found in User',
         })
       }
-
+      console.log('User found', userDb)
       const isPasswordValid = await bcrypt.compare(password, userDb.password)
       if (isPasswordValid) {
         //TODO
         // Gerer Token => Inserte Token In BDD if user can connect
         // Maybe add 1-2sec delay if password Wrong
         const token = jwt.sign(
-          { id: userDb.idUser, email: userDb.email, role: userDb.role },
+          { id: userDb.id_user, email: userDb.email, role: userDb.role },
           process.env.APP_KEY || 'default_secret_key',
           {
             expiresIn: '1h',
@@ -275,7 +273,7 @@ export default class UsersController {
     for (const user of users) {
       const isTokenMatch = await bcrypt.compare(token, user.token)
       if (isTokenMatch) {
-        await db.from('users').where('idUser', user.idUser).update({
+        await db.from('users').where('id_user', user.id_user).update({
           token: null, // Optionnel : réinitialiser le token après utilisation
           expired_date: null, // Optionnel : réinitialiser la date d'expiration
         })

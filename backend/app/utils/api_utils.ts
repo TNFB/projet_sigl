@@ -3,7 +3,7 @@ import db from '@adonisjs/lucid/services/db'
 
 // Définissez une interface pour le résultat
 interface UserResult {
-  idUser: number
+  id_user: number
   password: string
   email: string
   role: string
@@ -12,7 +12,7 @@ interface UserResult {
 export async function findUserByEmail(email: string): Promise<UserResult | null> {
   return (await User.query()
     .where('email', email)
-    .select('idUser', 'password', 'role', 'email')
+    .select('id_user', 'password', 'role', 'email')
     .first()) as UserResult | null
 }
 

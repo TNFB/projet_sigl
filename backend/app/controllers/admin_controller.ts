@@ -59,6 +59,7 @@ export default class AdminController {
       }
 
       const userDb = await findUserByEmail(email)
+      console.log(userDb)
 
       if (!userDb) {
         return response.status(404).json({
@@ -77,8 +78,9 @@ export default class AdminController {
 
       //Hasher le nouveau mot de passe
       const hashedPassword = await bcrypt.hash(newPassword, 10)
+      console.log(userDb.id_user)
       // Mettre à jour le mot de passe
-      await db.from('users').where('idUser', userDb.idUser).update({
+      await db.from('users').where('id_user', userDb.id_user).update({
         password: hashedPassword,
       })
 

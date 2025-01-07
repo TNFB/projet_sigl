@@ -13,7 +13,7 @@ COPY . .
 WORKDIR /app/front
 
 # Installation des dépendances du projet avec PNPM
-RUN pnpm install
+RUN pnpm install --prod
 
 ARG ARG_NEXT_PUBLIC_API_URL
 

@@ -46,8 +46,7 @@ Remplacez `CR_PAT` par votre token d'accès personnel et `USERNAME` par votre no
    3. `DB_PORT` : le port du serveur de base de données.
    4. `DB_USER` : l'utilisateur de la base de données.
    5. `DB_PASSWORD` : le mot de passe de l'utilisateur de la base de données.
-   6. `DB_DATABASE` : le nom de la base de données. **Doit être `sigl_db`**
-   7. `LOG_LEVEL` : le niveau de log du backend
+   6. `LOG_LEVEL` : le niveau de log du backend
 4. Éditer les variables d'environnements dans le fichier pour phpmyadmin :
    1. `PMA_HOST` : l'adresse du serveur de base de données.
    2. `PMA_PORT` : le port du serveur de base de données.

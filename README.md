@@ -55,7 +55,7 @@ Remplacez `CR_PAT` par votre token d'accès personnel et `USERNAME` par votre no
 5. Lancer le backend (la version du conteneur est celle  spécifiée par la variable `image`, par défaut : `latest`):
 
     ```sh
-    docker compose -f docker-compose-back.yml up -d
+    docker compose -f docker-compose-backend.yml up -d
     ```
 
 ## Installation du Frontend

@@ -19,6 +19,12 @@ WORKDIR /app/build
 
 RUN pnpm i --prod
 
+ENV DRIVE_DISK=fs
+ENV HOST=0.0.0.0
+ENV APP_KEY=xLxMeTQzOqYhsjMzrCWjeNG0gdqRBwuf
+ENV NODE_ENV=production
+ENV SESSION_DRIVER=cookie
+
 # Exposer le port utilisé par l'application
 EXPOSE 3333
 

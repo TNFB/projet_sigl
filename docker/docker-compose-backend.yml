@@ -13,7 +13,7 @@ services:
       DB_PASSWORD:
       LOG_LEVEL: info
     volumes:
-      - /storage:./storage:rw
+      - /storage:{chemin de stockage}/storage:rw
 
   phpmyadmin_sigl:
     container_name: phpmyadmin_sigl

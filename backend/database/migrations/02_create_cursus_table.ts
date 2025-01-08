@@ -7,8 +7,6 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id_cursus').primary()
       table.string('promotion_name')
-      table.dateTime('start_promotion_year')
-      table.dateTime('end_promotion_year')
     })
   }
 

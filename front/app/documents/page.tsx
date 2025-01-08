@@ -123,7 +123,7 @@ function Documents() {
             type='file'
             id='file'
             name='file'
-            accept='.pdf,.docx,.xlsx,.xls,.odt,.txt,.mdj' // Extensions autorisées
+            accept='.pdf,.docx,.xlsx,.xls,.odt,.txt' // Extensions autorisées
             onChange={(e) => {
               const selectedFile = e.target.files?.[0]
               if (selectedFile) {

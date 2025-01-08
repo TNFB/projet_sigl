@@ -14,7 +14,7 @@ export default class User extends BaseModel {
   declare name: string
 
   @column()
-  declare lastName: string
+  declare last_name: string
 
   @column()
   declare telephone: string

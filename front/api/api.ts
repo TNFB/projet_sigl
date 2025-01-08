@@ -98,7 +98,7 @@ export const postRequestCreateUser = async (
     email: string
     password: string
     name: string
-    lastName: string
+    last_name: string
     telephone: string
     role: string
   },

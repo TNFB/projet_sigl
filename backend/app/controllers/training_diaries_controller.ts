@@ -60,7 +60,7 @@ export default class TrainingDiariesController {
 
         // Si aucun journal n'existe, en créer un nouveau
         const [newTrainingDiaryId] = await db.table('training_diaries').insert({
-          createdAt: new Date(),
+          created_at: new Date(),
         })
 
         await db

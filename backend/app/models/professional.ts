@@ -5,5 +5,5 @@ export default class Professional extends BaseModel {
   declare id: number
 
   @column()
-  declare idCompany: number
+  declare id_company: number
 }

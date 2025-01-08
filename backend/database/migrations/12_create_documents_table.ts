@@ -7,8 +7,8 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id_document').primary()
       table.string('name')
-      table.string('documentPath')
-      table.timestamp('uploadedAt', { useTz: true })
+      table.string('document_path')
+      table.timestamp('uploaded_at', { useTz: true })
     })
   }
 

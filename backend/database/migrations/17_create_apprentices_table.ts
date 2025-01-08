@@ -37,12 +37,12 @@ export default class extends BaseSchema {
         .inTable('training_diaries')
         .onDelete('CASCADE')
       table
-        .integer('idCompany')
+        .integer('id_company')
         .unsigned()
-        .references('idCompany')
+        .references('id_company')
         .inTable('companies')
         .onDelete('CASCADE')
-      table.json('listMissions')
+      table.json('list_missions')
     })
   }
 

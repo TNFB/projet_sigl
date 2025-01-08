@@ -6,15 +6,15 @@ export default class extends BaseSeeder {
     await Professional.createMany([
       {
         id: 11,
-        idCompany: 1,
+        id_company: 1,
       },
       {
         id: 12,
-        idCompany: 2,
+        id_company: 2,
       },
       {
         id: 13,
-        idCompany: 3,
+        id_company: 3,
       },
     ])
   }

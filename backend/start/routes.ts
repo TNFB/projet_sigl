@@ -25,6 +25,7 @@ const ProfessionalsController = () => import('../app/controllers/professionals_c
 const MonthluNotesController = () => import('../app/controllers/monthly_notes_controller.js')
 const ApprenticeshipCoordinatorsController = () =>
   import('../app/controllers/apprenticeship_coordinators_controller.js')
+const EventsController = () => import('../app/controllers/events_controller.js')
 
 // Définir les routes
 
@@ -126,8 +127,17 @@ Route.group(() => {
 }).prefix('/professional')
 
 Route.group(() => {
-  Route.post('createMonthlyNote', [MonthluNotesController, 'createMonthlyNote']).as(
-    'createMonthlyNote'
+  Route.post('getAllNotes', [MonthluNotesController, 'getAllNotes']).as(
+    'getAllNotes'
+  )
+  Route.post('createNote', [MonthluNotesController, 'createNote']).as(
+    'createNote'
+  )
+  Route.post('updateNote', [MonthluNotesController, 'updateNote']).as(
+    'updateNote'
+  )
+  Route.delete('deleteNote', [MonthluNotesController, 'deleteNote']).as(
+    'deleteNote'
   )
 }).prefix('monthlyNotes')
 
@@ -136,3 +146,18 @@ Route.group(() => {
     'linkApprentice'
   )
 }).prefix('ApprenticeshipCoordinator')
+
+Route.group(() => {
+  Route.post('getEvents', [EventsController, 'getEvents']).as(
+    'getEvents'
+  )
+  Route.post('createEvent', [EventsController, 'createEvent']).as(
+    'createEvent'
+  )
+  Route.post('updateEvent', [EventsController, 'updateEvent']).as(
+    'updateEvent'
+  )
+  Route.delete('deleteEvent', [EventsController, 'deleteEvent']).as(
+    'deleteEvent'
+  )
+})

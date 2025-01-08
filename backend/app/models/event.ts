@@ -3,7 +3,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 export default class Calendar extends BaseModel {
   @column({ isPrimary: true })
-  declare id_calendar: number
+  declare id_event: number
 
   @column()
   declare id_user: number

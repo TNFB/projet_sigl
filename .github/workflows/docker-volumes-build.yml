@@ -1,0 +1,68 @@
+name: docker-volumes-build
+
+on:
+  push:
+    branches:
+      - docker-volumes
+
+env:
+  ARTIFACT_VERSION: v2.${{ github.run_number }}-docker-volumes
+
+jobs:
+  build_backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Run the Dockerfile
+        run: |
+          cd backend
+          docker build -t ghcr.io/tnfb/${{ github.event.repository.name }}/backend:${{ env.ARTIFACT_VERSION }} -t ghcr.io/tnfb/${{ github.event.repository.name }}/backend:latest .
+
+      # Pousser l'image Docker vers GHCR
+      - name: Push Docker image to GitHub Container Registry
+        run: |
+          docker push ghcr.io/tnfb/${{ github.event.repository.name }}/backend:${{ env.ARTIFACT_VERSION }}
+          docker push ghcr.io/tnfb/${{ github.event.repository.name }}/backend:latest
+      
+      - name: Trigger the deployment (ne fonctionne pas)
+        run: |
+          curl -X POST https://${{ secrets.WEBHOOK_CREDS }}@journaldeformation-bndwfxa2dafmh2hu.scm.francecentral-01.azurewebsites.net/api/registry/webhook
+  
+  build_front:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Run the Dockerfile
+        run: |
+          cd front
+          docker build -t ghcr.io/tnfb/${{ github.event.repository.name }}/front:${{ env.ARTIFACT_VERSION }} -t ghcr.io/tnfb/${{ github.event.repository.name }}/front:latest --build-arg ARG_NEXT_PUBLIC_API_URL=https://backend-journaldeformation-g4hbd5bcb7gme4dv.francecentral-01.azurewebsites.net .
+
+      # Pousser l'image Docker vers GHCR
+      - name: Push Docker image to GitHub Container Registry
+        run: |
+          docker push ghcr.io/tnfb/${{ github.event.repository.name }}/front:${{ env.ARTIFACT_VERSION }}
+          docker push ghcr.io/tnfb/${{ github.event.repository.name }}/front:latest
+      
+      - name: Trigger the deployment (ne fonctionne pas)
+        run: |
+          curl -X POST https://${{ secrets.WEBHOOK_CREDS }}@backend-journaldeformation-g4hbd5bcb7gme4dv.scm.francecentral-01.azurewebsites.net/api/registry/webhook

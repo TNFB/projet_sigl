@@ -1,10 +1,9 @@
 'use client'
 import React, { useState } from 'react'
 import BaseForm from '@/components/BaseForm'
-import { postRequestImportUser } from '@/api/api'
+import { postRequestDropDocument, postRequestImportUser } from '@/api/api'
 
 interface FormData {
-  email: string
   documentName: string
   document: File | null
 }
@@ -22,7 +21,6 @@ type Field = InputField
 
 function AddDoc() {
   const [formData, setFormData] = useState<FormData>({
-    email: 'admin@test.com',
     documentName: '',
     document: null,
   })
@@ -47,15 +45,22 @@ function AddDoc() {
     e.preventDefault()
 
     const formDataToSend = new FormData()
-    formDataToSend.append('email', formData.email)
-    formDataToSend.append('documentName', formData.documentName)
+
+    // Créer un objet JSON avec email et documentName
+    const jsonData = JSON.stringify({
+      documentName: formData.documentName,
+    })
+
+    // Ajouter le JSON comme un champ 'data' dans le FormData
+    formDataToSend.append('data', jsonData)
+
     if (formData.document) {
       formDataToSend.append('document', formData.document)
     }
 
     const url = 'document/dropDocument'
     try {
-      const response = await postRequestImportUser(url, formDataToSend)
+      const response = await postRequestDropDocument(url, formDataToSend)
       console.log('Success:', response)
       alert('Document ajouté avec succès')
     } catch (error) {

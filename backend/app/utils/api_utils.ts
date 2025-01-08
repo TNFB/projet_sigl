@@ -165,38 +165,6 @@ export async function findOrCreateApprenticeMaster(
   return apprenticeMaster as UserResult;
 }
 
-interface Company {
-  id_company: number;
-  name: string;
-}
-
-export async function getCompanyIdByName(companyName: string): Promise<number> {
-  try {
-    // Chercher l'entreprise
-    let company = await db
-      .from('companies')
-      .where('name', companyName)
-      .select('id_company')
-      .first() as Company | undefined;
-
-    // Si l'entreprise n'existe pas, la créer
-    if (!company) {
-      const [newCompany] = await db
-        .table('companies')
-        .insert({ name: companyName })
-        .returning('*') as Company[];
-      
-      company = newCompany;
-      console.log(`New company created: ${companyName} with ID: ${company.id_company}`);
-    }
-
-    return company.id_company;
-  } catch (error) {
-    console.error('Error fetching or creating company:', error);
-    throw error; // Vous pouvez choisir de gérer l'erreur différemment si nécessaire
-  }
-}
-
 interface TrainingDiary {
   id_training_diary: number;
   semester_grades: string;
@@ -257,6 +225,39 @@ export async function createApprenticeWithTrainingDiary(
   }
 }
 
+
+interface Company {
+  id_company: number;
+  name: string;
+}
+
+export async function getOrCreateCompanyIdByName(companyName: string): Promise<number> {
+  try {
+    // Chercher l'entreprise
+    let company = await db
+      .from('companies')
+      .where('name', companyName)
+      .select('id_company')
+      .first() as Company | undefined;
+
+    // Si l'entreprise n'existe pas, la créer
+    if (!company) {
+      const [newCompany] = await db
+        .table('companies')
+        .insert({ name: companyName })
+        .returning('*') as Company[];
+      
+      console.log(`New company created: ${newCompany.name} with ID: ${newCompany.id_company}`);
+      return newCompany.id_company;
+    }
+
+    return company.id_company;
+  } catch (error) {
+    console.error('Error fetching or creating company:', error);
+    throw error; // Vous pouvez choisir de gérer l'erreur différemment si nécessaire
+  }
+}
+
 interface Cursus {
   id_cursus: number;
   promotion_name: string;
@@ -277,9 +278,9 @@ export async function findOrCreateCursus(cursusName: string): Promise<number> {
         .table('cursus')
         .insert({ promotion_name: cursusName })
         .returning('*') as Cursus[];
-      
-      cursus = newCursus;
-      console.log(`New cursus created: ${cursusName} with ID: ${cursus.id_cursus}`);
+
+      console.log(`New cursus created: ${newCursus.promotion_name} with ID: ${newCursus.id_cursus}`);
+      return newCursus.id_cursus;
     }
 
     return cursus.id_cursus;

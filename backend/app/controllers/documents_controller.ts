@@ -3,7 +3,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import * as XLSX from 'xlsx'
 import fs from 'node:fs'
 import path from 'node:path'
-import { createApprenticeWithTrainingDiary, findOrCreateApprenticeMaster, findOrCreateCursus, findOrCreateEducationalTutor, findUserByEmail, generatePassword, getCompanyIdByName } from '#utils/api_utils.js'
+import { createApprenticeWithTrainingDiary, findOrCreateApprenticeMaster, findOrCreateCursus, findOrCreateEducationalTutor, findUserByEmail, generatePassword, getOrCreateCompanyIdByName } from '../utils/api_utils.js'
 import bcrypt from 'bcrypt'
 
 /**
@@ -30,17 +30,29 @@ export default class DocumentsController {
    *                             et les détails du document téléchargé ou une erreur en cas d'échec.
    */
   async dropDocument({ request, response }: HttpContext) {
+    console.log('Drop Document')
     try {
       const file = request.file('document', {
         extnames: ['docx', 'doc', 'odt', 'xlsx', 'xls', 'pdf', 'txt'], // Extensions autorisées
         size: '10mb', // Taille maximale autorisée
       })
 
-      const { email, documentName } = request.only(['email', 'documentName'])
+      const jsonData = request.input('data')
+      let data
+      try {
+        data = JSON.parse(jsonData)
+      } catch (error) {
+        return response.status(400).json({ error: 'Invalid JSON data' })
+      }
+
+      const { documentName } = data
 
       // Found User by Email
-      //const userDb = await db.from('users').where('email', email).select('*').first()
-      const userDb = await findUserByEmail(email)
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      const userDb = await findUserByEmail(emailUser)
       if (!userDb) {
         return response.status(400).json({
           status: 'error',
@@ -102,6 +114,7 @@ export default class DocumentsController {
    * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le résultat de l'importation.
    */
   async importUsers({ request, response }: HttpContext) {
+    console.log('import user via Excel')
     try {
       const file = request.file('file', {
         extnames: ['xlsx'],
@@ -133,6 +146,18 @@ export default class DocumentsController {
       for (const row of data) {
         const { email_apprentice, name_apprentice, last_name_aprentice, telephone_apprentice, cursus, email_educational_tutors, email_apprentice_masters, name_apprentice_masters, last_name_apprentice_masters, telephone_apprentice_masters, company_name } = row
 
+        //Get or Create Company ID
+        let company_id = await getOrCreateCompanyIdByName(company_name);
+        if(!company_id){
+          company_id = await getOrCreateCompanyIdByName(company_name)
+        }
+        
+        //Get or Create Cursus ID
+        let cursusId = await findOrCreateCursus(cursus);
+        if(!cursusId){
+          cursusId = await findOrCreateCursus(cursus);
+        }
+
         // Vérifier si l'aprpenti existe déjà
         let apprentice = await findUserByEmail(email_apprentice)
 
@@ -140,7 +165,7 @@ export default class DocumentsController {
           // Créer un nouvel user => apprenti
           const role = 'apprentices'
           const password = await generatePassword()
-          console.log(`Uuer Email : ${email_apprentice} & password: ${password}`)
+          console.log(`User Email : ${email_apprentice} & password: ${password}`)
           const [newUserId] = await db
             .table('users')
             .insert({
@@ -163,29 +188,24 @@ export default class DocumentsController {
             };
         }
 
-          const educationalTutor = await findOrCreateEducationalTutor(email_educational_tutors) // Return ID
+        const educationalTutor = await findOrCreateEducationalTutor(email_educational_tutors) // Return ID
 
-          //Get Company ID
-          const company_id = await getCompanyIdByName(company_name);
+        const apprenticeMaster = await findOrCreateApprenticeMaster(
+          email_apprentice_masters,
+          name_apprentice_masters,
+          last_name_apprentice_masters,
+          telephone_apprentice_masters,
+          company_id
+        );
 
-          const apprenticeMaster = await findOrCreateApprenticeMaster(
-            email_apprentice_masters,
-            name_apprentice_masters,
-            last_name_apprentice_masters,
-            telephone_apprentice_masters,
-            company_id
-          );
-
-          const cursusId = await findOrCreateCursus(cursus);
-
-          // Créer l'apprenti avec son journal de formation
-          await createApprenticeWithTrainingDiary(
-            apprentice.id_user,
-            educationalTutor.id_user,
-            apprenticeMaster.id_user,
-            company_id,
-            cursusId
-          );
+        // Créer l'apprenti avec son journal de formation
+        await createApprenticeWithTrainingDiary(
+          apprentice.id_user,
+          educationalTutor.id_user,
+          apprenticeMaster.id_user,
+          company_id,
+          cursusId
+        );
 
         results.push({
           apprentice: {

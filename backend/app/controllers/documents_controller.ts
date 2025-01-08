@@ -3,6 +3,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import * as XLSX from 'xlsx'
 import fs from 'node:fs'
 import path from 'node:path'
+import { createApprenticeWithTrainingDiary, findOrCreateApprenticeMaster, findOrCreateCursus, findOrCreateEducationalTutor, findUserByEmail, generatePassword, getOrCreateCompanyIdByName } from '../utils/api_utils.js'
+import bcrypt from 'bcrypt'
 
 /**
  * @class DocumentsController
@@ -28,16 +30,29 @@ export default class DocumentsController {
    *                             et les détails du document téléchargé ou une erreur en cas d'échec.
    */
   async dropDocument({ request, response }: HttpContext) {
+    console.log('Drop Document')
     try {
       const file = request.file('document', {
-        extnames: ['docx', 'doc', 'odt', 'xlsx', 'xls', 'pdf', 'txt', 'mdj'], // Extensions autorisées
+        extnames: ['docx', 'doc', 'odt', 'xlsx', 'xls', 'pdf', 'txt'], // Extensions autorisées
         size: '10mb', // Taille maximale autorisée
       })
 
-      const { email, documentName } = request.only(['email', 'documentName'])
+      const jsonData = request.input('data')
+      let data
+      try {
+        data = JSON.parse(jsonData)
+      } catch (error) {
+        return response.status(400).json({ error: 'Invalid JSON data' })
+      }
+
+      const { documentName } = data
 
       // Found User by Email
-      const userDb = await db.from('users').where('email', email).select('*').first()
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      const userDb = await findUserByEmail(emailUser)
       if (!userDb) {
         return response.status(400).json({
           status: 'error',
@@ -99,6 +114,7 @@ export default class DocumentsController {
    * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le résultat de l'importation.
    */
   async importUsers({ request, response }: HttpContext) {
+    console.log('import user via Excel')
     try {
       const file = request.file('file', {
         extnames: ['xlsx'],
@@ -109,9 +125,9 @@ export default class DocumentsController {
         return response.badRequest({ message: 'Invalid file' })
       }
 
-      const filePath = `${Date.now()}-${file.clientName}`
+      const filePath = `${Date.now()}_${file.clientName}`
       const fullPath = path.join(process.cwd(), 'tmp', filePath)
-      console.log(`Full path: ${fullPath}`) // Log the full path
+      //console.log(`Full path: ${fullPath}`) // Log the full path
 
       await file.move(process.cwd() + '/tmp', { name: filePath })
 
@@ -128,84 +144,92 @@ export default class DocumentsController {
       const results = []
       console.log(data)
       for (const row of data) {
-        const { email, name, last_name, apprenticeMasters, educationalTutors } = row
+        const { email_apprentice, name_apprentice, last_name_aprentice, telephone_apprentice, cursus, email_educational_tutors, email_apprentice_masters, name_apprentice_masters, last_name_apprentice_masters, telephone_apprentice_masters, company_name } = row
 
-        // Vérifier si l'utilisateur existe déjà
-        let user = await db.from('users').where('email', email).first()
+        //Get or Create Company ID
+        let company_id = await getOrCreateCompanyIdByName(company_name);
+        if(!company_id){
+          company_id = await getOrCreateCompanyIdByName(company_name)
+        }
+        
+        //Get or Create Cursus ID
+        let cursusId = await findOrCreateCursus(cursus);
+        if(!cursusId){
+          cursusId = await findOrCreateCursus(cursus);
+        }
 
-        if (!user) {
-          // Créer un nouvel utilisateur
+        // Vérifier si l'aprpenti existe déjà
+        let apprentice = await findUserByEmail(email_apprentice)
+
+        if (!apprentice) { // Aprpenti n'existe pas
+          // Créer un nouvel user => apprenti
           const role = 'apprentices'
-          const result = await db
+          const password = await generatePassword()
+          console.log(`User Email : ${email_apprentice} & password: ${password}`)
+          const [newUserId] = await db
             .table('users')
             .insert({
-              email,
-              name,
-              last_name,
-              role,
+              email: email_apprentice,
+              password: await bcrypt.hash(password, 10),
+              name: name_apprentice,
+              last_name: last_name_aprentice,
+              telephone: telephone_apprentice,
+              role: role,
             })
-            .returning('*') // Récupérer toutes les colonnes
-
-          user = { id_user: result[0], email, name, last_name }
+            .returning('id_user')
+            apprentice = {
+              id_user: newUserId,
+              email: email_apprentice,
+              role: role,
+              password: password,
+              name: name_apprentice,
+              last_name: last_name_aprentice,
+              telephone: telephone_apprentice
+            };
         }
 
-        // Créer un journal de formation (training diary)
-        const [trainingDiaryId] = await db
-          .table('training_diaries')
-          .insert({
-            semester_grades: JSON.stringify({}),
-            document_list: JSON.stringify([]),
-            evaluation: 0,
-            list_interview: JSON.stringify([]),
-            list_report: JSON.stringify([]),
-            list_presentation: JSON.stringify([]),
-            created_at: new Date(),
-          })
-          .returning('id_training_diary')
+        const educationalTutor = await findOrCreateEducationalTutor(email_educational_tutors) // Return ID
 
-        const apprenticeMaster = await db
-          .from('users')
-          .where('email', apprenticeMasters)
-          .where('role', 'apprentice_masters')
-          .first()
+        const apprenticeMaster = await findOrCreateApprenticeMaster(
+          email_apprentice_masters,
+          name_apprentice_masters,
+          last_name_apprentice_masters,
+          telephone_apprentice_masters,
+          company_id
+        );
 
-        // Associer le tuteur pédagogique
-        const educationalTutor = await db
-          .from('users')
-          .where('email', educationalTutors)
-          .where('role', 'educational_tutors')
-          .first()
-
-        const alreadyCreated = await db.from('apprentices').where('id', user.id_user).first()
-
-        if (!alreadyCreated) {
-          // Insérer dans la table apprentices
-          console.log(`create new User : ${user.id_user}`)
-          await db.table('apprentices').insert({
-            id: user.id_user,
-            id_educational_tutor: educationalTutor ? educationalTutor.id_user : null,
-            id_apprentice_master: apprenticeMaster ? apprenticeMaster.id_user : null,
-            id_training_diary: trainingDiaryId,
-            list_missions: JSON.stringify([]),
-          })
-        } else {
-          // Mettre à jour l'enregistrement existant
-          console.log(`already existing user : ${user.id_user}`)
-          await db
-            .from('apprentices')
-            .where('id', user.id_user)
-            .update({
-              id_educational_tutor: educationalTutor ? educationalTutor.id_user : null,
-              id_apprentice_master: apprenticeMaster ? apprenticeMaster.id_user : null,
-              id_training_diary: trainingDiaryId,
-            })
-        }
+        // Créer l'apprenti avec son journal de formation
+        await createApprenticeWithTrainingDiary(
+          apprentice.id_user,
+          educationalTutor.id_user,
+          apprenticeMaster.id_user,
+          company_id,
+          cursusId
+        );
 
         results.push({
-          user: user.email,
-          status: 'created/updated',
-          trainingDiaryId,
-        })
+          apprentice: {
+            email: email_apprentice,
+            id: apprentice.id_user
+          },
+          educationalTutor: {
+            email: email_educational_tutors,
+            id: educationalTutor.id_user
+          },
+          apprenticeMaster: {
+            email: email_apprentice_masters,
+            id: apprenticeMaster.id_user
+          },
+          company: {
+            name: company_name,
+            id: company_id
+          },
+          cursus: {
+            name: cursus,
+            id: cursusId
+          },
+          status: 'created/updated'
+        });
       }
 
       // Supprimer le fichier temporaire

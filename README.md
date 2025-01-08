@@ -40,7 +40,16 @@ Remplacez `CR_PAT` par votre token d'accès personnel et `USERNAME` par votre no
 
 1. Connectez-vous à la VM dédiée au backend.
 2. Copier le fichier docker/docker-compose-backend.yml sur la VM.
-3. Lancer le backend (la version du conteneur est celle  spécifiée par la variable `image`, par défaut : `latest`):
+3. Éditer les variables d'environnements dans le fichier :
+   1. `PORT` : le port sur lequel le backend sera exposé.
+   2. `DB_HOST` : l'adresse du serveur de base de données.
+   3. `DB_PORT` : le port du serveur de base de données.
+   4. `DB_USER` : l'utilisateur de la base de données.
+   5. `DB_PASSWORD` : le mot de passe de l'utilisateur de la base de données.
+   6. `DB_DATABASE` : le nom de la base de données. **Doit être `sigl_db`**
+   7. `LOG_LEVEL` : le niveau de log du backend
+   
+4. Lancer le backend (la version du conteneur est celle  spécifiée par la variable `image`, par défaut : `latest`):
 
     ```sh
     docker compose -f docker-compose-back.yml up -d

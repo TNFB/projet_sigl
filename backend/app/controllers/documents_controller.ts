@@ -159,7 +159,7 @@ export default class DocumentsController {
             list_interview: JSON.stringify([]),
             list_report: JSON.stringify([]),
             list_presentation: JSON.stringify([]),
-            createdAt: new Date(),
+            created_at: new Date(),
           })
           .returning('id_training_diary')
 
@@ -186,7 +186,7 @@ export default class DocumentsController {
             id_educational_tutor: educationalTutor ? educationalTutor.id_user : null,
             id_apprentice_master: apprenticeMaster ? apprenticeMaster.id_user : null,
             id_training_diary: trainingDiaryId,
-            listMissions: JSON.stringify([]),
+            list_missions: JSON.stringify([]),
           })
         } else {
           // Mettre à jour l'enregistrement existant

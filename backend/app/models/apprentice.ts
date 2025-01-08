@@ -20,5 +20,5 @@ export default class Apprentice extends BaseModel {
   declare id_company: number
 
   @column()
-  declare listMissions: JSON
+  declare list_missions: JSON
 }

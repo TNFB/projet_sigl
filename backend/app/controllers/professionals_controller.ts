@@ -11,7 +11,7 @@ export default class ProfessionalsController {
    * @param {HttpContext} context - Le contexte HTTP de la requête.
    *
    * @property {string} name - Le nom de l'utilisateur.
-   * @property {string} lastName - Le nom de famille de l'utilisateur.
+   * @property {string} last_name - Le nom de famille de l'utilisateur.
    * @property {string} email - L'email de l'utilisateur.
    * @property {string} companyName - Le nom de l'entreprise du professionnel.
    *
@@ -46,19 +46,19 @@ export default class ProfessionalsController {
       const results = []
 
       for (const person of peopleData) {
-        const { name, lastName, email, companyName } = person
+        const { name, last_name, email, companyName } = person
 
         // Vérifier si l'entreprise existe, sinon la créer
-        let idCompany = 0
+        let id_company = 0
         let company = await db.from('companies').where('name', companyName).first()
         if (!company) {
-          const newIdCompany = await db
+          const newid_company = await db
             .table('companies')
             .insert({ name: companyName })
-            .returning('idCompany')
-          idCompany = newIdCompany[0]
+            .returning('id_company')
+          id_company = newid_company[0]
         } else {
-          idCompany = company.idCompany
+          id_company = company.id_company
         }
 
         // Vérifier si l'utilisateur existe déjà
@@ -66,7 +66,7 @@ export default class ProfessionalsController {
 
         if (existingUser) {
           // Mettre à jour les informations de l'utilisateur existant
-          await db.from('users').where('email', email).update({ name, lastName })
+          await db.from('users').where('email', email).update({ name, last_name })
 
           // Vérifier si l'entrée existe dans professionals
           const existingMaster = await db
@@ -79,12 +79,12 @@ export default class ProfessionalsController {
             await db
               .from('professionals')
               .where('id', existingUser.id_user)
-              .update({ idCompany: idCompany })
+              .update({ id_company: id_company })
           } else {
             // Créer une nouvelle entrée dans professionals si elle n'existe pas
             await db.table('professionals').insert({
               id: existingUser.id_user,
-              idCompany: idCompany,
+              id_company: id_company,
             })
           }
 
@@ -92,7 +92,7 @@ export default class ProfessionalsController {
             email,
             status: 'updated',
             userId: existingUser.id_user,
-            compagnyId: idCompany,
+            compagnyId: id_company,
           })
         } else {
           // Créer un nouvel utilisateur
@@ -104,7 +104,7 @@ export default class ProfessionalsController {
             .insert({
               email,
               name,
-              lastName,
+              last_name,
               password: hashedPassword,
               role: 'professionals',
             })
@@ -113,13 +113,13 @@ export default class ProfessionalsController {
           // Créer l'entrée dans la table professionals
           await db.table('professionals').insert({
             id: userId,
-            idCompany: idCompany,
+            id_company: id_company,
           })
 
           // Vous devriez envoyer le mot de passe par email à l'utilisateur ici
           console.log(`Mot de passe généré pour ${email}: ${password}`)
 
-          results.push({ email, status: 'created', userId, compagnyId: idCompany })
+          results.push({ email, status: 'created', userId, compagnyId: id_company })
         }
       }
 

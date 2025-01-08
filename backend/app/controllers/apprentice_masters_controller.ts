@@ -95,9 +95,9 @@ export default class ApprenticeMastersController {
    * @param {HttpContext} context - Le contexte HTTP de la requête.
    *
    * @property {string} name - Le nom de l'utilisateur.
-   * @property {string} lastName - Le nom de famille de l'utilisateur.
+   * @property {string} last_name - Le nom de famille de l'utilisateur.
    * @property {string} email - L'email de l'utilisateur.
-   * @property {number} idCompany - L'ID de l'entreprise de l'utilisateur.
+   * @property {number} id_company - L'ID de l'entreprise de l'utilisateur.
    *
    * @throws {InternalServerError} En cas d'erreur lors du traitement de la requête.
    *
@@ -130,19 +130,19 @@ export default class ApprenticeMastersController {
       const results = []
 
       for (const person of peopleData) {
-        const { name, lastName, email, companyName } = person
+        const { name, last_name, email, companyName } = person
 
         // Vérifier si l'entreprise existe, sinon la créer
-        let idCompany = 0
+        let id_company = 0
         let company = await db.from('companies').where('name', companyName).first()
         if (!company) {
-          const newIdCompany = await db
+          const newid_company = await db
             .table('companies')
             .insert({ name: companyName })
-            .returning('idCompany')
-          idCompany = newIdCompany[0]
+            .returning('id_company')
+          id_company = newid_company[0]
         } else {
-          idCompany = company.idCompany
+          id_company = company.id_company
         }
 
         // Vérifier si l'utilisateur existe déjà
@@ -150,7 +150,7 @@ export default class ApprenticeMastersController {
 
         if (existingUser) {
           // Mettre à jour les informations de l'utilisateur existant
-          await db.from('users').where('email', email).update({ name, lastName })
+          await db.from('users').where('email', email).update({ name, last_name })
 
           // Vérifier si l'entrée existe dans apprentice_masters
           const existingMaster = await db
@@ -163,12 +163,12 @@ export default class ApprenticeMastersController {
             await db
               .from('apprentice_masters')
               .where('id', existingUser.id_user)
-              .update({ idCompany: idCompany })
+              .update({ id_company: id_company })
           } else {
             // Créer une nouvelle entrée dans apprentice_masters si elle n'existe pas
             await db.table('apprentice_masters').insert({
               id: existingUser.id_user,
-              idCompany: idCompany,
+              id_company: id_company,
             })
           }
 
@@ -176,7 +176,7 @@ export default class ApprenticeMastersController {
             email,
             status: 'updated',
             userId: existingUser.id_user,
-            compagnyId: idCompany,
+            compagnyId: id_company,
           })
         } else {
           // Créer un nouvel utilisateur
@@ -188,7 +188,7 @@ export default class ApprenticeMastersController {
             .insert({
               email,
               name,
-              lastName,
+              last_name,
               password: hashedPassword,
               role: 'apprentice_masters',
             })
@@ -197,13 +197,13 @@ export default class ApprenticeMastersController {
           // Créer l'entrée dans la table apprentice_masters
           await db.table('apprentice_masters').insert({
             id: userId,
-            idCompany: idCompany,
+            id_company: id_company,
           })
 
           // Vous devriez envoyer le mot de passe par email à l'utilisateur ici
           console.log(`Mot de passe généré pour ${email}: ${password}`)
 
-          results.push({ email, status: 'created', userId, compagnyId: idCompany })
+          results.push({ email, status: 'created', userId, compagnyId: id_company })
         }
       }
 
@@ -371,13 +371,13 @@ export default class ApprenticeMastersController {
         .from('apprentices')
         .join('users', 'apprentices.id', 'users.id_user')
         .where('apprentices.id_apprentice_master', master.id_user)
-        .select('users.email', 'users.name', 'users.lastName')
+        .select('users.email', 'users.name', 'users.last_name')
 
       // Formater les données des apprentis
       const formattedApprentices = apprentices.map((apprentice) => ({
         email: apprentice.email,
         nom: apprentice.name,
-        prenom: apprentice.lastName,
+        prenom: apprentice.last_name,
       }))
 
       // Créer l'objet JSON de réponse
@@ -385,7 +385,7 @@ export default class ApprenticeMastersController {
         tuteur: {
           email: master.email,
           nom: master.name,
-          prenom: master.lastName,
+          prenom: master.last_name,
         },
         apprentis: formattedApprentices,
       }

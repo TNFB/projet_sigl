@@ -68,7 +68,7 @@ export default class UsersController {
 
       // Sélectionner les colonnes en fonction du paramètre 'detailed'
       if (detailed === 'true') {
-        query = query.select('id_user', 'email', 'name', 'lastName', 'role')
+        query = query.select('id_user', 'email', 'name', 'last_name', 'role')
       } else {
         query = query.select('email')
       }
@@ -119,7 +119,7 @@ export default class UsersController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, password, name, lastName, telephone, role } = data
+      const { email, password, name, last_name, telephone, role } = data
 
       const emailUser = request.user?.email
       if (!emailUser) {
@@ -146,7 +146,7 @@ export default class UsersController {
       const hashedPassword = await bcrypt.hash(password, 10)
       const createUser = await db
         .table('users')
-        .insert({ email, password: hashedPassword, name, lastName, telephone, role })
+        .insert({ email, password: hashedPassword, name, last_name, telephone, role })
       console.log(`User created: ${createUser}`)
 
       //assigne Role

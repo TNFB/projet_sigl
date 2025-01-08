@@ -58,7 +58,7 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
         )
         const formattedUsers = response.users.map((user: any) => ({
           id: user.id_user,
-          name: `${user.name} ${user.lastName}`,
+          name: `${user.name} ${user.last_name}`,
           email: user.email,
           role: user.role,
         }))

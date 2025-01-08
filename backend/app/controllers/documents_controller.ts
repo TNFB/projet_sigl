@@ -64,8 +64,8 @@ export default class DocumentsController {
       // Save path in DB
       const savedDocument = await db.table('documents').insert({
         name: file.clientName,
-        documentPath: fileUrl,
-        uploadedAt: new Date(),
+        document_path: fileUrl,
+        uploaded_at: new Date(),
       })
       // Retourner une réponse réussie
       return response.created({
@@ -73,7 +73,7 @@ export default class DocumentsController {
         document: {
           id: savedDocument[0], // ID du fichier inséré (si disponible)
           name: file.clientName,
-          documentPath: fileUrl,
+          document_path: fileUrl,
         },
       })
     } catch (error) {
@@ -128,7 +128,7 @@ export default class DocumentsController {
       const results = []
       console.log(data)
       for (const row of data) {
-        const { email, name, lastName, apprenticeMasters, educationalTutors } = row
+        const { email, name, last_name, apprenticeMasters, educationalTutors } = row
 
         // Vérifier si l'utilisateur existe déjà
         let user = await db.from('users').where('email', email).first()
@@ -141,12 +141,12 @@ export default class DocumentsController {
             .insert({
               email,
               name,
-              lastName,
+              last_name,
               role,
             })
             .returning('*') // Récupérer toutes les colonnes
 
-          user = { id_user: result[0], email, name, lastName }
+          user = { id_user: result[0], email, name, last_name }
         }
 
         // Créer un journal de formation (training diary)

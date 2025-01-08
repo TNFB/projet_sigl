@@ -30,7 +30,7 @@ export default class CompaniesController {
    *
    * // Exemple de réponse réussie
    * {
-   *   "idCompany": 1,
+   *   "id_company": 1,
    *   "name": "Acme Corporation",
    *   "message": "Company created successfully"
    * }
@@ -83,10 +83,10 @@ export default class CompaniesController {
         }
 
         // Add new Company
-        const [idCompany] = await db.table('companies').insert({ name }).returning('idCompany')
+        const [id_company] = await db.table('companies').insert({ name }).returning('id_company')
 
         // Create response
-        const company = await db.from('companies').where('idCompany', idCompany).first()
+        const company = await db.from('companies').where('id_company', id_company).first()
 
         results.push({ ...company, status: 'success', message: 'Company created successfully' })
       }

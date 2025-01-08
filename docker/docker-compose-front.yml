@@ -1,0 +1,9 @@
+services:
+  front:
+    container_name: front
+    restart: unless-stopped
+    image: ghcr.io/tnfb/projet_sigl/front:latest
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000

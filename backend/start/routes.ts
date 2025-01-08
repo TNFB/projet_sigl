@@ -160,4 +160,4 @@ Route.group(() => {
   Route.delete('deleteEvent', [EventsController, 'deleteEvent']).as(
     'deleteEvent'
   )
-})
+}).prefix('events')

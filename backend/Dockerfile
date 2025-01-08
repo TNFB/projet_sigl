@@ -26,7 +26,7 @@ ENV NODE_ENV=production
 ENV SESSION_DRIVER=cookie
 ENV DB_DATABASE=sigl_db
 
-VOLUME [ "/storage" ]
+VOLUME [ "/app/build/storage" ]
 
 # Exposer le port utilisé par l'application
 EXPOSE 3333

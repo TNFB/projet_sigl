@@ -20,6 +20,13 @@ export async function findUserByEmail(email: string): Promise<UserResult | null>
     .first()) as UserResult | null
 }
 
+export async function findUserById(id: number): Promise<UserResult | null> {
+  return (await User.query()
+    .where('id_user', id)
+    .select('id_user', 'email', 'password', 'name', 'last_name', 'role', 'telephone')
+    .first()) as UserResult | null
+}
+
 export async function isUserTableEmpty(): Promise<boolean> {
   const count = await db.from('users').count('* as total').first()
   return count?.total === 0

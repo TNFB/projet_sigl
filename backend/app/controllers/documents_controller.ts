@@ -72,6 +72,7 @@ export default class DocumentsController {
       //Path
       const basePath = `/${userDb.id_user}`
       const fileUrl = `${basePath}/${documentName}.${file.extname}`
+      console.log(`fileUrl: ${fileUrl}`)
 
       // Vérifier si le document existe déjà
       const existingDocument = await db
@@ -79,7 +80,6 @@ export default class DocumentsController {
         .where('name', documentName)
         .first()
 
-      console.log(`fileUrl: ${fileUrl}`)
       if (existingDocument) {
         if (existingDocument.document_path !== fileUrl) {
           //Remove to disk
@@ -92,7 +92,6 @@ export default class DocumentsController {
               console.log('Fichier supprimé avec succès');
             }
           });
-          console.log('Cette ligne s\'exécute après la tentative de suppression');
           
           await db.from('documents')
             .where('id_document', existingDocument.id_document)
@@ -100,13 +99,13 @@ export default class DocumentsController {
               document_path: fileUrl,
               uploaded_at: new Date()
             })
-          console.log('update Done')
         } else {
           return response.ok({
             message: 'Document already exists (update doc)',
             document: existingDocument,
           })
         }
+        console.log('Le document existais déjà (update)')
       } else {
         // Nouveau document, insérer dans la DB
         await db.table('documents').insert({
@@ -114,12 +113,19 @@ export default class DocumentsController {
           document_path: fileUrl,
           uploaded_at: new Date(),
         })
+        console.log('Nouveau document inséré (BDD)')
       }
-  
-      // Déplacer le fichier une seule fois, après avoir mis à jour ou inséré dans la DB
-      await file.moveToDisk(fileUrl, {
-        name: documentName,
-      })
+      console.log('Befor Move To Disk')
+      try {
+        // Déplacer le fichier une seule fois, après avoir mis à jour ou inséré dans la DB
+        await file.moveToDisk(fileUrl, {
+          name: documentName,
+        })
+        console.log('Move document (Disk)')  
+      } catch ( error ) {
+        console.error('Erreur lors du déplacement du fichier:', error)
+      }
+      
       
       // Retourner une réponse réussie
       return response.created({

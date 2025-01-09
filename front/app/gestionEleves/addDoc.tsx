@@ -41,14 +41,20 @@ function AddDoc() {
     })
   }
 
+  const cleanDocumentName = (name: string) => {
+    // Si Charach Spécial => envoie BDD Faill
+    const withoutAccents = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    return withoutAccents.replace(/[^a-zA-Z0-9]/g, '_')
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     const formDataToSend = new FormData()
 
-    // Créer un objet JSON avec email et documentName
+    // Créer un objet JSON avec email et documentName + Clean Document
     const jsonData = JSON.stringify({
-      documentName: formData.documentName,
+      documentName: cleanDocumentName(formData.documentName),
     })
 
     // Ajouter le JSON comme un champ 'data' dans le FormData

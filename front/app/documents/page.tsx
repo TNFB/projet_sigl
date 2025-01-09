@@ -5,7 +5,7 @@ import Home from '@/components/Home'
 import { postRequestDropDocument } from '@/api/api'
 
 interface FormData {
-  document: string
+  documentName: string
   file: File | null
 }
 
@@ -22,26 +22,19 @@ type Field = SelectField
 
 function Documents() {
   const [formData, setFormData] = useState<FormData>({
-    document: '',
+    documentName: '',
     file: null,
   })
 
   const handleDocumentChange = (value: string) => {
     setFormData({
       ...formData,
-      document: value,
+      documentName: value,
     })
   }
 
-  /*const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files ? e.target.files[0] : null;
-    setFormData({
-      ...formData,
-      file,
-    });
-  };*/
-
   const [documents] = useState([
+    { value: 'doc_0', label: '' },
     { value: 'doc_1', label: 'Fiche de synthèse S5' },
     { value: 'doc_2', label: 'Fiche de synthèse S6' },
     { value: 'doc_3', label: 'Fiche de synthèse S7' },
@@ -63,6 +56,31 @@ function Documents() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
+    const formDataToSend = new FormData()
+
+    // Créer un objet JSON avec email et documentName
+    const jsonData = JSON.stringify({
+      documentName: formData.documentName,
+    })
+
+    // Ajouter le JSON comme un champ 'data' dans le FormData
+    formDataToSend.append('data', jsonData)
+
+    if (formData.file) {
+      formDataToSend.append('document', formData.file)
+    }
+
+    const url = 'document/dropDocument'
+    try {
+      const response = await postRequestDropDocument(url, formDataToSend)
+      console.log('Success:', response)
+      alert('Document ajouté avec succès')
+    } catch (error) {
+      console.error('Error:', error)
+      alert("Erreur lors de l'ajout du document")
+    }
+
+    /*
     if (!file) {
       console.error('No file selected')
       setError('Veuillez sélectionner un fichier à télécharger.')
@@ -86,6 +104,7 @@ function Documents() {
     } catch (error) {
       console.error('Error uploading document:', error)
     }
+      */
   }
 
   const fields: Field[] = [
@@ -93,7 +112,7 @@ function Documents() {
       type: 'select',
       label: 'type document :',
       name: 'document',
-      value: formData.document,
+      value: formData.documentName,
       options: documents,
       onChange: handleDocumentChange,
     },
@@ -145,21 +164,6 @@ function Documents() {
             id='documentName'
             name='documentName'
             onChange={(e) => setDocumentName(e.target.value)}
-            className='mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-          />
-        </div>
-        <div className='mb-4'>
-          <label
-            htmlFor='email'
-            className='block text-sm font-medium text-gray-700'
-          >
-            Email
-          </label>
-          <input
-            type='email'
-            id='email'
-            name='email'
-            onChange={(e) => setEmail(e.target.value)}
             className='mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
           />
         </div>

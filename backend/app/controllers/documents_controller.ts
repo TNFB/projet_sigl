@@ -72,22 +72,60 @@ export default class DocumentsController {
       //Path
       const basePath = `/${userDb.id_user}`
       const fileUrl = `${basePath}/${documentName}.${file.extname}`
-      // Save to disk
+
+      // Vérifier si le document existe déjà
+      const existingDocument = await db
+        .from('documents')
+        .where('name', documentName)
+        .first()
+
+      console.log(`fileUrl: ${fileUrl}`)
+      if (existingDocument) {
+        if (existingDocument.document_path !== fileUrl) {
+          //Remove to disk
+          const storagePath = process.env.STORAGE_PATH;
+          const fileToDelete = path.join(storagePath ?? '', existingDocument.document_path);
+          fs.unlink(fileToDelete, (err) => {
+            if (err) {
+              console.error('Erreur lors de la suppression du fichier (vérifier ENV):', err);
+            } else {
+              console.log('Fichier supprimé avec succès');
+            }
+          });
+          console.log('Cette ligne s\'exécute après la tentative de suppression');
+          
+          await db.from('documents')
+            .where('id_document', existingDocument.id_document)
+            .update({
+              document_path: fileUrl,
+              uploaded_at: new Date()
+            })
+          console.log('update Done')
+        } else {
+          return response.ok({
+            message: 'Document already exists (update doc)',
+            document: existingDocument,
+          })
+        }
+      } else {
+        // Nouveau document, insérer dans la DB
+        await db.table('documents').insert({
+          name: documentName,
+          document_path: fileUrl,
+          uploaded_at: new Date(),
+        })
+      }
+  
+      // Déplacer le fichier une seule fois, après avoir mis à jour ou inséré dans la DB
       await file.moveToDisk(fileUrl, {
         name: documentName,
       })
-      // Save path in DB
-      const savedDocument = await db.table('documents').insert({
-        name: file.clientName,
-        document_path: fileUrl,
-        uploaded_at: new Date(),
-      })
+      
       // Retourner une réponse réussie
       return response.created({
-        message: 'Document uploaded successfully',
+        message: existingDocument ? 'Document updated successfully' : 'Document uploaded successfully',
         document: {
-          id: savedDocument[0], // ID du fichier inséré (si disponible)
-          name: file.clientName,
+          name: documentName,
           document_path: fileUrl,
         },
       })
@@ -148,15 +186,9 @@ export default class DocumentsController {
 
         //Get or Create Company ID
         let company_id = await getOrCreateCompanyIdByName(company_name);
-        if(!company_id){
-          company_id = await getOrCreateCompanyIdByName(company_name)
-        }
         
         //Get or Create Cursus ID
         let cursusId = await findOrCreateCursus(cursus);
-        if(!cursusId){
-          cursusId = await findOrCreateCursus(cursus);
-        }
 
         // Vérifier si l'aprpenti existe déjà
         let apprentice = await findUserByEmail(email_apprentice)

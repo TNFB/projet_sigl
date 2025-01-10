@@ -219,9 +219,6 @@ export default class UsersController {
       }
       const isPasswordValid = await bcrypt.compare(password, userDb.password)
       if (isPasswordValid) {
-        //TODO
-        // Gerer Token => Inserte Token In BDD if user can connect
-        // Maybe add 1-2sec delay if password Wrong
         const token = jwt.sign(
           { id: userDb.id_user, email: userDb.email, role: userDb.role },
           process.env.APP_KEY || 'default_secret_key',
@@ -246,46 +243,6 @@ export default class UsersController {
         message: 'Erreur in users connection',
       })
     }
-  }
-
-  /**
-   * @brief Déconnecte l'utilisateur en supprimant le cookie d'accès.
-   *
-   * Cette méthode efface le cookie d'accès pour déconnecter l'utilisateur et renvoie une réponse indiquant que
-   * la déconnexion a été effectuée avec succès.
-   *
-   * @param {HttpContext} context - Le contexte HTTP contenant la réponse.
-   * @param {Object} context.response - L'objet de réponse HTTP utilisé pour renvoyer des réponses au client.
-   *
-   * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et un message indiquant que 
-                               la déconnexion a réussi.
-   */
-  async logoutUser({ request, response }: HttpContext) {
-    const { data } = request.only(['data'])
-    if (!data) {
-      return response.status(400).json({ error: 'Data is required' })
-    }
-    const { token } = data
-
-    const users = await db.from('users').select('token')
-
-    for (const user of users) {
-      const isTokenMatch = await bcrypt.compare(token, user.token)
-      if (isTokenMatch) {
-        await db.from('users').where('id_user', user.id_user).update({
-          token: null, // Optionnel : réinitialiser le token après utilisation
-          expired_date: null, // Optionnel : réinitialiser la date d'expiration
-        })
-        return response.status(200).json({
-          status: 'success',
-          message: 'Logout succesfull',
-        })
-      }
-    }
-    return response.status(400).json({
-      status: 'faill',
-      message: 'Faill to Logout',
-    })
   }
 
   /**
@@ -324,7 +281,11 @@ export default class UsersController {
       }
 
       // Found User by Email
-      const userDb = await findUserByEmail(email)
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      const userDb = await findUserByEmail(emailUser)
       if (!userDb) {
         return response.status(401).json({
           status: 'error',
@@ -356,6 +317,105 @@ export default class UsersController {
       return response.status(500).json({
         status: 'error',
         message: 'Erreur in users changePassword',
+      })
+    }
+  }
+
+  async getUserInfoByEmail({ request, response }: HttpContext) {
+    console.log('getUserInfoByEmail')
+    try {
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+
+      const userDb = await findUserByEmail(emailUser)
+      console.log('User found:', userDb); 
+
+      if (!userDb) {
+        return response.status(404).json({ error: 'Utilisateur non trouvé.' });
+      }
+
+      return response.status(200).json({
+        status: 'succes',
+        message: 'password changed succesfully',
+        userInfo: userDb
+      })
+
+    } catch (error) {
+      console.log(error)
+      return response.status(500).json({
+        status: 'error',
+        message: 'Erreur in users getUserInfoByEmail',
+      })
+    }
+  }
+
+  async updateUser({ request, response }: HttpContext) {
+    console.log('updateUser')
+    try {
+      const emailUser = request.user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+
+      // Vérifier si la table 'users' est vide
+      if (await isUserTableEmpty()) {
+        console.log('User table empty')
+        return response.status(400).json({
+          status: 'error',
+          message: 'No users table found/users table empty',
+        })
+      }
+      // Extraire les données de la requête
+      const { email, name, lastName, telephone } = data;
+
+      // Vous pouvez ajouter des validations ici si nécessaire
+      if (!email || !name || !lastName || !telephone) {
+        return response.status(400).json({ error: 'Tous les champs sont requis.' });
+      }
+
+      // Trouver l'utilisateur dans la base de données par email
+      const userDb = await findUserByEmail(emailUser);
+      if (!userDb) {
+        return response.status(404).json({ error: 'Utilisateur non trouvé.' });
+      }
+
+      await db.from('users')
+      .where('id_user', userDb.id_user)
+      .update({ 
+        email: email,
+        name: name,
+        last_name: lastName,
+        telephone: telephone
+       });
+
+      // Générer un nouveau token JWT avec le nouvel email
+      const newToken = jwt.sign(
+        { id: userDb.id_user, email: email, role: userDb.role },
+        process.env.APP_KEY || 'default_secret_key',
+        {
+          expiresIn: '1h',
+        }
+      )
+      const updatedUser = await findUserByEmail(email); // Utiliser le nouvel email pour récupérer les données mises à jour
+
+      return response.status(200).json({
+          status: 'success',
+          message: 'Informations utilisateur mises à jour avec succès.',
+          userInfo: updatedUser,
+          token: newToken
+      });
+
+    } catch (error) {
+      console.log(error)
+      return response.status(500).json({
+        status: 'error',
+        message: 'Erreur in users updateUser',
       })
     }
   }

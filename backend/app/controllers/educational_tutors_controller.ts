@@ -339,32 +339,21 @@ export default class EducationalTutorsController {
 
   public async getApprenticesByTutorEmail({ request, response }: HttpContext) {
     try {
-      const { data } = request.only(['data'])
-      if (!data) {
-        return response.status(400).json({ error: 'Data is required' })
-      }
-      const { email } = data
-
       const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
       // Vérifier si l'admin existe et si le token est valide
-      if (!(await isValidRole(emailUser, 'admins'))) {
+      if (!(await isValidRole(emailUser, 'educational_tutors'))) {
         return response.status(400).json({
           status: 'error',
           message: 'Invalid role',
         })
       }
-
-      if (!email) {
-        return response.status(400).json({ error: 'Email is required' })
-      }
-
       // Trouver le tuteur pédagogique par son email
       const tutor = await db
         .from('users')
-        .where('email', email)
+        .where('email', emailUser)
         .where('role', 'educational_tutors')
         .first()
 

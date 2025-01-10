@@ -77,8 +77,8 @@ export const SIDEBAR_ADMIN_ITEMS = [
     icon: 'UsersRound',
   },
   {
-    label: 'test',
-    href: '/test',
+    label: 'Gestion des utilisateurs',
+    href: '/gestionUsers',
     icon: 'UsersRound',
   },
 ]

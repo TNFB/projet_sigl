@@ -217,7 +217,6 @@ export default class UsersController {
           message: 'Email not found in User',
         })
       }
-      console.log('User found', userDb)
       const isPasswordValid = await bcrypt.compare(password, userDb.password)
       if (isPasswordValid) {
         //TODO

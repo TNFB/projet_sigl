@@ -172,16 +172,6 @@ export async function findOrCreateApprenticeMaster(
   return apprenticeMaster as UserResult;
 }
 
-interface TrainingDiary {
-  id_training_diary: number;
-  semester_grades: string;
-  document_list: string;
-  evaluation: number;
-  list_interview: string;
-  list_report: string;
-  list_presentation: string;
-}
-
 export async function createApprenticeWithTrainingDiary(
   apprenticeUserId: number,
   educationalTutorId: number,
@@ -198,7 +188,7 @@ export async function createApprenticeWithTrainingDiary(
 
     if (!existingApprentice) {
       // Créer un nouveau training diary
-      const [trainingDiary] = await db
+      const [insertedId] = await db
         .table('training_diaries')
         .insert({
           semester_grades: JSON.stringify({}),
@@ -209,7 +199,7 @@ export async function createApprenticeWithTrainingDiary(
           list_presentation: JSON.stringify([]),
           created_at: new Date()
         })
-        .returning('*') as TrainingDiary[];
+        .returning('id_training_diary');
 
       // Créer l'entrée dans la table apprentices
       await db.table('apprentices').insert({
@@ -217,7 +207,7 @@ export async function createApprenticeWithTrainingDiary(
         id_educational_tutor: educationalTutorId,
         id_apprentice_master: apprenticeMasterId,
         id_cursus: cursusId,
-        id_training_diary: trainingDiary.id_training_diary,
+        id_training_diary: insertedId,
         id_company: companyId,
         list_missions: JSON.stringify([])
       });
@@ -249,13 +239,13 @@ export async function getOrCreateCompanyIdByName(companyName: string): Promise<n
 
     // Si l'entreprise n'existe pas, la créer
     if (!company) {
-      const [newCompany] = await db
+      const [insertedId] = await db
         .table('companies')
         .insert({ name: companyName })
-        .returning('*') as Company[];
+        .returning('id_company');
       
-      console.log(`New company created: ${newCompany.name} with ID: ${newCompany.id_company}`);
-      return newCompany.id_company;
+      console.log(`New company created: ${companyName} with ID: ${insertedId}`);
+      return insertedId;
     }
 
     return company.id_company;
@@ -281,13 +271,13 @@ export async function findOrCreateCursus(cursusName: string): Promise<number> {
 
     // Si le cursus n'existe pas, le créer
     if (!cursus) {
-      const [newCursus] = await db
+      const [insertedId] = await db
         .table('cursus')
         .insert({ promotion_name: cursusName })
-        .returning('*') as Cursus[];
+        .returning('id_cursus');
 
-      console.log(`New cursus created: ${newCursus.promotion_name} with ID: ${newCursus.id_cursus}`);
-      return newCursus.id_cursus;
+      console.log(`New cursus created: ${cursusName} with ID: ${insertedId}`);
+      return insertedId;
     }
 
     return cursus.id_cursus;

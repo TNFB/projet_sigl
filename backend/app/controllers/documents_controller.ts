@@ -203,7 +203,7 @@ export default class DocumentsController {
           // Créer un nouvel user => apprenti
           const role = 'apprentices'
           const password = await generatePassword()
-          console.log(`User Email : ${email_apprentice} & password: ${password}`)
+          console.log(`Apprentice Email : ${email_apprentice} & password: ${password}`)
           const [newUserId] = await db
             .table('users')
             .insert({

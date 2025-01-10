@@ -359,10 +359,11 @@ export default class ApprenticeMastersController {
         .from('apprentices')
         .join('users', 'apprentices.id', 'users.id_user')
         .where('apprentices.id_apprentice_master', master.id_user)
-        .select('users.email', 'users.name', 'users.last_name')
+        .select('users.id_user', 'users.email', 'users.name', 'users.last_name')
 
       // Formater les données des apprentis
       const formattedApprentices = apprentices.map((apprentice: any) => ({
+        id_user: apprentice.id_user,
         email: apprentice.email,
         nom: apprentice.name,
         prenom: apprentice.last_name,

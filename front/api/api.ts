@@ -32,8 +32,7 @@ export const postRequest = async (url: string, body?: string) => {
   if (!response.ok) {
     throw new Error(`Failed to post to ${url}`)
   }
-
-  return response.json()
+  return await response.json();
 }
 
 export const postRequestDropDocument = async (

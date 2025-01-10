@@ -26,6 +26,7 @@ const MonthluNotesController = () => import('../app/controllers/monthly_notes_co
 const ApprenticeshipCoordinatorsController = () =>
   import('../app/controllers/apprenticeship_coordinators_controller.js')
 const EventsController = () => import('../app/controllers/events_controller.js')
+const ApprenticesController = () => import('../app/controllers/apprentices_controller.js')
 
 // Définir les routes
 
@@ -163,3 +164,5 @@ Route.group(() => {
     'deleteEvent'
   )
 }).prefix('events')
+
+Route.post('getInfoApprentice', [ApprenticesController, 'getInfoApprentice']).as('getInfoApprentice').prefix('apprentice')

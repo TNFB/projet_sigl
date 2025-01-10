@@ -40,33 +40,36 @@ const Profile = () => {
   }, [])
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const { name, value } = e.target
-  setFormData({
-    ...formData,
-    [name]: value,
-  })
+    const { name, value } = e.target
+    setFormData({
+      ...formData,
+      [name]: value,
+    })
 
-  if (name === 'email' && value !== userInfo.email) {
-    try {
-      const response = await postRequest('user/checkEmailExists', JSON.stringify({ 
-        data: { email: value }
-      }))
-      
-      if (response.status === 'success') {
-        if (response.exists) {
-          setEmailError('Cet email est déjà associé à un compte.')
+    if (name === 'email' && value !== userInfo.email) {
+      try {
+        const response = await postRequest(
+          'user/checkEmailExists',
+          JSON.stringify({
+            data: { email: value },
+          }),
+        )
+
+        if (response.status === 'success') {
+          if (response.exists) {
+            setEmailError('Cet email est déjà associé à un compte.')
+          } else {
+            setEmailError(null)
+          }
         } else {
-          setEmailError(null)
+          setEmailError("Erreur lors de la vérification de l'email.")
         }
-      } else {
+      } catch (err) {
+        console.error(err)
         setEmailError("Erreur lors de la vérification de l'email.")
       }
-    } catch (err) {
-      console.error(err)
-      setEmailError("Erreur lors de la vérification de l'email.")
     }
   }
-}
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing)
@@ -102,17 +105,17 @@ const Profile = () => {
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setPasswordData(prev => ({
+    setPasswordData((prev) => ({
       ...prev,
       [name]: value,
     }))
-    
+
     if (name === 'confirmPassword' || name === 'newPassword') {
       if (
         (name === 'confirmPassword' && value !== passwordData.newPassword) ||
         (name === 'newPassword' && value !== passwordData.confirmPassword)
       ) {
-        setPasswordError("Les nouveaux mots de passe ne correspondent pas.")
+        setPasswordError('Les nouveaux mots de passe ne correspondent pas.')
       } else {
         setPasswordError(null)
       }
@@ -124,28 +127,37 @@ const Profile = () => {
     setPasswordError(null)
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordError("Les nouveaux mots de passe ne correspondent pas.")
+      setPasswordError('Les nouveaux mots de passe ne correspondent pas.')
       return
     }
 
     try {
-      const response = await postRequest('user/changePassword', JSON.stringify({
-        data: {
-          oldPassword: passwordData.oldPassword,
-          newPassword: passwordData.newPassword,
-        }
-      }))
+      const response = await postRequest(
+        'user/changePassword',
+        JSON.stringify({
+          data: {
+            oldPassword: passwordData.oldPassword,
+            newPassword: passwordData.newPassword,
+          },
+        }),
+      )
 
       if (response.status === 'success') {
         setIsChangingPassword(false)
-        setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' })
+        setPasswordData({
+          oldPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        })
         // Afficher un message de succès si nécessaire
       } else {
-        setPasswordError(response.message || "Erreur lors du changement de mot de passe.")
+        setPasswordError(
+          response.message || 'Erreur lors du changement de mot de passe.',
+        )
       }
     } catch (err) {
       console.error(err)
-      setPasswordError("Erreur lors du changement de mot de passe.")
+      setPasswordError('Erreur lors du changement de mot de passe.')
     }
   }
 
@@ -164,7 +176,7 @@ const Profile = () => {
                 onChange={handleChange}
                 className='border p-2 rounded mb-2'
               />
-              {emailError && <p className="text-red-500">{emailError}</p>}
+              {emailError && <p className='text-red-500'>{emailError}</p>}
             </div>
             <div>
               <label>Nom :</label>
@@ -238,72 +250,87 @@ const Profile = () => {
             )}
           </div>
         )}
-        <div className="mt-8">
-          <h2 className="text-xl font-bold mb-4">Changer le mot de passe</h2>
+        <div className='mt-8'>
+          <h2 className='text-xl font-bold mb-4'>Changer le mot de passe</h2>
           {isChangingPassword ? (
-            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+            <form onSubmit={handlePasswordSubmit} className='space-y-4'>
               <div>
-                <label htmlFor="oldPassword" className="block mb-1">Ancien mot de passe:</label>
+                <label htmlFor='oldPassword' className='block mb-1'>
+                  Ancien mot de passe:
+                </label>
                 <input
-                  type="password"
-                  id="oldPassword"
-                  name="oldPassword"
+                  type='password'
+                  id='oldPassword'
+                  name='oldPassword'
                   value={passwordData.oldPassword}
                   onChange={handlePasswordChange}
-                  className="border p-2 rounded w-full"
+                  className='border p-2 rounded w-full'
                   required
                 />
               </div>
               <div>
-                <label htmlFor="newPassword" className="block mb-1">Nouveau mot de passe:</label>
+                <label htmlFor='newPassword' className='block mb-1'>
+                  Nouveau mot de passe:
+                </label>
                 <input
-                  type="password"
-                  id="newPassword"
-                  name="newPassword"
+                  type='password'
+                  id='newPassword'
+                  name='newPassword'
                   value={passwordData.newPassword}
                   onChange={handlePasswordChange}
-                  className="border p-2 rounded w-full"
+                  className='border p-2 rounded w-full'
                   required
                 />
               </div>
               <div>
-                <label htmlFor="confirmPassword" className="block mb-1">Confirmer le nouveau mot de passe:</label>
+                <label htmlFor='confirmPassword' className='block mb-1'>
+                  Confirmer le nouveau mot de passe:
+                </label>
                 <input
-                  type="password"
-                  id="confirmPassword"
-                  name="confirmPassword"
+                  type='password'
+                  id='confirmPassword'
+                  name='confirmPassword'
                   value={passwordData.confirmPassword}
                   onChange={handlePasswordChange}
-                  className="border p-2 rounded w-full"
+                  className='border p-2 rounded w-full'
                   required
                 />
               </div>
-              {passwordError && <p className="text-red-500">{passwordError}</p>}
-              <div className="flex space-x-2">
-                <button 
-                  type="submit" 
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                  disabled={!!passwordError || !passwordData.oldPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+              {passwordError && <p className='text-red-500'>{passwordError}</p>}
+              <div className='flex space-x-2'>
+                <button
+                  type='submit'
+                  className='bg-blue-500 text-white px-4 py-2 rounded'
+                  disabled={
+                    !!passwordError ||
+                    !passwordData.oldPassword ||
+                    !passwordData.newPassword ||
+                    !passwordData.confirmPassword
+                  }
                 >
                   Changer le mot de passe
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type='button'
                   onClick={() => {
                     setIsChangingPassword(false)
-                    setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' })
+                    setPasswordData({
+                      oldPassword: '',
+                      newPassword: '',
+                      confirmPassword: '',
+                    })
                     setPasswordError(null)
-                  }} 
-                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  }}
+                  className='bg-gray-500 text-white px-4 py-2 rounded'
                 >
                   Annuler
                 </button>
               </div>
             </form>
           ) : (
-            <button 
-              onClick={() => setIsChangingPassword(true)} 
-              className="bg-green-500 text-white px-4 py-2 rounded"
+            <button
+              onClick={() => setIsChangingPassword(true)}
+              className='bg-green-500 text-white px-4 py-2 rounded'
             >
               Modifier le mot de passe
             </button>

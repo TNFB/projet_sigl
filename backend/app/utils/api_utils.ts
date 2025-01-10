@@ -2,7 +2,6 @@ import User from '#models/user'
 import db from '@adonisjs/lucid/services/db'
 import bcrypt from 'bcrypt'
 
-// Définissez une interface pour le résultat
 interface UserResult {
   id_user: number
   email: string

@@ -6,7 +6,7 @@ export default class MonthlyNotesController {
   // Fonction pour récupérer toutes les notes
   public async getAllNotes({ request, response }: HttpContext) {
     try {
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
           return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -41,7 +41,7 @@ export default class MonthlyNotesController {
       const { id_training_diary, title, content } = data;
 
       // Récupérer l'email de l'utilisateur
-      const emailUser = request.user?.email;
+      const emailUser = (request as any).user?.email;
       if (!emailUser) {
           return response.status(401).json({ error: 'Unauthorized' });
       }

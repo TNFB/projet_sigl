@@ -43,7 +43,7 @@ export default class CompaniesController {
       }
       const { companiesData } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -126,7 +126,7 @@ export default class CompaniesController {
    */
   public async getAllCompanyNames({ request, response }: HttpContext) {
     try {
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -147,7 +147,7 @@ export default class CompaniesController {
       }
 
       // Extraire uniquement les noms
-      const companyNames = companies.map((company) => company.name)
+      const companyNames = companies.map((company: any) => company.name)
 
       return response.status(200).json({
         companyNames: companyNames,

@@ -3,6 +3,7 @@ import { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
 import { findUserByEmail, isUserTableEmpty, isValidRole } from '../utils/api_utils.js'
 import jwt from 'jsonwebtoken'
+import User from '#models/user'
 
 /**
  * @class UsersController
@@ -37,7 +38,7 @@ export default class UsersController {
       const role = data.role
       const detailed = data.detailed
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -82,7 +83,7 @@ export default class UsersController {
           users: users,
         })
       } else {
-        const emails = users.map((user) => user.email)
+        const emails = users.map((user: User) => user.email)
         return response.status(200).json({
           status: 'success',
           emails: emails,
@@ -121,7 +122,7 @@ export default class UsersController {
       }
       const { email, password, name, last_name, telephone, role } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -219,9 +220,6 @@ export default class UsersController {
       }
       const isPasswordValid = await bcrypt.compare(password, userDb.password)
       if (isPasswordValid) {
-        //TODO
-        // Gerer Token => Inserte Token In BDD if user can connect
-        // Maybe add 1-2sec delay if password Wrong
         const token = jwt.sign(
           { id: userDb.id_user, email: userDb.email, role: userDb.role },
           process.env.APP_KEY || 'default_secret_key',
@@ -248,71 +246,113 @@ export default class UsersController {
     }
   }
 
-  /**
-   * @brief Déconnecte l'utilisateur en supprimant le cookie d'accès.
-   *
-   * Cette méthode efface le cookie d'accès pour déconnecter l'utilisateur et renvoie une réponse indiquant que
-   * la déconnexion a été effectuée avec succès.
-   *
-   * @param {HttpContext} context - Le contexte HTTP contenant la réponse.
-   * @param {Object} context.response - L'objet de réponse HTTP utilisé pour renvoyer des réponses au client.
-   *
-   * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le statut et un message indiquant que 
-                               la déconnexion a réussi.
-   */
-  async logoutUser({ request, response }: HttpContext) {
-    const { data } = request.only(['data'])
-    if (!data) {
-      return response.status(400).json({ error: 'Data is required' })
-    }
-    const { token } = data
-
-    const users = await db.from('users').select('token')
-
-    for (const user of users) {
-      const isTokenMatch = await bcrypt.compare(token, user.token)
-      if (isTokenMatch) {
-        await db.from('users').where('id_user', user.id_user).update({
-          token: null, // Optionnel : réinitialiser le token après utilisation
-          expired_date: null, // Optionnel : réinitialiser la date d'expiration
-        })
-        return response.status(200).json({
-          status: 'success',
-          message: 'Logout succesfull',
-        })
-      }
-    }
-    return response.status(400).json({
-      status: 'faill',
-      message: 'Faill to Logout',
-    })
-  }
-
-  /**
-   * @brief Change le mot de passe d'un utilisateur existant.
-   *
-   * Cette méthode vérifie l'existence de l'utilisateur dans la base de données en fonction de son email,
-   * puis met à jour son mot de passe si les conditions sont remplies.
-   *
-   * @param {HttpContext} context - Le contexte HTTP contenant la requête et la réponse.
-   * @param {Object} context.request - L'objet de requête HTTP contenant les informations pour changer le mot de passe.
-   * @param {Object} context.response - L'objet de réponse HTTP utilisé pour renvoyer des réponses au client.
-   *
-   * @throws {NotFound} Si la table des utilisateurs est vide ou si aucun utilisateur n'est trouvé avec l'email fourni.
-   * @throws {UnprocessableEntity} Si le nouveau mot de passe est identique à l'ancien.
-   * @throws {Unauthorized} Si l'ancien mot de passe fourni est incorrect.
-   * @throws {InternalServerError} En cas d'erreur lors du traitement du changement du mot de passe.
-   *
-   * @return {Promise<Object>} Une promesse qui résout un objet JSON contenant le statut et un message
-   *                           indiquant le résultat de l'opération (succès ou type d'erreur).
-   */
   async changePassword({ request, response }: HttpContext) {
     try {
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+  
       const { data } = request.only(['data'])
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, oldPassword, newPassword } = data
+  
+      const { oldPassword, newPassword } = data
+      if (!oldPassword || !newPassword) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Old password and new password are required',
+        })
+      }
+  
+      // Récupérer l'utilisateur
+      const user = await db.from('users').where('email', emailUser).first()
+      if (!user) {
+        return response.status(404).json({
+          status: 'error',
+          message: 'User not found',
+        })
+      }
+
+      // Vérifier l'ancien mot de passe
+      const isPasswordValid = await bcrypt.compare(oldPassword, user.password)
+      if (!isPasswordValid) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Ancien mot de passe incorrect',
+        })
+      }
+
+      // Vérifier que le nouveau mot de passe est différent de l'ancien
+      const isNewPasswordSameAsOld = await bcrypt.compare(newPassword, user.password)
+      if (isNewPasswordSameAsOld) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Le nouveau mot de passe doit être différent de lancien',
+        })
+      }
+  
+      // Hasher le nouveau mot de passe
+      const hashedPassword = await bcrypt.hash(newPassword, 10)
+  
+      // Mettre à jour le mot de passe
+      await db.from('users').where('email', emailUser).update({ password: hashedPassword })
+  
+      return response.status(200).json({
+        status: 'success',
+        message: 'Mot de passe changé avec succès',
+      })
+    } catch (error) {
+      console.log(error)
+      return response.status(500).json({
+        status: 'error',
+        message: 'Erreur in users changePassword',
+      })
+    }
+  }
+  
+
+  async getUserInfoByEmail({ request, response }: HttpContext) {
+    console.log('getUserInfoByEmail')
+    try {
+      const emailUser = (request as any).user.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+
+      const userDb = await findUserByEmail(emailUser)
+
+      if (!userDb) {
+        return response.status(404).json({ error: 'Utilisateur non trouvé.' });
+      }
+
+      return response.status(200).json({
+        status: 'succes',
+        message: 'password changed succesfully',
+        userInfo: userDb
+      })
+
+    } catch (error) {
+      console.log(error)
+      return response.status(500).json({
+        status: 'error',
+        message: 'Erreur in users getUserInfoByEmail',
+      })
+    }
+  }
+
+  async updateUser({ request, response }: HttpContext) {
+    console.log('updateUser')
+    try {
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
 
       // Vérifier si la table 'users' est vide
       if (await isUserTableEmpty()) {
@@ -322,40 +362,89 @@ export default class UsersController {
           message: 'No users table found/users table empty',
         })
       }
+      // Extraire les données de la requête
+      const { email, name, lastName, telephone } = data;
 
-      // Found User by Email
-      const userDb = await findUserByEmail(email)
+      // Vous pouvez ajouter des validations ici si nécessaire
+      if (!email || !name || !lastName || !telephone) {
+        return response.status(400).json({ error: 'Tous les champs sont requis.' });
+      }
+
+      // Trouver l'utilisateur dans la base de données par email
+      const userDb = await findUserByEmail(emailUser);
       if (!userDb) {
-        return response.status(401).json({
-          status: 'error',
-          message: 'Email not found in User',
-        })
+        return response.status(404).json({ error: 'Utilisateur non trouvé.' });
       }
 
-      const bddPassword = userDb.password
-      if (await bcrypt.compare(newPassword, bddPassword)) {
-        return response.status(422).json({
-          status: 'error',
-          Message: 'The new password is the same the old one',
-        })
-      } else if (!(await bcrypt.compare(oldPassword, bddPassword))) {
-        //Old Password not the same as the one in BDD
-        return response.status(401).json({
-          status: 'Unauthorized',
-          messsage: 'Identification with password is wrong',
-        })
-      } else {
-        await db.from('users').where('email', email).update({ password: newPassword })
-        return response.status(200).json({
-          status: 'succes',
-          message: 'password changed succesfully',
-        })
-      }
+      await db.from('users')
+      .where('id_user', userDb.id_user)
+      .update({ 
+        email: email,
+        name: name,
+        last_name: lastName,
+        telephone: telephone
+       });
+
+      // Générer un nouveau token JWT avec le nouvel email
+      const newToken = jwt.sign(
+        { id: userDb.id_user, email: email, role: userDb.role },
+        process.env.APP_KEY || 'default_secret_key',
+        {
+          expiresIn: '1h',
+        }
+      )
+      const updatedUser = await findUserByEmail(email); // Utiliser le nouvel email pour récupérer les données mises à jour
+
+      return response.status(200).json({
+          status: 'success',
+          message: 'Informations utilisateur mises à jour avec succès.',
+          userInfo: updatedUser,
+          token: newToken
+      });
+
     } catch (error) {
       console.log(error)
       return response.status(500).json({
         status: 'error',
-        message: 'Erreur in users changePassword',
+        message: 'Erreur in users updateUser',
+      })
+    }
+  }
+
+  async checkEmailExists({ request, response }: HttpContext) {
+    try {
+      // Récupérer l'email depuis la requête
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+  
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+
+      const { email } = data
+      if (!email) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Email is required',
+        })
+      }
+  
+      // Vérifier si l'email existe dans la base de données
+      const user = await db.from('users').where('email', email).first()
+  
+      // Renvoyer la réponse
+      return response.status(200).json({
+        status: 'success',
+        exists: !!user,
+      })
+    } catch (error) {
+      console.log(error)
+      return response.status(500).json({
+        status: 'error',
+        message: 'Erreur in users checkEmailExists',
       })
     }
   }

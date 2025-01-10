@@ -19,6 +19,7 @@ export const postRequest = async (url: string, body?: string) => {
   const token = localStorage.getItem('token')
   console.log('token:', token)
   console.log('body:', body)
+  console.log(`URL: ${url}`)
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {
     method: 'POST',
     headers: {

@@ -57,7 +57,7 @@ export default class EducationalTutorsController {
       }
       const { tutorId, apprenticeIds } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -82,7 +82,7 @@ export default class EducationalTutorsController {
       const newApprentices = [...new Set([...currentApprentices, ...apprenticeIds])]
 
       // Start Transaction
-      await db.transaction(async (trx) => {
+      await db.transaction(async (trx: any) => {
         // Update educational_tutors
         await trx
           .from('educational_tutors')
@@ -127,7 +127,7 @@ export default class EducationalTutorsController {
       }
       const { email } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -151,7 +151,7 @@ export default class EducationalTutorsController {
       }
 
       // Commencer une transaction
-      await db.transaction(async (trx) => {
+      await db.transaction(async (trx: any) => {
         // Mettre à jour le rôle de l'utilisateur
         await trx.from('users').where('id_user', user.id_user).update({ role: 'educational_tutor' })
 
@@ -192,7 +192,7 @@ export default class EducationalTutorsController {
       }
       const { email } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -251,7 +251,7 @@ export default class EducationalTutorsController {
       }
       const { peopleData } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -345,7 +345,7 @@ export default class EducationalTutorsController {
       }
       const { email } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -380,7 +380,7 @@ export default class EducationalTutorsController {
         .select('users.email', 'users.name', 'users.last_name')
 
       // Formater les données des apprentis
-      const formattedApprentices = apprentices.map((apprentice) => ({
+      const formattedApprentices = apprentices.map((apprentice: any) => ({
         email: apprentice.email,
         nom: apprentice.name,
         prenom: apprentice.last_name,

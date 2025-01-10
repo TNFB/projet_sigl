@@ -37,6 +37,9 @@ Route.group(() => {
   )
   Route.post('/createUser', [UserController, 'createUser']).as('createUser')
   Route.post('/changePassword', [UserController, 'changePassword']).as('changePassword')
+  Route.post('/getUserInfoByEmail', [UserController, 'getUserInfoByEmail']).as('getUserInfoByEmail')
+  Route.post('/updateUser', [UserController, 'updateUser']).as('updateUser')
+  Route.post('/checkEmailExists', [UserController, 'checkEmailExists']).as('checkEmailExists')
 }).prefix('/user')
 
 Route.group(() => {
@@ -95,7 +98,6 @@ Route.group(() => {
   ]).as('addMissionToApprentice')
 }).prefix('/CompanyRepresentatives')
 
-Route.post('logout', [UserController, 'logoutUser']).as('logoutUser')
 
 Route.group(() => {
   Route.post('dropDocument', [DocumentsController, 'dropDocument']).as('dropDocument')

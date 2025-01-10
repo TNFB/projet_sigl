@@ -39,6 +39,7 @@ Route.group(() => {
   Route.post('/changePassword', [UserController, 'changePassword']).as('changePassword')
   Route.post('/getUserInfoByEmail', [UserController, 'getUserInfoByEmail']).as('getUserInfoByEmail')
   Route.post('/updateUser', [UserController, 'updateUser']).as('updateUser')
+  Route.post('/checkEmailExists', [UserController, 'checkEmailExists']).as('checkEmailExists')
 }).prefix('/user')
 
 Route.group(() => {

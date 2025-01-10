@@ -246,73 +246,63 @@ export default class UsersController {
     }
   }
 
-  /**
-   * @brief Change le mot de passe d'un utilisateur existant.
-   *
-   * Cette méthode vérifie l'existence de l'utilisateur dans la base de données en fonction de son email,
-   * puis met à jour son mot de passe si les conditions sont remplies.
-   *
-   * @param {HttpContext} context - Le contexte HTTP contenant la requête et la réponse.
-   * @param {Object} context.request - L'objet de requête HTTP contenant les informations pour changer le mot de passe.
-   * @param {Object} context.response - L'objet de réponse HTTP utilisé pour renvoyer des réponses au client.
-   *
-   * @throws {NotFound} Si la table des utilisateurs est vide ou si aucun utilisateur n'est trouvé avec l'email fourni.
-   * @throws {UnprocessableEntity} Si le nouveau mot de passe est identique à l'ancien.
-   * @throws {Unauthorized} Si l'ancien mot de passe fourni est incorrect.
-   * @throws {InternalServerError} En cas d'erreur lors du traitement du changement du mot de passe.
-   *
-   * @return {Promise<Object>} Une promesse qui résout un objet JSON contenant le statut et un message
-   *                           indiquant le résultat de l'opération (succès ou type d'erreur).
-   */
   async changePassword({ request, response }: HttpContext) {
     try {
-      const { data } = request.only(['data'])
-      if (!data) {
-        return response.status(400).json({ error: 'Data is required' })
-      }
-      const { email, oldPassword, newPassword } = data
-
-      // Vérifier si la table 'users' est vide
-      if (await isUserTableEmpty()) {
-        console.log('User table empty')
-        return response.status(400).json({
-          status: 'error',
-          message: 'No users table found/users table empty',
-        })
-      }
-
-      // Found User by Email
       const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
-      const userDb = await findUserByEmail(emailUser)
-      if (!userDb) {
-        return response.status(401).json({
+  
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+  
+      const { oldPassword, newPassword } = data
+      if (!oldPassword || !newPassword) {
+        return response.status(400).json({
           status: 'error',
-          message: 'Email not found in User',
+          message: 'Old password and new password are required',
+        })
+      }
+  
+      // Récupérer l'utilisateur
+      const user = await db.from('users').where('email', emailUser).first()
+      if (!user) {
+        return response.status(404).json({
+          status: 'error',
+          message: 'User not found',
         })
       }
 
-      const bddPassword = userDb.password
-      if (await bcrypt.compare(newPassword, bddPassword)) {
-        return response.status(422).json({
+      // Vérifier l'ancien mot de passe
+      const isPasswordValid = await bcrypt.compare(oldPassword, user.password)
+      if (!isPasswordValid) {
+        return response.status(400).json({
           status: 'error',
-          Message: 'The new password is the same the old one',
-        })
-      } else if (!(await bcrypt.compare(oldPassword, bddPassword))) {
-        //Old Password not the same as the one in BDD
-        return response.status(401).json({
-          status: 'Unauthorized',
-          messsage: 'Identification with password is wrong',
-        })
-      } else {
-        await db.from('users').where('email', email).update({ password: newPassword })
-        return response.status(200).json({
-          status: 'succes',
-          message: 'password changed succesfully',
+          message: 'Ancien mot de passe incorrect',
         })
       }
+
+      // Vérifier que le nouveau mot de passe est différent de l'ancien
+      const isNewPasswordSameAsOld = await bcrypt.compare(newPassword, user.password)
+      if (isNewPasswordSameAsOld) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Le nouveau mot de passe doit être différent de lancien',
+        })
+      }
+  
+      // Hasher le nouveau mot de passe
+      const hashedPassword = await bcrypt.hash(newPassword, 10)
+  
+      // Mettre à jour le mot de passe
+      await db.from('users').where('email', emailUser).update({ password: hashedPassword })
+  
+      return response.status(200).json({
+        status: 'success',
+        message: 'Mot de passe changé avec succès',
+      })
     } catch (error) {
       console.log(error)
       return response.status(500).json({
@@ -321,6 +311,7 @@ export default class UsersController {
       })
     }
   }
+  
 
   async getUserInfoByEmail({ request, response }: HttpContext) {
     console.log('getUserInfoByEmail')
@@ -331,7 +322,6 @@ export default class UsersController {
       }
 
       const userDb = await findUserByEmail(emailUser)
-      console.log('User found:', userDb); 
 
       if (!userDb) {
         return response.status(404).json({ error: 'Utilisateur non trouvé.' });
@@ -417,6 +407,44 @@ export default class UsersController {
       return response.status(500).json({
         status: 'error',
         message: 'Erreur in users updateUser',
+      })
+    }
+  }
+
+  async checkEmailExists({ request, response }: HttpContext) {
+    try {
+      // Récupérer l'email depuis la requête
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+  
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+
+      const { email } = data
+      if (!email) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Email is required',
+        })
+      }
+  
+      // Vérifier si l'email existe dans la base de données
+      const user = await db.from('users').where('email', email).first()
+  
+      // Renvoyer la réponse
+      return response.status(200).json({
+        status: 'success',
+        exists: !!user,
+      })
+    } catch (error) {
+      console.log(error)
+      return response.status(500).json({
+        status: 'error',
+        message: 'Erreur in users checkEmailExists',
       })
     }
   }

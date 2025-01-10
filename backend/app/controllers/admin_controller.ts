@@ -46,7 +46,7 @@ export default class AdminController {
         })
       }
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -130,7 +130,7 @@ export default class AdminController {
         })
       }
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }

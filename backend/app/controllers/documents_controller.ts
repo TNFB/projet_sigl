@@ -48,7 +48,7 @@ export default class DocumentsController {
       const { documentName } = data
 
       // Found User by Email
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }

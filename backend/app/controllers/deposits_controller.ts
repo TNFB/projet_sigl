@@ -15,7 +15,7 @@ export default class DepositsController {
    */
   public async getAllDeposits({ request, response }: HttpContext) {
     try {
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -47,7 +47,7 @@ export default class DepositsController {
       }
       const { deposit } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -91,7 +91,7 @@ export default class DepositsController {
       }
       const { deposit } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }

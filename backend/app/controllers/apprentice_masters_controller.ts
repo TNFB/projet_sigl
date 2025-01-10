@@ -2,7 +2,6 @@ import db from '@adonisjs/lucid/services/db'
 import bcrypt from 'bcrypt'
 import { findUserByEmail, isValidRole } from '../utils/api_utils.js'
 import { HttpContext } from '@adonisjs/core/http'
-
 export default class ApprenticeMastersController {
   /**
    * @method addApprentices
@@ -46,7 +45,7 @@ export default class ApprenticeMastersController {
       }
       const { masterId, apprenticeIds } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -65,7 +64,7 @@ export default class ApprenticeMastersController {
       }
 
       // Start Transaction
-      await db.transaction(async (trx) => {
+      await db.transaction(async (trx: any) => {
         // Update table apprentices for each apprentice
         for (const apprenticeId of apprenticeIds) {
           await trx
@@ -111,7 +110,7 @@ export default class ApprenticeMastersController {
       }
       const { peopleData } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -240,7 +239,7 @@ export default class ApprenticeMastersController {
       }
       const { email } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -299,7 +298,7 @@ export default class ApprenticeMastersController {
       }
       const { email } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -339,7 +338,7 @@ export default class ApprenticeMastersController {
       }
       const { email } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -374,7 +373,7 @@ export default class ApprenticeMastersController {
         .select('users.email', 'users.name', 'users.last_name')
 
       // Formater les données des apprentis
-      const formattedApprentices = apprentices.map((apprentice) => ({
+      const formattedApprentices = apprentices.map((apprentice: any) => ({
         email: apprentice.email,
         nom: apprentice.name,
         prenom: apprentice.last_name,

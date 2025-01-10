@@ -11,7 +11,7 @@ export default class EventsController {
             }
             const { event_id } = data
 
-            const emailUser = request.user?.email
+            const emailUser = (request as any).user?.email
             if (!emailUser) {
                 return response.status(401).json({ error: 'Unauthorized' })
             }
@@ -49,7 +49,7 @@ export default class EventsController {
             }
             const { start_date, end_date, title, type, color } = data
 
-            const emailUser = request.user?.email
+            const emailUser = (request as any).user?.email
             if (!emailUser) {
                 return response.status(401).json({ error: 'Unauthorized' })
             }

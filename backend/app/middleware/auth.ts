@@ -24,7 +24,7 @@ export default class Auth {
 
     try {
       const decoded = jwt.verify(token, process.env.APP_KEY as string) as { email: string }
-      request.user = decoded
+      (request as any).user = decoded
       await next()
     } catch (error) {
       console.log('Auth middleware: Invalid token', error)

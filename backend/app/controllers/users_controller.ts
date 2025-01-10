@@ -3,6 +3,7 @@ import { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
 import { findUserByEmail, isUserTableEmpty, isValidRole } from '../utils/api_utils.js'
 import jwt from 'jsonwebtoken'
+import User from '#models/user'
 
 /**
  * @class UsersController
@@ -37,7 +38,7 @@ export default class UsersController {
       const role = data.role
       const detailed = data.detailed
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -82,7 +83,7 @@ export default class UsersController {
           users: users,
         })
       } else {
-        const emails = users.map((user) => user.email)
+        const emails = users.map((user: User) => user.email)
         return response.status(200).json({
           status: 'success',
           emails: emails,
@@ -121,7 +122,7 @@ export default class UsersController {
       }
       const { email, password, name, last_name, telephone, role } = data
 
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -281,7 +282,7 @@ export default class UsersController {
       }
 
       // Found User by Email
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -324,7 +325,7 @@ export default class UsersController {
   async getUserInfoByEmail({ request, response }: HttpContext) {
     console.log('getUserInfoByEmail')
     try {
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }
@@ -354,7 +355,7 @@ export default class UsersController {
   async updateUser({ request, response }: HttpContext) {
     console.log('updateUser')
     try {
-      const emailUser = request.user?.email
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
         return response.status(401).json({ error: 'Unauthorized' })
       }

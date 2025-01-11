@@ -171,4 +171,7 @@ Route.group(() => {
   Route.post('addMission', [ApprenticesController, 'addMission']).as('addMission')
   Route.post('updateMission', [ApprenticesController, 'updateMission']).as('updateMission')
   Route.post('deleteMission', [ApprenticesController, 'deleteMission']).as('deleteMission')
+  Route.post('addSkill', [ApprenticesController, 'addSkill']).as('addSkill')
+  Route.post('updateSkill', [ApprenticesController, 'updateSkill']).as('updateSkill')
+  Route.post('deleteSkill', [ApprenticesController, 'deleteSkill']).as('deleteSkill')
 }).prefix('apprentice')

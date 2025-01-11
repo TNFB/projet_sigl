@@ -9,11 +9,18 @@ interface Student {
   nom: string;
   prenom: string;
   list_missions: Mission[];
+  list_skills: Skill[];
 }
 
 interface Mission {
   id: number;
   titre: string;
+  description: string;
+}
+
+interface Skill {
+  id: number;
+  skill: string;
   description: string;
 }
 
@@ -133,6 +140,83 @@ function ConfirmDeleteModal({ isOpen, onClose, onConfirm, missionTitle }: { isOp
   );
 }
 
+function AddEditSkillModal({ isOpen, onClose, onAdd, onUpdate, skill }: { isOpen: boolean; onClose: () => void; onAdd: (skill: Omit<Skill, 'id'>) => void; onUpdate: (skill: Skill) => void; skill: Skill | null }) {
+  const [skillName, setSkillName] = useState(skill ? skill.skill : '');
+  const [description, setDescription] = useState(skill ? skill.description : '');
+
+  useEffect(() => {
+    if (skill) {
+      setSkillName(skill.skill);
+      setDescription(skill.description);
+    }
+  }, [skill]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (skill) {
+      onUpdate({ ...skill, skill: skillName, description }); // Modifier la compétence existante
+    } else {
+      onAdd({ skill: skillName, description }); // Ajouter une nouvelle compétence
+    }
+
+    setSkillName('');
+    setDescription('');
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <h3 className="text-lg font-bold mb-4">{skill ? 'Modifier la compétence' : 'Ajouter une nouvelle compétence'}</h3>
+        
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            value={skillName}
+            onChange={(e) => setSkillName(e.target.value)}
+            placeholder="Nom de la compétence"
+            className="w-full p-2 mb-4 border rounded"
+            required
+          />
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Description de la compétence"
+            className="w-full p-2 mb-4 border rounded"
+            required
+          />
+          <div className="flex justify-end">
+            <button type="button" onClick={onClose} className="px-4 py-2 mr-2 bg-gray-200 rounded">Annuler</button>
+            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">{skill ? 'Modifier' : 'Ajouter'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function ConfirmDeleteSkillModal({ isOpen, onClose, onConfirm, skillTitle }: { isOpen: boolean; onClose: () => void; onConfirm: () => void; skillTitle: string | null }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <h3 className="text-lg font-bold mb-4">Confirmation de suppression</h3>
+        {skillTitle && (
+          <p>Êtes-vous sûr de vouloir supprimer la compétence : "<strong>{skillTitle}</strong>" ?</p>
+        )}
+        <div className="flex justify-end mt-4">
+          <button type="button" onClick={onClose} className="px-4 py-2 mr-2 bg-gray-200 rounded">Annuler</button>
+          <button type="button" onClick={onConfirm} className="px-4 py-2 bg-red-500 text-white rounded">Supprimer</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function StudentInfo() {
   const { id } = useParams();
   const [student, setStudent] = useState<Student | null>(null);
@@ -145,6 +229,11 @@ export default function StudentInfo() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [missionToDeleteId, setMissionToDeleteId] = useState<number | null>(null);
   const [missionToDeleteTitle, setMissionToDeleteTitle] = useState<string | null>(null);
+  const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
+  const [skillToEdit, setSkillToEdit] = useState<Skill | null>(null);
+  const [isDeleteSkillModalOpen, setIsDeleteSkillModalOpen] = useState(false);
+  const [skillToDeleteId, setSkillToDeleteId] = useState<number | null>(null);
+  const [skillToDeleteTitle, setSkillToDeleteTitle] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -156,29 +245,43 @@ export default function StudentInfo() {
           const studentResponse = await postRequest(`apprentice/getInfoApprentice`, JSON.stringify({ data: { id } }));
           if (studentResponse.redirect) {
             window.location.href = '/Login';
-            return
+            return;
           } else {
-            // Vérifiez si list_missions est déjà un tableau
             let parsedMissions = Array.isArray(studentResponse.list_missions) 
               ? studentResponse.list_missions 
-              : []; // Utilisez un tableau vide si ce n'est pas un tableau
-
-            // Si list_missions est une chaîne, essayez de la parser
+              : [];
+  
             if (typeof studentResponse.list_missions === 'string') {
               try {
                 parsedMissions = JSON.parse(studentResponse.list_missions);
               } catch (parseError) {
                 console.error('Error parsing list_missions:', parseError);
-                // Continuez avec un tableau vide si le parsing échoue
                 parsedMissions = [];
               }
             }
-
+  
+            let parsedSkills = Array.isArray(studentResponse.list_skills)
+              ? studentResponse.list_skills
+              : [];
+  
+            if (typeof studentResponse.list_skills === 'string') {
+              try {
+                parsedSkills = JSON.parse(studentResponse.list_skills);
+              } catch (parseError) {
+                console.error('Error parsing list_skills:', parseError);
+                parsedSkills = [];
+              }
+            }
+  
+            console.log('list_missions:', JSON.stringify(parsedMissions, null, 2));
+            console.log('list_skills:', JSON.stringify(parsedSkills, null, 2));
+  
             setStudent({
               email: studentResponse.email,
               nom: studentResponse.name,
               prenom: studentResponse.last_name,
-              list_missions: parsedMissions
+              list_missions: parsedMissions,
+              list_skills: parsedSkills // Assurez-vous d'ajouter les compétences ici
             });
           }
         } catch (err) {
@@ -191,6 +294,7 @@ export default function StudentInfo() {
       fetchData();
     }
   }, [id]);
+  
 
   const addMission = async (newMission: Omit<Mission, 'id'>) => {
     try {
@@ -227,7 +331,7 @@ export default function StudentInfo() {
 
   const handleUpdateMission = async (updatedMission: Mission) => {
     try {
-      await updateMission(updatedMission); // Utilisez votre fonction updateMission ici
+      await updateMission(updatedMission);
       setIsEditModalOpen(false);
     } catch (err) {
       console.error(err);
@@ -260,6 +364,76 @@ export default function StudentInfo() {
       setIsDeleteModalOpen(false);
       setMissionToDeleteId(null);
       setMissionToDeleteTitle(null);
+    }
+  };
+
+  const addSkill = async (newSkill: Omit<Skill, 'id'>) => {
+    try {
+      const response = await postRequest('apprentice/addSkill', JSON.stringify({ data: { id, skill: newSkill } }));
+      if (response.skill) {
+        setStudent(prev => ({
+          ...prev!,
+          list_skills: [...prev!.list_skills, response.skill],
+        }));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
+  const updateSkill = async (skill: Skill) => {
+    try {
+      const response = await postRequest('apprentice/updateSkill', JSON.stringify({ data: { id, skill } }));
+      setStudent(prev => ({
+        ...prev!,
+        list_skills: prev!.list_skills.map(m => m.id === skill.id ? skill : m),
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleEditSkill = (skill: Skill) => {
+    setSkillToEdit(skill);
+    setIsSkillModalOpen(true);
+  };
+  
+  const handleUpdateSkill = async (updatedSkill: Skill) => {
+    try {
+      await updateSkill(updatedSkill);
+      setIsSkillModalOpen(false);
+    } catch (err) {
+      console.error(err);
+      setError("Erreur lors de la mise à jour de la compétance");
+    }
+    
+  };
+  
+  const handleDeleteSkill = (skill: Skill) => {
+    setSkillToDeleteId(skill.id);
+    setSkillToDeleteTitle(skill.skill);
+    setIsDeleteSkillModalOpen(true);
+  };
+
+  const confirmDeleteSkill = async () => {
+    if (skillToDeleteId !== null) {
+      await deleteSkill(skillToDeleteId);
+      setIsDeleteSkillModalOpen(false);
+      setSkillToDeleteId(null);
+      setSkillToDeleteTitle(null);
+    }
+  };
+
+  const deleteSkill = async (skillId: number) => {
+    try {
+      await postRequest('apprentice/deleteSkill', JSON.stringify({ data: { id, skillId } }));
+      setStudent(prev => ({
+        ...prev!,
+        list_skills: prev!.list_skills.filter(m => m.id !== skillId),
+      }));
+    } catch (err) {
+      console.error(err);
+      setError("Erreur lors de la suppression de la mission");
     }
   };
 
@@ -306,7 +480,6 @@ export default function StudentInfo() {
                 ))}
               </tbody>
             </table>
-            
             <button onClick={() => setIsModalOpen(true)} className="px-4 py-2 bg-green-500 text-white rounded">
               Ajouter une mission
             </button>
@@ -328,6 +501,47 @@ export default function StudentInfo() {
               onClose={() => setIsDeleteModalOpen(false)}
               onConfirm={confirmDeleteMission}
               missionTitle={missionToDeleteTitle}
+            />
+            <h2 className="text-xl font-bold mb-2">Compétences</h2>
+            <table className="w-full mb-4">
+              <thead>
+                <tr>
+                  <th>Compétence</th>
+                  <th>Description</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {student?.list_skills?.map(skill => (
+                  <tr key={skill.id}>
+                    <td>{skill.skill}</td>
+                    <td>{skill.description}</td>
+                    <td>
+                    <button onClick={() => handleEditSkill(skill)}>Modifier</button>
+                      <button onClick={() => handleDeleteSkill(skill)} className="text-red-500">Supprimer</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <button onClick={() => { setIsSkillModalOpen(true); setSkillToEdit(null); }} className="px-4 py-2 bg-green-500 text-white rounded">
+              Ajouter une compétence
+            </button>
+            {isSkillModalOpen && (
+              <AddEditSkillModal
+                isOpen={isSkillModalOpen}
+                onClose={() => setIsSkillModalOpen(false)}
+                onAdd={addSkill}
+                onUpdate={handleUpdateSkill}
+                skill={skillToEdit}
+              />
+            )}
+            <ConfirmDeleteSkillModal
+              isOpen={isDeleteSkillModalOpen}
+              onClose={() => setIsDeleteSkillModalOpen(false)}
+              onConfirm={confirmDeleteSkill}
+              skillTitle={skillToDeleteTitle}
             />
           </div>
         )}

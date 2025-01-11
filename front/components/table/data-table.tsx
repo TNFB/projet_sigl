@@ -12,7 +12,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { ChevronDown, Plus, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -31,14 +31,14 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends { promotion?: string }, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   onAdd?: () => void
   onDelete?: (rows: TData[]) => void
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { promotion?: string }, TValue>({
   columns,
   data,
   onAdd,
@@ -48,6 +48,7 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
+  const [promotionOptions, setPromotionOptions] = useState<string[]>([])
 
   const table = useReactTable({
     data,
@@ -68,11 +69,39 @@ export function DataTable<TData, TValue>({
     },
   })
 
+  useEffect(() => {
+    // Vérifiez que les données de la table sont correctement chargées
+    const rows = table.getCoreRowModel().rows
+    console.log('Table rows:', rows)
+
+    if (rows.length > 0) {
+      // Extract unique promotion values from the table data
+      const promotions = Array.from(
+        new Set(
+          rows
+            .map((row) => row.original.promotion)
+            .filter(
+              (promotion): promotion is string =>
+                promotion !== null && promotion !== undefined,
+            ),
+        ),
+      )
+      setPromotionOptions(promotions)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table.getRowModel().rows])
+
   const handleDeleteUsers = () => {
     if (onDelete) {
       onDelete(selectedRows)
     }
     table.resetRowSelection()
+  }
+
+  const handleResetFilters = () => {
+    table.getColumn('email')?.setFilterValue('')
+    table.getColumn('role')?.setFilterValue('')
+    table.getColumn('promotion')?.setFilterValue('')
   }
 
   const selectedRows = table
@@ -82,14 +111,53 @@ export function DataTable<TData, TValue>({
   return (
     <div className='h-full w-full p-4'>
       <div className='flex items-center justify-between mb-4'>
-        <Input
-          placeholder='Filtrer emails...'
-          value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
-            table.getColumn('email')?.setFilterValue(event.target.value)
-          }
-          className='max-w-sm border border-gray-300 text-black placeholder-gray-500 rounded-lg'
-        />
+        <div className='flex items-center gap-2'>
+          <Input
+            placeholder='Filtrer emails...'
+            value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
+            onChange={(event) =>
+              table.getColumn('email')?.setFilterValue(event.target.value)
+            }
+            className='max-w-sm border border-gray-300 text-black placeholder-gray-500 rounded-lg'
+          />
+          <span className='text-black whitespace-nowrap ml-2'>Filtres :</span>
+          <select
+            value={(table.getColumn('role')?.getFilterValue() as string) ?? ''}
+            onChange={(event) =>
+              table.getColumn('role')?.setFilterValue(event.target.value)
+            }
+            className='bg-[#f3f4f6] max-w-sm text-center border h-10 w-80 border-gray-300 text-black rounded-lg focus:outline-none'
+          >
+            <option value=''>Rôles</option>
+            <option value='admins'>Administrateur</option>
+            <option value='apprentice_masters'>
+              Maîtres d&apos;apprentissage
+            </option>
+            <option value='educational_tutors'>Tuteurs pédagogiques</option>
+            <option value='apprentices'>Apprentis</option>
+            <option value='professionals'>Professionnels</option>
+            <option value='teachers'>Professeurs</option>
+          </select>
+          <select
+            value={
+              (table.getColumn('promotion')?.getFilterValue() as string) ?? ''
+            }
+            onChange={(event) =>
+              table.getColumn('promotion')?.setFilterValue(event.target.value)
+            }
+            className='bg-[#f3f4f6] max-w-sm text-center border h-10 w-80 border-gray-300 text-black rounded-lg focus:outline-none'
+          >
+            <option value=''>Promotions</option>
+            {promotionOptions.map((promotion) => (
+              <option key={promotion} value={promotion}>
+                {promotion}
+              </option>
+            ))}
+          </select>
+          <Button onClick={handleResetFilters} className='ml-2'>
+            Réinitialiser les filtres
+          </Button>
+        </div>
         <div className='flex items-center gap-2'>
           {onDelete && selectedRows.length > 0 && (
             <Button variant='destructive' onClick={handleDeleteUsers}>
@@ -98,7 +166,7 @@ export function DataTable<TData, TValue>({
             </Button>
           )}
           {onAdd && (
-            <Button onClick={onAdd}>
+            <Button onClick={onAdd} className='bg-green-500'>
               <Plus className='mr-2 h-4 w-4' /> Ajouter
             </Button>
           )}

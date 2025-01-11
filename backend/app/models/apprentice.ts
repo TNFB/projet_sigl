@@ -21,4 +21,7 @@ export default class Apprentice extends BaseModel {
 
   @column()
   declare list_missions: JSON
+
+  @column()
+  declare list_skills: JSON
 }

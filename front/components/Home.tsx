@@ -20,6 +20,7 @@ interface HomeProps {
 }
 
 interface Student {
+  id_user: number
   prenom: string
   nom: string
   email: string
@@ -36,24 +37,24 @@ const Home = ({ children }: HomeProps) => {
   const [email, setEmail] = useState<string | null>(null)
   const [students, setStudents] = useState<Student[]>([])
 
-  const fetchStudents = React.useCallback(
-    async (url: string) => {
-      try {
-        const data = {
-          email: email,
-        }
+  const fetchStudents = React.useCallback(async (url: string) => {
+    try {
+      const response = await postRequest(url);
+      // Vérifiez si la réponse est un tableau
+      const apprentices = Array.isArray(response) ? response : response.apprentis || [];
 
-        postRequest(url, JSON.stringify({ data: data })).then((response) => {
-          const apprentices = response.apprentis
-          setStudents(apprentices)
-          console.log('Success:', response)
-        })
-      } catch (error) {
-        console.error('Error:', error)
-      }
-    },
-    [email],
-  )
+      const formattedApprentices = apprentices.map((apprentice: any) => ({
+      id_user: apprentice.id_user,
+      email: apprentice.email,
+      nom: apprentice.nom,
+      prenom: apprentice.prenom,
+    }));
+      setStudents(formattedApprentices);
+      console.log('Success:', response);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }, []);
 
   useEffect(() => {
     const userRole = localStorage.getItem('role') as
@@ -84,8 +85,8 @@ const Home = ({ children }: HomeProps) => {
 
   const transformStudentsToSidebarItems = (students: Student[]) => {
     const items = students.map((student) => ({
-      label: `${student.prenom} ${student.nom}`,
-      href: '/',
+      label: `${student.nom} ${student.prenom}`,
+      href: `/student/${student.id_user}`,
       icon: 'UsersRound',
     }))
     return [
@@ -102,8 +103,6 @@ const Home = ({ children }: HomeProps) => {
     switch (userType) {
       case 'admins':
         return SIDEBAR_ADMIN_ITEMS
-      case 'apprenticeship_coordinators':
-        return SIDEBAR_ITEMS
       case 'apprentice_masters':
         return transformStudentsToSidebarItems(students)
       case 'educational_tutors':

@@ -56,14 +56,18 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
           'user/getUserEmailsByRole',
           JSON.stringify({ data: data }),
         )
-        const formattedUsers = response.users.map((user: any) => ({
-          id: user.id_user,
-          name: `${user.name} ${user.last_name}`,
-          email: user.email,
-          role: user.role,
-        }))
-        setUsers(formattedUsers)
-        console.log('get USers Emal by Roles successfull:', response)
+        if (response.redirect) {
+          window.location.href = '/Login';
+        } else {
+          const formattedUsers = response.users.map((user: any) => ({
+            id: user.id_user,
+            name: `${user.name} ${user.last_name}`,
+            email: user.email,
+            role: user.role,
+          }))
+          setUsers(formattedUsers)
+          console.log('get USers Emal by Roles successfull:', response)
+        }
       } catch (error) {
         console.error('Error fetching emails:', error)
       }

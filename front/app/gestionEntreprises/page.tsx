@@ -46,33 +46,18 @@ const GestionEntreprises = () => {
 
       postRequest('company/createCompany', JSON.stringify({ data: data })).then(
         (response) => {
-          console.log('Success:', response)
-          alert('Entreprise(s) ajoutée(s) avec succès')
-          //Here can get return opf response
-          // exemple : const { somthing } = response;
+          if (response.redirect) {
+            window.location.href = '/Login';
+          } else {
+            console.log('Success:', response)
+            alert('Entreprise(s) ajoutée(s) avec succès')
+          }
         },
       )
     } catch (error) {
       console.error('Error:', error)
       alert("Erreur lors de l'ajout de l'entreprise")
     }
-    /*
-    const url = 'company/createCompany';
-    const formattedData = {
-      data: rows.map(row => ({
-        name: row.name,
-      }))
-    };
-    postRequest(url, JSON.stringify(formattedData))
-        .then(response => {
-        console.log('Success:', response);
-        alert('Entreprise(s) ajoutée(s) avec succès');
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Erreur lors de l\'ajout de l\'entreprise');
-      });
-      */
   }
 
   if (isLoading) {

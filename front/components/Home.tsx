@@ -40,17 +40,20 @@ const Home = ({ children }: HomeProps) => {
   const fetchStudents = React.useCallback(async (url: string) => {
     try {
       const response = await postRequest(url);
-      // Vérifiez si la réponse est un tableau
-      const apprentices = Array.isArray(response) ? response : response.apprentis || [];
+      if (response.redirect) {
+        window.location.href = '/Login';
+      } else {
+        const apprentices = Array.isArray(response) ? response : response.apprentis || [];
 
-      const formattedApprentices = apprentices.map((apprentice: any) => ({
-      id_user: apprentice.id_user,
-      email: apprentice.email,
-      nom: apprentice.nom,
-      prenom: apprentice.prenom,
-    }));
-      setStudents(formattedApprentices);
-      console.log('Success:', response);
+        const formattedApprentices = apprentices.map((apprentice: any) => ({
+          id_user: apprentice.id_user,
+          email: apprentice.email,
+          nom: apprentice.nom,
+          prenom: apprentice.prenom,
+        }));
+        setStudents(formattedApprentices);
+        console.log('Success:', response);
+      }
     } catch (error) {
       console.error('Error:', error);
     }

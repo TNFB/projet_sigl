@@ -55,36 +55,17 @@ const GestionMaitresApp = () => {
         'apprenticeMaster/createOrUpdateApprenticeMaster',
         JSON.stringify({ data: data }),
       ).then((response) => {
-        console.log('Success:', response)
-        alert("Maître(s) d'apprentissage ajouté(s) avec succès")
-        //Here can get return opf response
-        // exemple : const { somthing } = response;
+        if (response.redirect) {
+          window.location.href = '/Login';
+        } else {
+          console.log('Success:', response)
+          alert("Maître(s) d'apprentissage ajouté(s) avec succès")
+        }
       })
     } catch (error) {
       console.error('Error:', error)
       alert("Erreur lors de l'ajout du maître d'apprentissage")
     }
-
-    /*
-    const url = 'apprenticeMaster/createOrUpdateApprenticeMaster';
-    const formattedData = {
-      data: rows.map(row => ({
-        name: row.prenom,
-        last_name: row.nom,
-        email: row.email,
-        companyName: row.entreprise
-      }))
-    };
-    postRequest(url, JSON.stringify(formattedData))
-      .then(response => {
-       console.log('Success:', response);
-        alert('Maître(s) d\'apprentissage ajouté(s) avec succès');
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Erreur lors de l\'ajout du maître d\'apprentissage');
-    });
-    */
   }
 
   if (isLoading) {

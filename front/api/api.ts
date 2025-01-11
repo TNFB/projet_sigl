@@ -14,7 +14,6 @@
 
   return response.json();
 };*/
-
 export const postRequest = async (url: string, body?: string) => {
   const token = localStorage.getItem('token')
   console.log('token:', token)
@@ -28,6 +27,12 @@ export const postRequest = async (url: string, body?: string) => {
     },
     body: body,
   })
+
+  if (response.status === 401) {
+    // Token is invalid or expired
+    localStorage.removeItem('token'); // Clear the invalid token
+    return { redirect: true };
+  }
 
   if (!response.ok) {
     throw new Error(`Failed to post to ${url}`)

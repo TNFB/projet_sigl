@@ -50,16 +50,14 @@ const NewLivrable = () => {
 
       postRequest('deposit/addDeposit', JSON.stringify({ data: data })).then(
         (response) => {
-          console.log('deposit created successfully:', response)
-          alert('Livrable ajouté avec succès')
-          //Here can get return opf response
-          // exemple : const { somthing } = response;
+          if (response.redirect) {
+            window.location.href = '/Login';
+          } else {
+            console.log('deposit created successfully:', response)
+            alert('Livrable ajouté avec succès')
+          }
         },
       )
-
-      /*const response = await postRequest('deposit/addDeposit', JSON.stringify(formData));
-      console.log('deposit created successfully:', response);
-      alert('Livrable ajouté avec succès');*/
     } catch (error) {
       console.error('Error create deposit:', error)
       alert("Erreur lors de l'ajout du livrable")

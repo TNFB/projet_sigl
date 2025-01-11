@@ -21,16 +21,20 @@ export default function StudentInfo() {
       const fetchStudentInfo = async () => {
         try {
           const response = await postRequest(`apprentice/getInfoApprentice`, JSON.stringify({ data: { id } }));
-          console.log(`response:`, response); // Affichez la réponse complète
-
-          if (response) {
-            setStudent({
-              email: response.email,
-              nom: response.name,
-              prenom: response.last_name,
-            });
+          if (response.redirect) {
+            window.location.href = '/Login';
           } else {
-            setError("Aucun étudiant trouvé");
+            console.log(`response:`, response); // Affichez la réponse complète
+
+            if (response) {
+              setStudent({
+                email: response.email,
+                nom: response.name,
+                prenom: response.last_name,
+              });
+            } else {
+              setError("Aucun étudiant trouvé");
+            }
           }
         } catch (err) {
           console.error(err);

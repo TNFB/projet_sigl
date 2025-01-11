@@ -22,11 +22,15 @@ const Profile = () => {
     const getUserInfo = async () => {
       try {
         const response = await postRequest('user/getUserInfoByEmail')
-        if (response && response.userInfo) {
-          setUserInfo(response.userInfo)
-          setFormData(response.userInfo)
+        if (response.redirect) {
+          window.location.href = '/Login';
         } else {
-          setError('Aucune information utilisateur trouvée.')
+          if (response && response.userInfo) {
+            setUserInfo(response.userInfo)
+            setFormData(response.userInfo)
+          } else {
+            setError('Aucune information utilisateur trouvée.')
+          }
         }
       } catch (err) {
         console.error(err)
@@ -54,15 +58,18 @@ const Profile = () => {
             data: { email: value },
           }),
         )
-
-        if (response.status === 'success') {
-          if (response.exists) {
-            setEmailError('Cet email est déjà associé à un compte.')
-          } else {
-            setEmailError(null)
-          }
+        if (response.redirect) {
+          window.location.href = '/Login';
         } else {
-          setEmailError("Erreur lors de la vérification de l'email.")
+          if (response.status === 'success') {
+            if (response.exists) {
+              setEmailError('Cet email est déjà associé à un compte.')
+            } else {
+              setEmailError(null)
+            }
+          } else {
+            setEmailError("Erreur lors de la vérification de l'email.")
+          }
         }
       } catch (err) {
         console.error(err)
@@ -84,10 +91,13 @@ const Profile = () => {
         'user/updateUser',
         JSON.stringify({ data: formData }),
       )
-
-      setUserInfo(response.userInfo)
-      localStorage.setItem('token', response.token)
-      setIsEditing(false)
+      if (response.redirect) {
+        window.location.href = '/Login';
+      } else {
+        setUserInfo(response.userInfo)
+        localStorage.setItem('token', response.token)
+        setIsEditing(false)
+      }
     } catch (err) {
       console.error(err)
       setError("Erreur lors de l'enregistrement des modifications.")
@@ -141,19 +151,21 @@ const Profile = () => {
           },
         }),
       )
-
-      if (response.status === 'success') {
-        setIsChangingPassword(false)
-        setPasswordData({
-          oldPassword: '',
-          newPassword: '',
-          confirmPassword: '',
-        })
-        // Afficher un message de succès si nécessaire
+      if (response.redirect) {
+        window.location.href = '/Login';
       } else {
-        setPasswordError(
-          response.message || 'Erreur lors du changement de mot de passe.',
-        )
+        if (response.status === 'success') {
+          setIsChangingPassword(false)
+          setPasswordData({
+            oldPassword: '',
+            newPassword: '',
+            confirmPassword: '',
+          })
+        } else {
+          setPasswordError(
+            response.message || 'Erreur lors du changement de mot de passe.',
+          )
+        }
       }
     } catch (err) {
       console.error(err)

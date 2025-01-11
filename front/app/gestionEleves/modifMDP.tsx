@@ -45,21 +45,18 @@ function ModifMDP() {
           'user/getUserEmailsByRole',
           JSON.stringify({ data: data }),
         ).then((response) => {
-          console.log('get User Email by Roles successfull:', response)
-          //Here can get return opf response
-          // exemple : const { somthing } = response;
+          if (response.redirect) {
+            window.location.href = '/Login';
+          } else {
+            console.log('get User Email by Roles successfull:', response)
+
           const emailOptions = response.emails.map((email: string) => ({
             value: email,
             label: email,
           }))
           setEmails(emailOptions)
+          }
         })
-        //const response = await postRequest('user/getUserEmailsByRole?role');
-        //const emailOptions = response.emails.map((email: string) => ({
-        //  value: email,
-        //  label: email,
-        //}));
-        //setEmails(emailOptions);
       } catch (error) {
         console.error('Error fetching emails:', error)
       }
@@ -100,18 +97,13 @@ function ModifMDP() {
         'admin/overritePassword',
         JSON.stringify({ data: data }),
       ).then((response) => {
-        console.log('OverritePassword successfull:', response)
-        alert('Mot de passe modifié avec succès')
-        //Here can get return opf response
-        // exemple : const { somthing } = response;
+        if (response.redirect) {
+          window.location.href = '/Login';
+        } else {
+          console.log('OverritePassword successfull:', response)
+          alert('Mot de passe modifié avec succès')
+        }
       })
-      /*
-      const hashedPassword = await bcrypt.hash(formData.password, 10);
-      postRequest('admin/overritePassword', JSON.stringify({ email: formData.email, newPassword: hashedPassword }))
-        .then(response => {
-        console.log('Success:', response);
-          alert('Mot de passe modifié avec succès');
-      })*/
     } catch (error) {
       console.error('Error:', error)
       alert('Erreur lors de la modification du mot de passe')

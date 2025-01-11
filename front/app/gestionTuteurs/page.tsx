@@ -53,34 +53,18 @@ const GestionTuteurs = () => {
         'educationalTutor/createOrUpdateEducationalTutor',
         JSON.stringify({ data: data }),
       ).then((response) => {
-        console.log('Success:', response)
-        alert('Tuteur(s) pédagogique(s) ajouté(s) avec succès')
-        //Here can get return opf response
-        // exemple : const { somthing } = response;
+        if (response.redirect) {
+          window.location.href = '/Login';
+        } else {
+          console.log('Success:', response)
+          alert('Tuteur(s) pédagogique(s) ajouté(s) avec succès')
+        }
       })
     } catch (error) {
       console.error('Error:', error)
       alert("Erreur lors de l'ajout du tuteur pédagogique")
     }
-    /*
-    const url = 'educationalTutor/createOrUpdateEducationalTutor';
-    const formattedData = {
-      data: rows.map(row => ({
-        name: row.prenom,
-        last_name: row.nom,
-        email: row.email
-      }))
-    };
-    postRequest(url, JSON.stringify(formattedData))
-      .then(response => {
-       console.log('Success:', response);
-        alert('Tuteur(s) pédagogique(s) ajouté(s) avec succès');
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Erreur lors de l\'ajout du tuteur pédagogique');
-    });
-    */
+
   }
 
   if (isLoading) {

@@ -73,7 +73,7 @@ export default class TrainingDiariesController {
           trainingDiaryId: newTrainingDiaryId,
         })
       } else {
-        return response.status(403).json({
+        return response.notFound({
           message: 'user not found or not authorised',
         })
       }

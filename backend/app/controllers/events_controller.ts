@@ -17,7 +17,7 @@ export default class EventsController {
             }
             const user = await findUserByEmail(emailUser)
             if (!user) {
-                return response.status(401).json({ error: 'Error User Not found' })
+                return response.notFound({ message: 'Error User Not found' })
             }
             let query = db.from('events').where('id_user', user.id_user)
 
@@ -55,7 +55,7 @@ export default class EventsController {
             }
             const user = await findUserByEmail(emailUser)
             if (!user) {
-                return response.status(401).json({ error: 'Error User Not found' })
+                return response.notFound({ message: 'Error User Not found' })
             }
 
             const [newEventId] = await db.table('events').insert({

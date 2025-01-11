@@ -60,7 +60,7 @@ export default class ApprenticeMastersController {
       // master existe ?
       const master = await db.from('apprentice_masters').where('id', masterId).first()
       if (!master) {
-        return response.status(400).json({ message: 'Master not found' })
+        return response.notFound({ message: 'Master not found' })
       }
 
       // Start Transaction
@@ -257,8 +257,7 @@ export default class ApprenticeMastersController {
         const apprentice = await db.from('apprentices').where('id', existingUser.id_user).first()
 
         if (!apprentice || !apprentice.id_training_diary) {
-          return response.status(404).json({
-            status: 'not found',
+          return response.notFound({
             message: 'Training diary not found for this user',
           })
         }
@@ -269,16 +268,14 @@ export default class ApprenticeMastersController {
           .first()
 
         if (!trainingDiary) {
-          return response.status(404).json({
-            status: 'not found',
+          return response.notFound({
             message: 'Training diary not found',
           })
         }
 
         return response.status(200).json({ trainingDiary })
       } else {
-        return response.status(404).json({
-          status: 'not found',
+        return response.notFound({
           message: 'User not found',
         })
       }
@@ -317,8 +314,7 @@ export default class ApprenticeMastersController {
 
         return response.status(200).json({ apprentice })
       } else {
-        return response.status(404).json({
-          status: 'not found',
+        return response.notFound({
           message: 'User not found',
         })
       }
@@ -351,7 +347,7 @@ export default class ApprenticeMastersController {
         .first()
 
       if (!master) {
-        return response.status(404).json({ error: 'Apprentice Masters not found' })
+        return response.notFound({ message: 'Apprentice Masters not found' })
       }
 
       // Trouver les apprentis associés à ce tuteur

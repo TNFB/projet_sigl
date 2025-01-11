@@ -54,8 +54,7 @@ export default class DocumentsController {
       }
       const userDb = await findUserByEmail(emailUser)
       if (!userDb) {
-        return response.status(400).json({
-          status: 'error',
+        return response.notFound({
           message: 'Email not found',
         })
       }

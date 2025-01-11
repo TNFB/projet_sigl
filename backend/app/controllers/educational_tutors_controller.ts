@@ -72,7 +72,7 @@ export default class EducationalTutorsController {
       // master existe ?
       const master = await db.from('educational_tutors').where('id', tutorId).first()
       if (!master) {
-        return response.status(400).json({ message: 'educational tutors not found' })
+        return response.notFound({ message: 'educational tutors not found' })
       }
 
       // get apprentice list (if existe)
@@ -147,7 +147,7 @@ export default class EducationalTutorsController {
       const user = await db.from('users').where('email', email).first()
 
       if (!user) {
-        return response.status(400).json({ message: 'User not found' })
+        return response.notFound({ message: 'User not found' })
       }
 
       // Commencer une transaction
@@ -210,8 +210,7 @@ export default class EducationalTutorsController {
         const apprentice = await db.from('apprentices').where('id', existingUser.id_user).first()
 
         if (!apprentice || !apprentice.id_training_diary) {
-          return response.status(404).json({
-            status: 'not found',
+          return response.notFound({
             message: 'Training diary not found for this user',
           })
         }
@@ -222,16 +221,14 @@ export default class EducationalTutorsController {
           .first()
 
         if (!trainingDiary) {
-          return response.status(404).json({
-            status: 'not found',
+          return response.notFound({
             message: 'Training diary not found',
           })
         }
 
         return response.status(200).json({ trainingDiary })
       } else {
-        return response.status(404).json({
-          status: 'not found',
+        return response.notFound({
           message: 'User not found',
         })
       }
@@ -358,7 +355,7 @@ export default class EducationalTutorsController {
         .first()
 
       if (!tutor) {
-        return response.status(404).json({ error: 'Educational tutor not found' })
+        return response.notFound({ message: 'Educational tutor not found' })
       }
 
       // Trouver les apprentis associés à ce tuteur

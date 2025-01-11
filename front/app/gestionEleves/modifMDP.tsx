@@ -18,6 +18,13 @@ interface SelectField {
   onChange: (value: string) => void
 }
 
+interface ErrorResponse {
+  response?: {
+    status: number
+    message?: string
+  }
+}
+
 function ModifMDP() {
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -118,9 +125,9 @@ function ModifMDP() {
           })
         }, 2000)
       }
-    } catch (error) {
-      console.error('Error:', error)
-      if (error.response && error.response.status === 422) {
+    } catch (error: unknown) {
+      const errorResponse = error as ErrorResponse
+      if (errorResponse.response && errorResponse.response.status === 422) {
         setErrorMessage('Le mot de passe ne peut pas être le même')
       } else {
         setErrorMessage('Erreur lors de la modification du mot de passe')

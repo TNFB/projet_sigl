@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { postRequest } from '@/api/api'
+import { postRequest, postRequestCreateUser } from '@/api/api'
 
 export type User = {
   id: string

@@ -4,13 +4,31 @@
 
 Ce projet contient un frontend et un backend qui doivent être installés sur deux machines virtuelles (VM) différentes en utilisant Docker. Les images Docker sont hébergées sur un dépôt privé sur `ghcr.io` et nécessitent une authentification.
 
-## Prérequis
+- [Projet SIGL](#projet-sigl)
+  - [Installation depuis GHCR.io (GitHub Container Registery)](#installation-depuis-ghcrio-github-container-registery)
+    - [Prérequis](#prérequis)
+    - [Authentification GHCR.io](#authentification-ghcrio)
+    - [Authentification Docker](#authentification-docker)
+    - [Installation du Backend](#installation-du-backend)
+    - [Installation du Frontend](#installation-du-frontend)
+    - [Limitations connues](#limitations-connues)
+  - [Installation de l'environnement de développement (Windows)](#installation-de-lenvironnement-de-développement-windows)
+    - [Prérequis](#prérequis-1)
+    - [Installation de Node.js](#installation-de-nodejs)
+    - [Installation de WAMP](#installation-de-wamp)
+    - [Lancement du backend](#lancement-du-backend)
+    - [Lancement du frontend](#lancement-du-frontend)
+
+
+## Installation depuis GHCR.io (GitHub Container Registery)
+
+### Prérequis
 
 - Deux VM configurées et accessibles (à développer)
 - Docker installé sur les deux VM (à développer)
 - Accès au dépôt privé sur Github
 
-## Authentification GHCR.io
+### Authentification GHCR.io
 
 Pour accéder aux images Docker, vous devez disposer d'un token d'accès personnel (PAT) classique. Vous pouvez en générer un sur GitHub en suivant ces étapes :
 
@@ -26,7 +44,7 @@ Pour accéder aux images Docker, vous devez disposer d'un token d'accès personn
 10. Cliquez sur `Generate token`.
 11. Sauvegardez votre token d'accès personnel. Vous ne pourrez plus le voir après avoir quitté la page.
 
-## Authentification Docker
+### Authentification Docker
 
 Avant de pouvoir tirer les images Docker, vous devez vous authentifier auprès de `ghcr.io` :
 
@@ -36,7 +54,7 @@ echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
 
 Remplacez `CR_PAT` par votre token d'accès personnel et `USERNAME` par votre nom d'utilisateur GitHub (et non pas votre adresse e-mail).
 
-## Installation du Backend
+### Installation du Backend
 
 1. Connectez-vous à la VM dédiée au backend.
 2. Copier le fichier docker/docker-compose-backend.yml sur la VM.
@@ -57,7 +75,7 @@ Remplacez `CR_PAT` par votre token d'accès personnel et `USERNAME` par votre no
     docker compose -f docker-compose-backend.yml up -d
     ```
 
-## Installation du Frontend
+### Installation du Frontend
 
 1. Connectez-vous à la VM dédiée au frontend.
 2. Copier le fichier docker/docker-compose-front.yml sur la VM.
@@ -67,10 +85,18 @@ Remplacez `CR_PAT` par votre token d'accès personnel et `USERNAME` par votre no
     docker compose -f docker-compose-front.yml up -d
     ```
 
-## Limitations connues
+### Limitations connues
 
 - Les images Docker comprennent le site déjà compilé. Si vous souhaitez modifier le nom DNS du backend, vous devrez recompiler le frontend à partir du Dockerfile fourni avec l'argument `ARG_NEXT_PUBLIC_API_URL` défini sur l'URL du backend.
 
-## Support
+## Installation de l'environnement de développement (Windows)
 
-Pour toute question ou problème, veuillez ouvrir une issue sur le dépôt GitHub.
+### Prérequis
+
+### Installation de Node.js
+
+### Installation de WAMP
+
+### Lancement du backend
+
+### Lancement du frontend

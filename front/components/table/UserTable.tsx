@@ -36,6 +36,7 @@ export type User = {
   name: string
   email: string
   role: string
+  promotion?: string
 }
 
 type UserTableProps = {
@@ -44,7 +45,9 @@ type UserTableProps = {
 
 const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
   const [users, setUsers] = useState<User[]>([])
+  const [promotions, setPromotions] = useState<string[]>([])
 
+  // Récupère les utilisateurs à afficher
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -61,6 +64,7 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
           name: `${user.name} ${user.last_name}`,
           email: user.email,
           role: user.role,
+          promotion: user.promotion_name,
         }))
         setUsers(formattedUsers)
         console.log('get USers Emal by Roles successfull:', response)
@@ -72,16 +76,56 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
     fetchUsers()
   }, [typeUser])
 
-  console.log(users)
+  // Récupère les promotions pour le champ ajout d un apprenti
+  useEffect(() => {
+    const fetchPromotions = async () => {
+      //const response = await fetch('/api/promotions')
+      //const data = await response.json()
+      const data = ['Poincarré', 'Einstein', 'Curie', 'Newton']
+      setPromotions(data)
+    }
 
+    fetchPromotions()
+  }, [])
+
+  //Gestion de la popup
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState<Partial<User>>({
     name: '',
     email: '',
     role: 'user',
+    entreprise: '',
+    promotion: '',
   })
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add')
 
+  const openEditDialog = (user: User) => {
+    setCurrentUser(user)
+    setDialogMode('edit')
+    setIsDialogOpen(true)
+  }
+
+  //Gestion des couleurs des rôles
+  const getRoleClass = (role: string) => {
+    switch (role) {
+      case 'admins':
+        return 'bg-red-500 text-white'
+      case 'apprentice_masters':
+        return 'bg-green-500 text-white'
+      case 'educational_tutors':
+        return 'bg-blue-500 text-white'
+      case 'apprentices':
+        return 'bg-yellow-500 text-white'
+      case 'professionals':
+        return 'bg-pink-500 text-white'
+      case 'teachers':
+        return 'bg-teal-500 text-white'
+      default:
+        return ''
+    }
+  }
+
+  //Gestion de l'ajout et de la modification
   const handleSaveUser = () => {
     if (currentUser.name && currentUser.email) {
       if (dialogMode === 'add') {
@@ -108,6 +152,7 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
     }
   }
 
+  //Gestion des Suppressions
   const handleDeleteUsers = (rowsToDelete: User[]) => {
     setUsers(
       users.filter((user) => !rowsToDelete.some((row) => row.id === user.id)),
@@ -118,12 +163,7 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
     setUsers(users.filter((user) => user.id !== userId))
   }
 
-  const openEditDialog = (user: User) => {
-    setCurrentUser(user)
-    setDialogMode('edit')
-    setIsDialogOpen(true)
-  }
-
+  //Gestion des colonnes et actions
   const columns: ColumnDef<User>[] = [
     {
       id: 'select',
@@ -167,17 +207,18 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
       cell: ({ row }) => {
         const role = row.getValue('role')
         return (
-          <Badge
-            className={`${
-              role === 'admin'
-                ? 'bg-green-200 text-gray-600 dark:bg-green-400/20 shadow-none px-4 rounded-full dark:text-white'
-                : 'bg-blue-200 text-gray-600 dark:bg-blue-400/20 shadow-none px-4 rounded-full dark:text-white'
-            }`}
-          >
+          <Badge className={`${getRoleClass(row.original.role)} no-hover`}>
             {role as string}
           </Badge>
         )
       },
+    },
+    {
+      accessorKey: 'promotion',
+      header: 'Promotion',
+      cell: ({ row }) => (
+        <div className='lowercase'>{row.getValue('promotion')}</div>
+      ),
     },
     {
       id: 'actions',
@@ -280,7 +321,13 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
                 onValueChange={(value) =>
                   setCurrentUser({
                     ...currentUser,
-                    role: value as 'admin' | 'user',
+                    role: value as
+                      | 'admins'
+                      | 'apprentice_masters'
+                      | 'educational_tutors'
+                      | 'apprentices'
+                      | 'professionals'
+                      | 'teachers',
                   })
                 }
               >
@@ -288,14 +335,66 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
                   <SelectValue placeholder='Role' />
                 </SelectTrigger>
                 <SelectContent id='role'>
-                  <SelectItem value='user'>User</SelectItem>
-                  <SelectItem value='admin'>Admin</SelectItem>
+                  <SelectItem value='admins'>Administrateur</SelectItem>
+                  <SelectItem value='apprentice_masters'>
+                    Maître d&apos;apprentissage
+                  </SelectItem>
+                  <SelectItem value='educational_tutors'>
+                    Tuteur pédagogique
+                  </SelectItem>
+                  <SelectItem value='apprentices'>Apprenti</SelectItem>
+                  <SelectItem value='professionals'>Professionnel</SelectItem>
+                  <SelectItem value='teachers'>Professeur</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
+          {currentUser.role === 'apprentices' && (
+            <div className='grid grid-cols-4 items-center gap-4'>
+              <Label htmlFor='promotion' className='text-right'>
+                Promotion
+              </Label>
+              <Select
+                value={currentUser.promotion}
+                onValueChange={(value) =>
+                  setCurrentUser({ ...currentUser, promotion: value })
+                }
+              >
+                <SelectTrigger className='w-[180px]'>
+                  <SelectValue placeholder='Promotion' />
+                </SelectTrigger>
+                <SelectContent id='promotion'>
+                  {promotions.map((promotion) => (
+                    <SelectItem key={promotion} value={promotion}>
+                      {promotion}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          {(currentUser.role === 'apprentice_masters' ||
+            currentUser.role === 'professionals') && (
+            <div className='grid grid-cols-4 items-center gap-4'>
+              <Label htmlFor='entreprise' className='text-right'>
+                Entreprise
+              </Label>
+              <Input
+                id='entreprise'
+                value={currentUser.entreprise}
+                onChange={(e) =>
+                  setCurrentUser({ ...currentUser, entreprise: e.target.value })
+                }
+                className='col-span-3 border border-gray-300 text-black placeholder-gray-500 rounded-sm focus:border-gray-300'
+              />
+            </div>
+          )}
           <DialogFooter>
-            <Button type='submit' onClick={handleSaveUser}>
+            <Button
+              type='submit'
+              onClick={handleSaveUser}
+              className='bg-green-500'
+            >
               {dialogMode === 'add' ? 'Ajouter' : 'Sauvegarder'}
             </Button>
           </DialogFooter>

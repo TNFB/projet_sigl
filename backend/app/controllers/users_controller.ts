@@ -69,7 +69,10 @@ export default class UsersController {
 
       // Sélectionner les colonnes en fonction du paramètre 'detailed'
       if (detailed === 'true') {
-        query = query.select('id_user', 'email', 'name', 'last_name', 'role')
+        query = query
+          .leftJoin('apprentices', 'users.id_user', 'apprentices.id')
+          .leftJoin('cursus', 'apprentices.id_cursus', 'cursus.id_cursus')
+          .select('users.id_user', 'users.email', 'users.name', 'users.last_name', 'users.role', 'cursus.promotion_name')
       } else {
         query = query.select('email')
       }

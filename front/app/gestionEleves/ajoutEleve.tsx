@@ -66,10 +66,9 @@ function AjoutEleve() {
     }
 
     try {
-      const hashedPassword = await bcrypt.hash(password, 10)
       const response = await postRequestCreateUser('user/createUser', {
         ...formData,
-        password: hashedPassword,
+        password: password,
       })
       console.log('User created successfully:', response)
       alert('Utilisateur ajouté avec succès')

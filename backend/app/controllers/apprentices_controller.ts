@@ -281,4 +281,58 @@ export default class ApprenticesController {
       return response.internalServerError({ message: 'An error occurred while deleting the skill' });
     }
   }
+
+  public async getMissionAndSkillApprenticeByEmail({ request, response }: HttpContext) {
+    console.log('getMissionAndSkillApprenticeByEmail');
+    const emailUser = (request as any).user?.email;
+    const { data } = request.only(['data']);
+    
+    if (!data || !data.email) {
+        return response.status(400).json({ error: 'Email is required' });
+    }
+    
+    const { email } = data;
+    
+    try {
+        // Trouver l'apprenti par email
+        const apprentice = await db.from('users')
+            .where('email', email)
+            .where('role', 'apprentices')
+            .select('id_user')
+            .first();
+        
+        if (!apprentice) {
+            return response.notFound({ message: 'Apprentice not found' });
+        }
+
+        const user = await db.from('users').where('email', emailUser).first();
+        if (!user) {
+            return response.notFound({ message: 'User not found' });
+        }
+
+        let apprenticeInfo = null;
+
+        
+        apprenticeInfo = await db.from('apprentices')
+            .where('id', apprentice.id_user)
+            .select('list_missions', 'list_skills')
+            .first();
+        
+
+        if (!apprenticeInfo) {
+            return response.forbidden({ message: 'Access denied or no information available' });
+        }
+
+        // Retourner uniquement les missions et compétences
+        const combinedInfo = {
+          list_missions: apprenticeInfo ? apprenticeInfo.list_missions : null,
+          list_skills: apprenticeInfo ? apprenticeInfo.list_skills : null
+        };
+        return response.ok(combinedInfo);
+    } catch (error) {
+        console.error('Error fetching apprentice info:', error);
+        return response.internalServerError({ message: 'An error occurred while fetching apprentice information' });
+    }
+  }
+
 }

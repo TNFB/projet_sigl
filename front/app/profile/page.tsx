@@ -17,6 +17,8 @@ const Profile = () => {
     confirmPassword: '',
   })
   const [passwordError, setPasswordError] = useState<string | null>(null)
+  const [competences, setCompetences] = useState<any[]>([]);
+  const [missions, setMissions] = useState<any[]>([]);
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -28,6 +30,45 @@ const Profile = () => {
           if (response && response.userInfo) {
             setUserInfo(response.userInfo)
             setFormData(response.userInfo)
+
+            // Vérifiez si l'utilisateur est un apprenti
+            if (response.userInfo.role === 'apprentices') {
+              // Appeler l'API pour récupérer les compétences et missions
+              const skillsAndMissionsResponse = await postRequest(
+                'apprentice/getMissionAndSkillApprenticeByEmail',
+                JSON.stringify({ data: { email: response.userInfo.email } })
+              );
+
+              let parsedMissions = Array.isArray(skillsAndMissionsResponse.list_missions)
+                ? skillsAndMissionsResponse.list_missions
+                : []
+
+              if (typeof skillsAndMissionsResponse.list_missions === 'string') {
+                try {
+                  parsedMissions = JSON.parse(skillsAndMissionsResponse.list_missions)
+                } catch (parseError) {
+                  console.error('Error parsing list_missions:', parseError)
+                  parsedMissions = []
+                }
+              }
+
+              let parsedSkills = Array.isArray(skillsAndMissionsResponse.list_skills)
+                ? skillsAndMissionsResponse.list_skills
+                : []
+
+              if (typeof skillsAndMissionsResponse.list_skills === 'string') {
+                try {
+                  parsedSkills = JSON.parse(skillsAndMissionsResponse.list_skills)
+                } catch (parseError) {
+                  console.error('Error parsing list_skills:', parseError)
+                  parsedSkills = []
+                }
+              }
+              console.log(`parsedMissions: ${JSON.stringify(parsedMissions, null, 2)}`)
+              console.log(`parsedSkills: ${JSON.stringify(parsedSkills, null, 2)}`)
+              setMissions(parsedMissions);
+              setCompetences(parsedSkills);
+            }
           } else {
             setError('Aucune information utilisateur trouvée.')
           }
@@ -110,9 +151,6 @@ const Profile = () => {
     setEmailError(null)
   }
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>{error}</div>
-
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setPasswordData((prev) => ({
@@ -172,6 +210,9 @@ const Profile = () => {
       setPasswordError('Erreur lors du changement de mot de passe.')
     }
   }
+
+  if (loading) return <div>Loading...</div>
+  if (error) return <div>{error}</div>
 
   return (
     <Home>
@@ -348,6 +389,53 @@ const Profile = () => {
             </button>
           )}
         </div>
+        {userInfo.role === 'apprentices' && (
+          <>
+            <h2 className="text-xl font-bold mt-4">Compétences</h2>
+            {competences.length > 0 ? (
+              <table className="min-w-full border-collapse border border-gray-300">
+                <thead>
+                  <tr>
+                    <th className="border border-gray-300 p-2">Compétence</th>
+                    <th className="border border-gray-300 p-2">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {competences.map((skill) => (
+                    <tr key={skill.id}>
+                      <td className="border border-gray-300 p-2">{skill.skill}</td>
+                      <td className="border border-gray-300 p-2">{skill.description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>Aucune compétence trouvée.</p>
+            )}
+
+            <h2 className="text-xl font-bold mt-4">Missions</h2>
+            {missions.length > 0 ? (
+              <table className="min-w-full border-collapse border border-gray-300">
+                <thead>
+                  <tr>
+                    <th className="border border-gray-300 p-2">Titre</th>
+                    <th className="border border-gray-300 p-2">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {missions.map((mission) => (
+                    <tr key={mission.id}>
+                      <td className="border border-gray-300 p-2">{mission.titre}</td>
+                      <td className="border border-gray-300 p-2">{mission.description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>Aucune mission trouvée.</p>
+            )}
+          </>
+        )}
       </div>
     </Home>
   )

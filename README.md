@@ -120,17 +120,21 @@ docker build -t ghcr.io/tnfb/projet_sigl/front:latest --build-arg ARG_NEXT_PUBLI
 1. Connectez-vous à la VM dédiée au backend.
 2. Copier le fichier docker/docker-compose-backend.yml sur la VM.
 3. Éditer les variables d'environnements dans le fichier pour le backend :
-   1. `PORT` : le port sur lequel le backend sera exposé.
-   2. `DB_HOST` : l'adresse du serveur de base de données.
-   3. `DB_PORT` : le port du serveur de base de données.
-   4. `DB_USER` : l'utilisateur de la base de données.
-   5. `DB_PASSWORD` : le mot de passe de l'utilisateur de la base de données.
-   6. `LOG_LEVEL` : le niveau de log du backend
-4. Éditer les variables d'environnements dans le fichier pour phpmyadmin :
+   1. `DB_HOST` : l'adresse du serveur de base de données.
+   2. `DB_PORT` : le port du serveur de base de données.
+   3. `DB_USER` : l'utilisateur de la base de données.
+   4. `DB_PASSWORD` : le mot de passe de l'utilisateur de la base de données.
+   5. `LOG_LEVEL` : le niveau de log du backend
+4. Éditer le volume du stockage des fichiers utilisateurs :
+   1. Remplacer `~chemin de stockage machine hôte~` par le chemin de stockage sur la machine hôte. (Exemple pour Debian : `/home/user/storage`)
+5. Éditer les variables d'environnements dans le fichier pour PHPMyAdmin :
    1. `PMA_HOST` : l'adresse du serveur de base de données.
    2. `PMA_PORT` : le port du serveur de base de données.
    3. `PMA_ABSOLUTE_URI` : l'URL absolue de phpmyadmin.
-5. Lancer le backend (la version du conteneur est celle  spécifiée par la variable `image`, par défaut : `latest`):
+6. Modifier (ou non) les ports attribués aux conteneurs.
+   * Par défaut, le backend est exposé sur le port 3333 et PHPMyAdmin sur le port 60000.
+   * Pour modifier un port, changer le premier nombre du port (Exemple 3333:3333 -> 3334:3333). Le port exposé à l'utilisateur sera donc 3334.
+7. Lancer le backend (la version du conteneur est celle  spécifiée par la variable `image`, par défaut : `latest`):
 
     ```sh
     docker compose -f docker-compose-backend.yml up -d
@@ -140,7 +144,10 @@ docker build -t ghcr.io/tnfb/projet_sigl/front:latest --build-arg ARG_NEXT_PUBLI
 
 1. Connectez-vous à la VM dédiée au frontend.
 2. Copier le fichier docker/docker-compose-front.yml sur la VM.
-3. Lancer le front (la version du conteneur est celle  spécifiée par la variable `image`, par défaut : `latest`):
+3. Modifier (ou non) le port attribué au conteneur.
+   * Par défaut, le front est exposé sur le port 3000.
+   * Pour modifier le port, changer le premier nombre du port (Exemple 3000:3000 -> 3001:3000). Le port exposé à l'utilisateur sera donc 3001.
+4. Lancer le front (la version du conteneur est celle  spécifiée par la variable `image`, par défaut : `latest`):
 
     ```sh
     docker compose -f docker-compose-front.yml up -d
@@ -171,6 +178,8 @@ exit
 * Le module `pnpm` pour Node.js (installable avec `npm install -g pnpm`)
 
 ### Lancement du backend
+
+Démarrer WAMP et s'assurer que le serveur MySQL est en cours d'exécution.
 
 Se rendre dans le dossier `backend` du projet et exécuter la commande suivante :
 

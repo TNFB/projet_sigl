@@ -446,4 +446,29 @@ export default class UsersController {
       })
     }
   }
+  
+  public async getRole({ request, response }: HttpContext) {
+    console.log('getRole')
+    try {
+      // Récupérer l'email de l'utilisateur à partir du token JWT
+      const userEmail = (request as any).user?.email
+
+      if (!userEmail) {
+        return response.unauthorized({ message: 'User not authenticated' })
+      }
+
+      // Rechercher l'utilisateur dans la base de données
+      const user = await db.from('users').where('email', userEmail).select('role').first()
+
+      if (!user) {
+        return response.notFound({ message: 'User not found' })
+      }
+
+      // Retourner le rôle de l'utilisateur
+      return response.ok({ role: user.role })
+    } catch (error) {
+      console.error('Error fetching user role:', error)
+      return response.internalServerError({ message: 'An error occurred while fetching the user role' })
+    }
+  }
 }

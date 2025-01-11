@@ -41,6 +41,7 @@ Route.group(() => {
   Route.post('/getUserInfoByEmail', [UserController, 'getUserInfoByEmail']).as('getUserInfoByEmail')
   Route.post('/updateUser', [UserController, 'updateUser']).as('updateUser')
   Route.post('/checkEmailExists', [UserController, 'checkEmailExists']).as('checkEmailExists')
+  Route.post('/getRole', [UserController, 'getRole']).as('getRole')
 }).prefix('/user')
 
 Route.group(() => {
@@ -165,4 +166,9 @@ Route.group(() => {
   )
 }).prefix('events')
 
-Route.post('getInfoApprentice', [ApprenticesController, 'getInfoApprentice']).as('getInfoApprentice').prefix('apprentice')
+Route.group(() => {
+  Route.post('getInfoApprentice', [ApprenticesController, 'getInfoApprentice']).as('getInfoApprentice')
+  Route.post('addMission', [ApprenticesController, 'addMission']).as('addMission')
+  Route.post('updateMission', [ApprenticesController, 'updateMission']).as('updateMission')
+  Route.post('deleteMission', [ApprenticesController, 'deleteMission']).as('deleteMission')
+}).prefix('apprentice')

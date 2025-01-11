@@ -27,6 +27,8 @@ const ApprenticeshipCoordinatorsController = () =>
   import('../app/controllers/apprenticeship_coordinators_controller.js')
 const EventsController = () => import('../app/controllers/events_controller.js')
 const ApprenticesController = () => import('../app/controllers/apprentices_controller.js')
+const CursusController = () => import('../app/controllers/cursus_controller.js')
+
 
 // Définir les routes
 
@@ -165,6 +167,10 @@ Route.group(() => {
     'deleteEvent'
   )
 }).prefix('events')
+
+Route.group(() => {
+  Route.post('promotions', [CursusController, 'getAllPromotions']).as('getAllPromotions')
+}).prefix('cursus')
 
 Route.group(() => {
   Route.post('getInfoApprentice', [ApprenticesController, 'getInfoApprentice']).as('getInfoApprentice')

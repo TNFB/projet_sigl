@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 import { findUserByEmail, isUserTableEmpty, isValidRole } from '../utils/api_utils.js'
 import jwt from 'jsonwebtoken'
 import User from '#models/user'
+import { sendEmailToUser } from '../utils/email_utils.js'
 
 /**
  * @class UsersController
@@ -152,6 +153,20 @@ export default class UsersController {
         .table('users')
         .insert({ email, password: hashedPassword, name, last_name, telephone, role })
       console.log(`User created: ${createUser}`)
+
+      // Envoyer un email à l'utilisateur avec ses identifiants de connexion
+      const emailContent = `Bonjour ${name},
+
+      Votre compte a été créé avec succès. Voici vos identifiants de connexion :
+
+      Email : ${email}
+      Mot de passe : ${password}
+
+      Veuillez vous connecter et changer votre mot de passe dès que possible.
+
+      Cordialement,
+      L'équipe`
+      await sendEmailToUser(email, 'Bienvenue sur notre plateforme', emailContent)
 
       //assigne Role
       let id = createUser
@@ -472,6 +487,23 @@ export default class UsersController {
     } catch (error) {
       console.error('Error fetching user role:', error)
       return response.internalServerError({ message: 'An error occurred while fetching the user role' })
+    }
+  }
+
+  async sendEmail({ request, response }: HttpContext) {
+    try {
+      const { email, subject, content } = request.only(['email', 'subject', 'content'])
+
+      if (!email || !subject || !content) {
+        return response.status(400).json({ error: 'Email, subject, and content are required' })
+      }
+
+      await sendEmailToUser(email, subject, content)
+
+      return response.status(200).json({ message: 'Email sent successfully' })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return response.status(500).json({ error: 'Error sending email' })
     }
   }
 }

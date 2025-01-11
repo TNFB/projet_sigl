@@ -80,12 +80,17 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
   // Récupère les promotions pour le champ ajout d un apprenti
   useEffect(() => {
     const fetchPromotions = async () => {
-      //const response = await fetch('/api/promotions')
-      //const data = await response.json()
-      const data = ['Poincarré', 'Einstein', 'Curie', 'Newton']
-      setPromotions(data)
+      try {
+        const response = await postRequest('cursus/promotions')
+        console.log('response:', response)
+        const promotions = response.promotions.map(
+          (promotion: any) => promotion.promotion_name,
+        )
+        setPromotions(promotions)
+      } catch (error) {
+        console.error('Error fetching promotions:', error)
+      }
     }
-
     fetchPromotions()
   }, [])
 
@@ -127,29 +132,41 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
   }
 
   //Gestion de l'ajout et de la modification
-  const handleSaveUser = () => {
-    if (currentUser.name && currentUser.email) {
-      if (dialogMode === 'add') {
-        const newUser: User = {
-          id: String(users.length + 1),
-          name: currentUser.name,
-          email: currentUser.email,
-          role: currentUser.role || 'user',
-        }
-        setUsers([...users, newUser])
-      } else {
-        // Edit existing user
-        setUsers(
-          users.map((user) =>
-            user.id === currentUser.id
-              ? ({ ...user, ...currentUser } as User)
-              : user,
-          ),
-        )
-      }
+  const handleSaveUser = async () => {
+    const { name, email, role, entreprise, promotion } = currentUser
 
-      setIsDialogOpen(false)
-      setCurrentUser({ name: '', email: '', role: 'user' })
+    if (name && email) {
+      try {
+        const response = await postRequestCreateUser('user/createUser', {
+          email,
+          password: 'defaultPassword',
+          name,
+          last_name: '',
+          telephone: '',
+          role: role || 'user',
+          entreprise,
+          promotion,
+        })
+
+        console.log('User created successfully:', response)
+        alert('Utilisateur ajouté avec succès')
+
+        const newUser: User = {
+          id: response.userId,
+          name,
+          email,
+          role: role || 'user',
+          entreprise,
+          promotion,
+        }
+
+        setUsers([...users, newUser])
+        setIsDialogOpen(false)
+        setCurrentUser({ name: '', email: '', role: 'user' })
+      } catch (error) {
+        console.error('Error creating user:', error)
+        alert("Erreur lors de l'ajout de l'utilisateur")
+      }
     }
   }
 

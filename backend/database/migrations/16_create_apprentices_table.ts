@@ -43,6 +43,7 @@ export default class extends BaseSchema {
         .inTable('companies')
         .onDelete('CASCADE')
       table.json('list_missions')
+      table.json('list_skills')
     })
   }
 

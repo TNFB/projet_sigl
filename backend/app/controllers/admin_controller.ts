@@ -62,8 +62,7 @@ export default class AdminController {
       console.log(userDb)
 
       if (!userDb) {
-        return response.status(404).json({
-          status: 'error',
+        return response.notFound({
           message: 'User not found',
         })
       }
@@ -146,8 +145,7 @@ export default class AdminController {
       const userDb = await findUserByEmail(email)
 
       if (!userDb) {
-        return response.status(400).json({
-          status: 'error',
+        return response.notFound({
           message: 'Email not found',
         })
       }

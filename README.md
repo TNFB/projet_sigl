@@ -1,32 +1,65 @@
-# Projet SIGL
+# Projet SIGL  <!-- omit from toc -->
 
 [![Build develop](https://github.com/TNFB/projet_sigl/actions/workflows/dev-build.yml/badge.svg)](https://github.com/TNFB/projet_sigl/actions/workflows/dev-build.yml)
 
 Ce projet contient un frontend et un backend qui doivent être installés sur deux machines virtuelles (VM) différentes en utilisant Docker. Les images Docker sont hébergées sur un dépôt privé sur `ghcr.io` et nécessitent une authentification.
 
-- [Projet SIGL](#projet-sigl)
-  - [Installation depuis GHCR.io (GitHub Container Registery)](#installation-depuis-ghcrio-github-container-registery)
-    - [Prérequis](#prérequis)
-    - [Authentification GHCR.io](#authentification-ghcrio)
-    - [Authentification Docker](#authentification-docker)
-    - [Installation du Backend](#installation-du-backend)
-    - [Installation du Frontend](#installation-du-frontend)
-    - [Limitations connues](#limitations-connues)
-  - [Installation de l'environnement de développement (Windows)](#installation-de-lenvironnement-de-développement-windows)
-    - [Prérequis](#prérequis-1)
-    - [Installation de Node.js](#installation-de-nodejs)
-    - [Installation de WAMP](#installation-de-wamp)
-    - [Lancement du backend](#lancement-du-backend)
-    - [Lancement du frontend](#lancement-du-frontend)
+## Table des matières <!-- omit from toc -->
 
+* [Gestion de code source](#gestion-de-code-source)
+  * [Explication des branches](#explication-des-branches)
+  * [Workflow GitHub Actions](#workflow-github-actions)
+* [Spécifications minimales des VM pour de la production](#spécifications-minimales-des-vm-pour-de-la-production)
+* [Installation depuis GHCR.io (GitHub Container Registery)](#installation-depuis-ghcrio-github-container-registery)
+  * [Installation de Docker](#installation-de-docker)
+  * [Authentification GHCR.io](#authentification-ghcrio)
+  * [Authentification Docker](#authentification-docker)
+  * [Limitations connues](#limitations-connues)
+* [Installation à partir du code source](#installation-à-partir-du-code-source)
+  * [Téléchargement du code source](#téléchargement-du-code-source)
+  * [Compilation du backend](#compilation-du-backend)
+  * [Compilation du frontend](#compilation-du-frontend)
+* [Lancement de l'environnement de production](#lancement-de-lenvironnement-de-production)
+  * [Lancement du Backend](#lancement-du-backend)
+  * [Lancement du Frontend](#lancement-du-frontend)
+  * [(Ré)initilisation de la base de données](#réinitilisation-de-la-base-de-données)
+* [Installation de l'environnement de développement (Windows)](#installation-de-lenvironnement-de-développement-windows)
+  * [Prérequis](#prérequis)
+  * [Lancement du backend](#lancement-du-backend-1)
+  * [Lancement du frontend](#lancement-du-frontend-1)
+
+## Gestion de code source
+
+### Explication des branches
+
+* `main` : branche principale du projet, contient le code source de la version de production.
+* `develop` : branche de développement, contient le code source de la version de développement.
+* `Backend` : branche de développement du backend.
+* `back-tests` : branche de développement des tests du backend.
+
+### Workflow GitHub Actions
+
+* `main-build` : déclenche le workflow de build de la branche `main`.
+* `dev-build` : déclenche le workflow de build de la branche `develop`.
+
+## Spécifications minimales des VM pour de la production
+
+* 1 vCPU (64 bits)
+* 1 Go de RAM
+* 10 Go de stockage
+* 1 interface réseau
+* 1 adresse IP publique accessible depuis Internet
+* Système d'exploitation
+  * Linux (Debian 12 recommandé)
+  * Windows (11 recommandé)
+  * N'importe quel OS compatible avec Docker
 
 ## Installation depuis GHCR.io (GitHub Container Registery)
 
-### Prérequis
+### Installation de Docker
 
-- Deux VM configurées et accessibles (à développer)
-- Docker installé sur les deux VM (à développer)
-- Accès au dépôt privé sur Github
+Pour installer Docker sur une machine Linux, vous pouvez suivre les instructions officielles sur le site de Docker : [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/).
+Ensuite, vous pouvez installer Docker Compose en suivant les instructions officielles : [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/).
 
 ### Authentification GHCR.io
 
@@ -54,7 +87,35 @@ echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
 
 Remplacez `CR_PAT` par votre token d'accès personnel et `USERNAME` par votre nom d'utilisateur GitHub (et non pas votre adresse e-mail).
 
-### Installation du Backend
+### Limitations connues
+
+* Les images Docker comprennent le site déjà compilé. Si vous souhaitez modifier le nom DNS du backend, vous devrez recompiler le frontend à partir du Dockerfile fourni avec l'argument `ARG_NEXT_PUBLIC_API_URL` défini sur l'URL du backend. Voir la section [Compilation du frontend](#compilation-du-frontend) pour plus d'informations.
+
+## Installation à partir du code source
+
+### Téléchargement du code source
+
+Se rendre sur le dépôt GitHub du projet dans la branche `main`, puis cliquer sur le bouton `Code` et choisir `Download ZIP`. Extraire le contenu de l'archive dans un dossier de votre choix sur la VM.
+
+### Compilation du backend
+
+Se rendre dans le dossier `backend` du projet et exécuter la commande suivante :
+
+```sh
+docker build -t ghcr.io/tnfb/projet_sigl/backend:latest .
+```
+
+### Compilation du frontend
+
+Se rendre dans le dossier `front` du projet et exécuter la commande suivante, en remplaçant `URL_backend` par l'URL publique du backend :
+
+```sh
+docker build -t ghcr.io/tnfb/projet_sigl/front:latest --build-arg ARG_NEXT_PUBLIC_API_URL=URL_backend .
+```
+
+## Lancement de l'environnement de production
+
+### Lancement du Backend
 
 1. Connectez-vous à la VM dédiée au backend.
 2. Copier le fichier docker/docker-compose-backend.yml sur la VM.
@@ -75,7 +136,7 @@ Remplacez `CR_PAT` par votre token d'accès personnel et `USERNAME` par votre no
     docker compose -f docker-compose-backend.yml up -d
     ```
 
-### Installation du Frontend
+### Lancement du Frontend
 
 1. Connectez-vous à la VM dédiée au frontend.
 2. Copier le fichier docker/docker-compose-front.yml sur la VM.
@@ -85,18 +146,54 @@ Remplacez `CR_PAT` par votre token d'accès personnel et `USERNAME` par votre no
     docker compose -f docker-compose-front.yml up -d
     ```
 
-### Limitations connues
+### (Ré)initilisation de la base de données
 
-- Les images Docker comprennent le site déjà compilé. Si vous souhaitez modifier le nom DNS du backend, vous devrez recompiler le frontend à partir du Dockerfile fourni avec l'argument `ARG_NEXT_PUBLIC_API_URL` défini sur l'URL du backend.
+Pour (ré)initiliser la base de données avec des données de base, se connecter à la VM dédiée au backend puis au conteneur du backend :
+
+```sh
+docker exec -it back bash
+```
+
+Puis exécuter les commandes suivantes :
+
+```sh
+cd /app/backend/build
+node ace migration:refresh --seed
+exit
+```
 
 ## Installation de l'environnement de développement (Windows)
 
 ### Prérequis
 
-### Installation de Node.js
-
-### Installation de WAMP
+* Node.js
+* WAMP
+* Le module `pnpm` pour Node.js (installable avec `npm install -g pnpm`)
 
 ### Lancement du backend
 
+Se rendre dans le dossier `backend` du projet et exécuter la commande suivante :
+
+```sh
+pnpm install
+```
+
+Puis lancer le backend avec la commande suivante :
+
+```sh
+node ace serve --watch
+```
+
 ### Lancement du frontend
+
+Se rendre dans le dossier `front` du projet et exécuter la commande suivante :
+
+```sh
+pnpm install
+```
+
+Puis lancer le frontend avec la commande suivante :
+
+```sh
+pnpm run dev
+```

@@ -23,7 +23,7 @@ export default class ApprenticesController {
 
       const user = await db.from('users').where('email', emailUser).first()
       if (!user) {
-          return response.unauthorized({ message: 'User not found' })
+          return response.notFound({ message: 'User not found' })
       }
 
       let isAuthorized = false

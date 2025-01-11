@@ -29,7 +29,6 @@ export const postRequest = async (url: string, body?: string) => {
   })
 
   if (response.status === 401) {
-    // Token is invalid or expired
     localStorage.removeItem('token'); // Clear the invalid token
     return { redirect: true };
   }

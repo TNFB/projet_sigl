@@ -213,8 +213,7 @@ export default class UsersController {
       // Found User by Email
       const userDb = await findUserByEmail(email)
       if (!userDb) {
-        return response.status(401).json({
-          status: 'error',
+        return response.notFound({
           message: 'Email not found in User',
         })
       }
@@ -269,8 +268,7 @@ export default class UsersController {
       // Récupérer l'utilisateur
       const user = await db.from('users').where('email', emailUser).first()
       if (!user) {
-        return response.status(404).json({
-          status: 'error',
+        return response.notFound({
           message: 'User not found',
         })
       }

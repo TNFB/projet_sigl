@@ -14,7 +14,7 @@ export default class MonthlyNotesController {
       // Trouver l'utilisateur par email
       const user = await findUserByEmail(emailUser)
       if (!user) {
-          return response.status(401).json({ error: 'Error User Not found' })
+          return response.notFound({ message: 'Error User Not found' })
       }
 
       // Récupérer les notes mensuelles liées à l'utilisateur via le training_diary
@@ -49,7 +49,7 @@ export default class MonthlyNotesController {
       // Trouver l'utilisateur par email
       const user = await findUserByEmail(emailUser);
       if (!user) {
-          return response.status(401).json({ error: 'Error User Not found' });
+          return response.notFound({ message: 'Error User Not found' });
       }
 
       // Vérifier si le training diary appartient à l'apprenti de l'utilisateur
@@ -61,7 +61,7 @@ export default class MonthlyNotesController {
 
       // Si le training diary n'est pas trouvé ou n'appartient pas à l'apprenti, renvoyer une erreur
       if (!trainingDiary) {
-          return response.status(403).json({ error: 'Training diary not found or does not belong to the user' });
+          return response.notFound({ message: 'Training diary not found or does not belong to the user' });
       }
 
       // Créer la note si toutes les vérifications sont passées

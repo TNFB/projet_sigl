@@ -71,7 +71,7 @@ export default class CompanyRepresentativesController {
         .select('id', 'list_mission')
         .first()
       if (!apprentice) {
-        return response.status(400).json({ message: 'Apprentice not found' })
+        return response.notFound({ message: 'Apprentice not found' })
       }
 
       // check all mission field

@@ -157,15 +157,15 @@ export default class UsersController {
       // Envoyer un email à l'utilisateur avec ses identifiants de connexion
       const emailContent = `Bonjour ${name},
 
-      Votre compte a été créé avec succès. Voici vos identifiants de connexion :
+Votre compte a été créé avec succès. Voici vos identifiants de connexion :
 
-      Email : ${email}
-      Mot de passe : ${password}
+Email : ${email}
+Mot de passe : ${password}
 
-      Veuillez vous connecter et changer votre mot de passe dès que possible.
+Veuillez vous connecter et changer votre mot de passe dès que possible.
 
-      Cordialement,
-      L'équipe`
+Cordialement,
+L'équipe`
       await sendEmailToUser(email, 'Bienvenue sur notre plateforme', emailContent)
 
       //assigne Role

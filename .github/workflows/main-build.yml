@@ -1,12 +1,12 @@
-name: docker-volumes-build
+name: main-build
 
 on:
   push:
     branches:
-      - docker-volumes
+      - main
 
 env:
-  ARTIFACT_VERSION: v2.${{ github.run_number }}-docker-volumes
+  ARTIFACT_VERSION: v3.${{ github.run_number }}
 
 jobs:
   build_backend:
@@ -33,11 +33,7 @@ jobs:
         run: |
           docker push ghcr.io/tnfb/${{ github.event.repository.name }}/backend:${{ env.ARTIFACT_VERSION }}
           docker push ghcr.io/tnfb/${{ github.event.repository.name }}/backend:latest
-      
-      - name: Trigger the deployment (ne fonctionne pas)
-        run: |
-          curl -X POST https://${{ secrets.WEBHOOK_CREDS }}@journaldeformation-bndwfxa2dafmh2hu.scm.francecentral-01.azurewebsites.net/api/registry/webhook
-  
+ 
   build_front:
     runs-on: ubuntu-latest
 
@@ -62,7 +58,3 @@ jobs:
         run: |
           docker push ghcr.io/tnfb/${{ github.event.repository.name }}/front:${{ env.ARTIFACT_VERSION }}
           docker push ghcr.io/tnfb/${{ github.event.repository.name }}/front:latest
-      
-      - name: Trigger the deployment (ne fonctionne pas)
-        run: |
-          curl -X POST https://${{ secrets.WEBHOOK_CREDS }}@backend-journaldeformation-g4hbd5bcb7gme4dv.scm.francecentral-01.azurewebsites.net/api/registry/webhook

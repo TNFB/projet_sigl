@@ -21,10 +21,12 @@ RUN pnpm i --prod
 
 ENV DRIVE_DISK=fs
 ENV HOST=0.0.0.0
+ENV PORT=3333
 ENV APP_KEY=xLxMeTQzOqYhsjMzrCWjeNG0gdqRBwuf
 ENV NODE_ENV=production
 ENV SESSION_DRIVER=cookie
 ENV DB_DATABASE=sigl_db
+ENV STORAGE_PATH=/app/build/storage
 
 VOLUME [ "/app/build/storage" ]
 

@@ -60,6 +60,7 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
           'user/getUserEmailsByRole',
           JSON.stringify({ data: data }),
         )
+
         const formattedUsers = response.users.map((user: any) => ({
           id: user.id_user,
           name: `${user.name} ${user.last_name}`,
@@ -415,4 +416,5 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
     </div>
   )
 }
+
 export default UserTable

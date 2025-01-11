@@ -69,7 +69,10 @@ export default class UsersController {
 
       // Sélectionner les colonnes en fonction du paramètre 'detailed'
       if (detailed === 'true') {
-        query = query.select('id_user', 'email', 'name', 'last_name', 'role')
+        query = query
+          .leftJoin('apprentices', 'users.id_user', 'apprentices.id')
+          .leftJoin('cursus', 'apprentices.id_cursus', 'cursus.id_cursus')
+          .select('users.id_user', 'users.email', 'users.name', 'users.last_name', 'users.role', 'cursus.promotion_name')
       } else {
         query = query.select('email')
       }
@@ -391,7 +394,7 @@ export default class UsersController {
           expiresIn: '1h',
         }
       )
-      const updatedUser = await findUserByEmail(email); // Utiliser le nouvel email pour récupérer les données mises à jour
+      const updatedUser = await findUserByEmail(email);
 
       return response.status(200).json({
           status: 'success',
@@ -446,8 +449,8 @@ export default class UsersController {
       })
     }
   }
-  
-  public async getRole({ request, response }: HttpContext) {
+
+  async getRole({ request, response }: HttpContext) {
     console.log('getRole')
     try {
       // Récupérer l'email de l'utilisateur à partir du token JWT

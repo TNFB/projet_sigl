@@ -1,5 +1,6 @@
 'use client'
 import React, { ReactNode, useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar'
 import {
   IconArrowLeft,
@@ -27,6 +28,28 @@ interface Student {
 }
 
 const Home = ({ children }: HomeProps) => {
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkTokenExpiration = () => {
+      const token = localStorage.getItem('token')
+      if (token) {
+        const decodedToken = JSON.parse(atob(token.split('.')[1]))
+        const currentTime = Date.now() / 1000
+        if (decodedToken.exp < currentTime) {
+          localStorage.clear()
+          router.push('/Login')
+        }
+      } else {
+        router.push('/Login')
+      }
+    }
+
+    checkTokenExpiration()
+    const interval = setInterval(checkTokenExpiration, 60000)
+    return () => clearInterval(interval)
+  }, [router])
+
   const [userType, setUserType] = useState<
     | 'apprentices'
     | 'admins'
@@ -39,25 +62,24 @@ const Home = ({ children }: HomeProps) => {
 
   const fetchStudents = React.useCallback(async (url: string) => {
     try {
-      const response = await postRequest(url);
-      if (response.redirect) {
-        window.location.href = '/Login';
-      } else {
-        const apprentices = Array.isArray(response) ? response : response.apprentis || [];
+      const response = await postRequest(url)
+      // Vérifiez si la réponse est un tableau
+      const apprentices = Array.isArray(response)
+        ? response
+        : response.apprentis || []
 
-        const formattedApprentices = apprentices.map((apprentice: any) => ({
-          id_user: apprentice.id_user,
-          email: apprentice.email,
-          nom: apprentice.nom,
-          prenom: apprentice.prenom,
-        }));
-        setStudents(formattedApprentices);
-        console.log('Success:', response);
-      }
+      const formattedApprentices = apprentices.map((apprentice: any) => ({
+        id_user: apprentice.id_user,
+        email: apprentice.email,
+        nom: apprentice.nom,
+        prenom: apprentice.prenom,
+      }))
+      setStudents(formattedApprentices)
+      console.log('Success:', response)
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error:', error)
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     const userRole = localStorage.getItem('role') as

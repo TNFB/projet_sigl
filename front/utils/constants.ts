@@ -42,6 +42,11 @@ export const SIDEBAR_ADMIN_ITEMS = [
     icon: 'Home',
   },
   {
+    label: 'Gestion des utilisateurs',
+    href: '/gestionUsers',
+    icon: 'UsersRound',
+  },
+  {
     label: 'Gestion des élèves',
     href: '/gestionEleves',
     icon: 'UsersRound',
@@ -74,11 +79,6 @@ export const SIDEBAR_ADMIN_ITEMS = [
   {
     label: 'Équipes tutorales',
     href: '/gestionEquipes',
-    icon: 'UsersRound',
-  },
-  {
-    label: 'Gestion des utilisateurs',
-    href: '/gestionUsers',
     icon: 'UsersRound',
   },
 ]

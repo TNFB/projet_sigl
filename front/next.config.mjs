@@ -8,7 +8,14 @@ const nextConfig = {
   trailingSlash: true,
   images: {
     unoptimized: process.env.NEXT_PUBLIC_UNOPTIMIZED_IMAGES === 'true',
-    domains: ['assets.aceternity.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'assets.aceternity.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
 }
 

@@ -8,13 +8,13 @@ export default class MonthlyNotesController {
     try {
       const emailUser = (request as any).user?.email
       if (!emailUser) {
-          return response.status(401).json({ error: 'Unauthorized' })
+        return response.status(401).json({ error: 'Unauthorized' })
       }
 
       // Trouver l'utilisateur par email
       const user = await findUserByEmail(emailUser)
       if (!user) {
-          return response.notFound({ message: 'Error User Not found' })
+        return response.notFound({ message: 'Error User Not found' })
       }
 
       // Récupérer les notes mensuelles liées à l'utilisateur via le training_diary
@@ -36,20 +36,20 @@ export default class MonthlyNotesController {
     try {
       const { data } = request.only(['data']);
       if (!data) {
-          return response.status(400).json({ error: 'Data is required' });
+        return response.status(400).json({ error: 'Data is required' });
       }
       const { id_training_diary, title, content } = data;
 
       // Récupérer l'email de l'utilisateur
       const emailUser = (request as any).user?.email;
       if (!emailUser) {
-          return response.status(401).json({ error: 'Unauthorized' });
+        return response.status(401).json({ error: 'Unauthorized' });
       }
 
       // Trouver l'utilisateur par email
       const user = await findUserByEmail(emailUser);
       if (!user) {
-          return response.notFound({ message: 'Error User Not found' });
+        return response.notFound({ message: 'Error User Not found' });
       }
 
       // Vérifier si le training diary appartient à l'apprenti de l'utilisateur
@@ -61,7 +61,7 @@ export default class MonthlyNotesController {
 
       // Si le training diary n'est pas trouvé ou n'appartient pas à l'apprenti, renvoyer une erreur
       if (!trainingDiary) {
-          return response.notFound({ message: 'Training diary not found or does not belong to the user' });
+        return response.notFound({ message: 'Training diary not found or does not belong to the user' });
       }
 
       // Créer la note si toutes les vérifications sont passées
@@ -84,23 +84,21 @@ export default class MonthlyNotesController {
   // Fonction pour modifier une note
   public async updateNote({ request, response }: HttpContext) {
     try {
-        const { data } = request.only(['data']);
-        if (!data) {
-            return response.status(400).json({ error: 'Data is required' });
-        }
-        const { id_monthly_note, title, content } = data;
+      const { data } = request.only(['data']);
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' });
+      }
+      const { id_monthly_note, title, content } = data;
+      const updatedRows = await db.from('monthly_notes')
+        .where('id_monthly_note', id_monthly_note)
+        .update({ title, content });
+      if (updatedRows.length === 0) {
+        return response.notFound({ message: 'Note not found' });
+      }
 
-        const updatedRows = await db.from('monthly_notes')
-            .where('id_monthly_note', id_monthly_note)
-            .update({ title, content });
+      const updatedNote = await db.from('monthly_notes').where('id_monthly_note', id_monthly_note).first();
 
-        if (updatedRows.length === 0) {
-            return response.notFound({ message: 'Note not found' });
-        }
-
-        const updatedNote = await db.from('monthly_notes').where('id_monthly_note', id_monthly_note).first();
-
-        return response.ok({ message: 'Note updated successfully', note: updatedNote });
+      return response.ok({ message: 'Note updated successfully', note: updatedNote });
     } catch (error) {
         console.error('Error updating note:', error);
         return response.internalServerError({ message: 'An error occurred while updating the note' });
@@ -112,20 +110,20 @@ export default class MonthlyNotesController {
     try {
         const { data } = request.only(['data']);
         if (!data) {
-            return response.status(400).json({ error: 'Data is required' });
+          return response.status(400).json({ error: 'Data is required' });
         }
         const { id_monthly_note } = data;
 
         const deletedRows = await db.from('monthly_notes').where('id_monthly_note', id_monthly_note).delete();
 
         if (deletedRows.length === 0) {
-            return response.notFound({ message: 'Note not found' });
+          return response.notFound({ message: 'Note not found' });
         }
 
         return response.ok({ message: 'Note deleted successfully' });
     } catch (error) {
-        console.error('Error deleting note:', error);
-        return response.internalServerError({ message: 'An error occurred while deleting the note' });
+      console.error('Error deleting note:', error);
+      return response.internalServerError({ message: 'An error occurred while deleting the note' });
     }
   }
 }

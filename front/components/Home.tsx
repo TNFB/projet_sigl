@@ -39,22 +39,24 @@ const Home = ({ children }: HomeProps) => {
 
   const fetchStudents = React.useCallback(async (url: string) => {
     try {
-      const response = await postRequest(url);
+      const response = await postRequest(url)
       // Vérifiez si la réponse est un tableau
-      const apprentices = Array.isArray(response) ? response : response.apprentis || [];
+      const apprentices = Array.isArray(response)
+        ? response
+        : response.apprentis || []
 
       const formattedApprentices = apprentices.map((apprentice: any) => ({
-      id_user: apprentice.id_user,
-      email: apprentice.email,
-      nom: apprentice.nom,
-      prenom: apprentice.prenom,
-    }));
-      setStudents(formattedApprentices);
-      console.log('Success:', response);
+        id_user: apprentice.id_user,
+        email: apprentice.email,
+        nom: apprentice.nom,
+        prenom: apprentice.prenom,
+      }))
+      setStudents(formattedApprentices)
+      console.log('Success:', response)
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error:', error)
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     const userRole = localStorage.getItem('role') as

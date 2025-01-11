@@ -36,6 +36,7 @@ export type User = {
   name: string
   email: string
   role: string
+  entreprise?: string
   promotion?: string
 }
 

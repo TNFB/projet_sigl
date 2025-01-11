@@ -31,14 +31,14 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends { promotion?: string }, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   onAdd?: () => void
   onDelete?: (rows: TData[]) => void
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { promotion?: string }, TValue>({
   columns,
   data,
   onAdd,
@@ -80,7 +80,10 @@ export function DataTable<TData, TValue>({
         new Set(
           rows
             .map((row) => row.original.promotion)
-            .filter((promotion) => promotion !== null),
+            .filter(
+              (promotion): promotion is string =>
+                promotion !== null && promotion !== undefined,
+            ),
         ),
       )
       setPromotionOptions(promotions)

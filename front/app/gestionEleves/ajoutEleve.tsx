@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import BaseForm from '@/components/BaseForm'
 import { postRequestCreateUser } from '@/api/api'
+import ProgressPopup from '@/components/ProgressPopup'
 import bcrypt from 'bcryptjs'
 
 interface InputField {
@@ -41,6 +42,12 @@ function AjoutEleve() {
     role: '',
   })
 
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [popupStatus, setPopupStatus] = useState<
+    'creating' | 'success' | 'error'
+  >('creating')
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData({
@@ -58,6 +65,8 @@ function AjoutEleve() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setIsPopupOpen(true)
+    setPopupStatus('creating')
     const { email, password, name, last_name, telephone, role } = formData
 
     if (!email || !password || !name || !last_name || !telephone || !role) {
@@ -71,10 +80,26 @@ function AjoutEleve() {
         password: password,
       })
       console.log('User created successfully:', response)
-      alert('Utilisateur ajouté avec succès')
+      setPopupStatus('success')
+
+      setTimeout(() => {
+        setIsPopupOpen(false)
+        setFormData({
+          email: '',
+          password: '',
+          name: '',
+          last_name: '',
+          telephone: '',
+          role: 'apprentice',
+        })
+      }, 2000)
     } catch (error) {
       console.error('Error creating user:', error)
-      alert("Erreur lors de l'ajout de l'utilisateur")
+      setErrorMessage("Erreur lors de l'ajout de l'utilisateur")
+      setPopupStatus('error')
+      setTimeout(() => {
+        setIsPopupOpen(false)
+      }, 2000)
     }
   }
 
@@ -144,14 +169,24 @@ function AjoutEleve() {
   ]
 
   return (
-    <BaseForm
-      title="Ajout d'un utilisateur"
-      submitLabel='Ajouter'
-      onSubmit={handleSubmit}
-      fields={fields}
-      fieldsOrder={fieldsOrder}
-      className='min-w-80'
-    />
+    <div>
+      <BaseForm
+        title="Ajout d'un utilisateur"
+        submitLabel='Ajouter'
+        onSubmit={handleSubmit}
+        fields={fields}
+        fieldsOrder={fieldsOrder}
+        className='min-w-80'
+      />
+      <ProgressPopup
+        isOpen={isPopupOpen}
+        status={popupStatus}
+        creatingMessage="Création de l'utilisateur en cours..."
+        successMessage='Utilisateur bien créé !'
+        errorMessage={errorMessage}
+        onClose={() => setIsPopupOpen(false)}
+      />
+    </div>
   )
 }
 

@@ -11,6 +11,9 @@
 import router from '@adonisjs/core/services/router'
 import server from '@adonisjs/core/services/server'
 
+// Import the jobs to start the cron tasks
+import '../app/jobs/event_reminder.js'
+
 /**
  * The error handler is used to convert an exception
  * to a HTTP response.

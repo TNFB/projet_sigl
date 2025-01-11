@@ -155,17 +155,7 @@ export default class UsersController {
       console.log(`User created: ${createUser}`)
 
       // Envoyer un email à l'utilisateur avec ses identifiants de connexion
-      const emailContent = `Bonjour ${name},
-
-Votre compte a été créé avec succès. Voici vos identifiants de connexion :
-
-Email : ${email}
-Mot de passe : ${password}
-
-Veuillez vous connecter et changer votre mot de passe dès que possible.
-
-Cordialement,
-L'équipe`
+      const emailContent = `Bonjour ${name},\n\nVotre compte a été créé avec succès.\n\nVoici vos identifiants de connexion :\nEmail : ${email}\nMot de passe : ${password}\n\nVeuillez vous connecter et changer votre mot de passe dès que possible.\n\nCordialement,\nL'équipe`
       await sendEmailToUser(email, 'Bienvenue sur notre plateforme', emailContent)
 
       //assigne Role

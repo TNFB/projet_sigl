@@ -1,12 +1,14 @@
-import ApprenticeMaster from '#models/apprentice_master'
+import Apprentice from '#models/apprentice'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 
 export default class extends BaseSeeder {
   async run() {
-    await ApprenticeMaster.createMany([
+    await Apprentice.createMany([
       {
-        id: 2,
+        id: 3,
+        id_apprentice_master: 2,
         id_company: 1,
+        id_cursus: 1
       },
     ])
   }

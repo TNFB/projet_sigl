@@ -30,6 +30,8 @@ import {
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { postRequest, postRequestCreateUser } from '@/api/api'
+import ProgressPopup from '@/components/ProgressPopup'
+import { set } from 'date-fns'
 
 export type User = {
   id: string
@@ -48,6 +50,13 @@ type UserTableProps = {
 const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
   const [users, setUsers] = useState<User[]>([])
   const [promotions, setPromotions] = useState<string[]>([])
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [popupStatus, setPopupStatus] = useState<
+    'creating' | 'success' | 'error'
+  >('creating')
+  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [progressMessage, setProgressMessage] = useState<string>('')
+  const [successMessage, setSuccessMessage] = useState<string>('')
 
   // Récupère les utilisateurs à afficher
   useEffect(() => {
@@ -136,6 +145,9 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
   //Gestion de l'ajout et de la modification
   const handleSaveUser = async () => {
     const { name, last_name, email, role, entreprise, promotion } = currentUser
+    setIsPopupOpen(true)
+    setProgressMessage('Création en cours...')
+    setPopupStatus('creating')
 
     if (name && email) {
       try {
@@ -147,11 +159,11 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
           company: entreprise || '',
           promotion: promotion || '',
         }
-        console.log('data:', data)
         const response = await postRequestCreateUser('user/createUser', data)
 
         console.log('User created successfully:', response)
-        alert('Utilisateur ajouté avec succès')
+        setSuccessMessage('Utilisateur créé avec succès')
+        setPopupStatus('success')
 
         const newUser: User = {
           id: response.id_user,
@@ -165,30 +177,88 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
 
         setUsers([...users, newUser])
         setIsDialogOpen(false)
-        setCurrentUser({
-          name: '',
-          last_name: '',
-          email: '',
-          role: '',
-          entreprise: '',
-          promotion: '',
-        })
+        setTimeout(() => {
+          setIsPopupOpen(false)
+          setCurrentUser({
+            name: '',
+            last_name: '',
+            email: '',
+            role: '',
+            entreprise: '',
+            promotion: '',
+          })
+          window.location.reload()
+        }, 2000)
       } catch (error) {
         console.error('Error creating user:', error)
-        alert("Erreur lors de l'ajout de l'utilisateur")
+        setErrorMessage("Erreur lors de la création de l'utilisateur")
+        setPopupStatus('error')
+        setTimeout(() => {
+          setIsPopupOpen(false)
+        }, 2000)
       }
     }
   }
 
   //Gestion des Suppressions
-  const handleDeleteUsers = (rowsToDelete: User[]) => {
-    setUsers(
-      users.filter((user) => !rowsToDelete.some((row) => row.id === user.id)),
-    )
+  const handleDeleteUsers = async (rowsToDelete: User[]) => {
+    setIsPopupOpen(true)
+    setProgressMessage('Suppression en cours...')
+    setPopupStatus('creating')
+    await Promise.all(rowsToDelete.map(async (row) => {
+      try {
+        const data = {
+          email: row.email,
+        }
+        const response = await postRequest('admin/deleteUser', JSON.stringify({ data: data }))
+        console.log('User deleted successfully:', response)
+        setSuccessMessage('Utilisateurs supprimés avec succès')
+        setPopupStatus('success')
+      } catch (error) {
+        console.error('Error deleting user:', error)
+        setErrorMessage("Erreur lors de suppression des utilisateurs")
+        setPopupStatus('error')
+        setTimeout(() => {
+          setIsPopupOpen(false)
+        }, 2000)
+      }
+    }))
+    setTimeout(() => {
+      setIsPopupOpen(false)
+      setUsers(
+        users.filter((user) => !rowsToDelete.some((row) => row.id === user.id)),
+      )
+    }, 2000)
   }
 
-  const handleDeleteSingleUser = (userId: string) => {
-    setUsers(users.filter((user) => user.id !== userId))
+  const handleDeleteSingleUser = (userEmail: string) => {
+    setIsPopupOpen(true)
+    setProgressMessage('Suppression en cours...')
+    setPopupStatus('creating')
+    try {
+      const data = {
+        email: userEmail,
+      }
+      postRequest('admin/deleteUser', JSON.stringify({ data: data })).then(
+        (response) => {
+          console.log('User deleted successfully:', response)
+          setSuccessMessage('Utilisateur supprimé avec succès')
+          setPopupStatus('success')
+        },
+      )
+    } catch (error) {
+      console.error('Error delete user:', error)
+      setErrorMessage("Erreur lors de la suppression de l'utilisateur")
+        setPopupStatus('error')
+        setTimeout(() => {
+          setIsPopupOpen(false)
+        }, 2000)
+    }
+    setTimeout(() => {
+      setIsPopupOpen(false)
+      setUsers(users.filter((user) => user.email !== userEmail))
+    }, 2000)
+    
   }
 
   //Gestion des colonnes et actions
@@ -290,7 +360,7 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
               <DropdownMenuItem
                 onSelect={(e) => {
                   e.preventDefault()
-                  handleDeleteSingleUser(user.id)
+                  handleDeleteSingleUser(user.email)
                 }}
               >
                 <Trash2 className='mr-2 h-4 w-4' /> Supprimer
@@ -451,6 +521,14 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
           setIsDialogOpen(true)
         }}
         onDelete={handleDeleteUsers}
+      />
+      <ProgressPopup
+        isOpen={isPopupOpen}
+        status={popupStatus}
+        creatingMessage={progressMessage}
+        successMessage={successMessage}
+        errorMessage={errorMessage}
+        onClose={() => setIsPopupOpen(false)}
       />
     </div>
   )

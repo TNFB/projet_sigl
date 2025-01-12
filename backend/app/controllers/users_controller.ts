@@ -130,7 +130,6 @@ export default class UsersController {
     console.log('createUser')
     try {
       const { data } = request.only(['data'])
-      console.log('data:', data)
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
@@ -148,7 +147,6 @@ export default class UsersController {
         })
       }
 
-      console.log('email:', email)
       //Check if Email Existe
       const emailDB = await db.from('users').where('email', email).count('* as total')
       if (emailDB[0].total > 0) {
@@ -164,7 +162,6 @@ export default class UsersController {
       const createUser = await db
         .table('users')
         .insert({ email, password: hashedPassword, name, last_name, role })
-      console.log(`User created: ${createUser}`)
 
       switch (role) {
         case 'admins':
@@ -216,6 +213,7 @@ export default class UsersController {
             list_presentation: JSON.stringify([]),
             created_at: new Date()
           }).returning('id_training_diary')
+
           // Insérer l'id de l'utilisateur et l'id de la promotion dans la table correspondante
           await db.table(role).insert({ id: createUser, id_cursus: promotionId, id_training_diary: newTrainingDiaryId })
           break

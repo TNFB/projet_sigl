@@ -106,6 +106,8 @@ Route.group(() => {
 Route.group(() => {
   Route.post('dropDocument', [DocumentsController, 'dropDocument']).as('dropDocument')
   Route.post('importUsers', [DocumentsController, 'importUsers']).as('importUsers')
+  Route.post('getUserDocuments', [DocumentsController, 'getUserDocuments']).as('getUserDocuments')
+  Route.post('download', [DocumentsController, 'download']).as('download')
 }).prefix('/document')
 
 Route.group(() => {

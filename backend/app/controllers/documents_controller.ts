@@ -71,7 +71,6 @@ export default class DocumentsController {
       //Path
       const basePath = `/${userDb.id_user}`
       const fileUrl = `${basePath}/${documentName}.${file.extname}`
-      console.log(`fileUrl: ${fileUrl}`)
 
       // Vérifier si le document existe déjà
       const existingDocument = await db
@@ -87,8 +86,6 @@ export default class DocumentsController {
           fs.unlink(fileToDelete, (err) => {
             if (err) {
               console.error('Erreur lors de la suppression du fichier (vérifier ENV):', err);
-            } else {
-              console.log('Fichier supprimé avec succès');
             }
           });
           
@@ -104,7 +101,6 @@ export default class DocumentsController {
             document: existingDocument,
           })
         }
-        console.log('Le document existais déjà (update)')
       } else {
         // Nouveau document, insérer dans la DB
         await db.table('documents').insert({
@@ -112,15 +108,12 @@ export default class DocumentsController {
           document_path: fileUrl,
           uploaded_at: new Date(),
         })
-        console.log('Nouveau document inséré (BDD)')
       }
-      console.log('Befor Move To Disk')
       try {
         // Déplacer le fichier une seule fois, après avoir mis à jour ou inséré dans la DB
         await file.moveToDisk(fileUrl, {
           name: documentName,
         })
-        console.log('Move document (Disk)')  
       } catch ( error ) {
         console.error('Erreur lors du déplacement du fichier:', error)
       }
@@ -170,7 +163,6 @@ export default class DocumentsController {
 
       const filePath = `${Date.now()}_${file.clientName}`
       const fullPath = path.join(process.cwd(), 'tmp', filePath)
-      //console.log(`Full path: ${fullPath}`) // Log the full path
 
       await file.move(process.cwd() + '/tmp', { name: filePath })
 
@@ -281,6 +273,77 @@ export default class DocumentsController {
       return response.internalServerError({
         message: 'An error occurred while importing users',
         error: error.message,
+      })
+    }
+  }
+
+  async getUserDocuments({ request, response }: HttpContext) {
+    console.log('getUserDocuments')
+    try {
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+  
+      const userDb = await findUserByEmail(emailUser)
+      if (!userDb) {
+        return response.notFound({ message: 'User not found' })
+      }
+  
+      const userDocuments = await db
+        .from('documents')
+        .select('id_document', 'name', 'document_path', 'uploaded_at')
+        .where('document_path', 'like', `/${userDb.id_user}/%`)
+        .orderBy('uploaded_at', 'desc')
+  
+      return response.ok({
+        message: 'Documents retrieved successfully',
+        documents: userDocuments
+      })
+    } catch (error) {
+      console.error('Error in getUserDocuments:', error)
+      return response.status(500).json({
+        status: 'error',
+        message: 'Error retrieving user documents'
+      })
+    }
+  }
+  
+  async download({ request, response }: HttpContext) {
+    console.log('download')
+    try {
+      const { data } = request.only(['data'])
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+  
+      const { path } = data
+  
+      const document = await db
+        .from('documents')
+        .where('document_path', path)
+        .first()
+  
+      if (!document) {
+        return response.notFound({ message: 'Document not found' })
+      }
+  
+      const storagePath = process.env.STORAGE_PATH
+      if (!storagePath) {
+        return response.internalServerError({ message: 'Storage path not configured' })
+      }
+  
+      const filePath = `${storagePath}/${document.document_path}`
+      if (!fs.existsSync(filePath)) {
+        return response.notFound({ message: 'File not found on server' })
+      }
+      return response.download(filePath, document.name)
+    } catch (error) {
+      console.error('Error in download:', error)
+      return response.status(500).json({
+        status: 'error',
+        message: 'Error downloading document'
       })
     }
   }

@@ -41,6 +41,7 @@ export type User = {
   role: string
   entreprise?: string
   promotion?: string
+  telephone?: string
 }
 
 type UserTableProps = {
@@ -85,13 +86,15 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
     role: '',
     entreprise: '',
     promotion: '',
+    telephone: '',
   })
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add')
 
   const openEditDialog = (user: User) => {
-    console.log('user', user)
-    const [firstName, lastName] = user.name.split(' ')
+    const [firstName, ...lastNameParts] = user.name.split(' ')
+    const lastName = lastNameParts.join(' ')
     setCurrentUser({ ...user, name: firstName, last_name: lastName })
+    console.log('currentUser', currentUser.last_name)
     setDialogMode('edit')
     setIsDialogOpen(true)
   }
@@ -118,7 +121,8 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
 
   //Gestion de l'ajout et de la modification
   const handleSaveUser = async () => {
-    const { name, email, role, entreprise, promotion } = currentUser
+    const { name, last_name, email, role, entreprise, promotion, telephone } =
+      currentUser
     console.log('currentUser', currentUser)
     setIsPopupOpen(true)
     setProgressMessage('Création en cours...')
@@ -129,24 +133,28 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
         const data = {
           email: email || '',
           name: name || '',
-          last_name: last_name || '',
+          lastName: last_name || '',
           role: role || 'user',
           company: entreprise || '',
           promotion: promotion || '',
+          telephone: telephone || '',
         }
-        const response = await postRequestCreateUser('user/createUser', data)
+        console.log('data', data)
+
+        let response
+        if (dialogMode === 'add') {
+          response = await postRequestCreateUser('user/createUser', data)
+          setSuccessMessage('Utilisateur créé avec succès')
+        } else {
+          response = await postRequest(
+            'user/updateUser',
+            JSON.stringify({ data: data }),
+          )
+          setSuccessMessage('Utilisateur modifié avec succès')
+        }
         setSuccessMessage('Utilisateur créé avec succès')
         setPopupStatus('success')
 
-        const newUser: User = {
-          id: response.id_user,
-          name: response.name,
-          last_name: response.last_name,
-          email: response.email,
-          role: response.role,
-          entreprise: response.entreprise || '',
-          promotion: response.promotion || '',
-        }
         setTimeout(() => {
           setIsDialogOpen(false)
           setIsPopupOpen(false)
@@ -411,7 +419,7 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
                 onChange={(e) =>
                   setCurrentUser({ ...currentUser, last_name: e.target.value })
                 }
-                className='col-span-3 border border-gray-300 text-black placeholder-gray-500 rounded-sm focus:border-gray-300'
+                className='col-span-3 border border-gray-300 text-black placeholder-gray-500 rounded-sm focus:border-gray-300 selection:bg-gray-300 selection:text-black'
               />
             </div>
             <div className='grid grid-cols-4 items-center gap-4'>
@@ -436,6 +444,19 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
                 value={currentUser.email}
                 onChange={(e) =>
                   setCurrentUser({ ...currentUser, email: e.target.value })
+                }
+                className='col-span-3 border border-gray-300 text-black placeholder-gray-500 rounded-sm focus:border-gray-300'
+              />
+            </div>
+            <div className='grid grid-cols-4 items-center gap-4'>
+              <Label htmlFor='email' className='text-right'>
+                Téléphone
+              </Label>
+              <Input
+                id='telephone'
+                value={currentUser.telephone}
+                onChange={(e) =>
+                  setCurrentUser({ ...currentUser, telephone: e.target.value })
                 }
                 className='col-span-3 border border-gray-300 text-black placeholder-gray-500 rounded-sm focus:border-gray-300'
               />

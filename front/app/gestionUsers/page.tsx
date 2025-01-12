@@ -34,6 +34,7 @@ export default function GestionUsers() {
           email: user.email,
           role: user.role,
           promotion: user.promotion_name,
+          telephone: user.telephone,
         }))
         setUsers(formattedUsers)
       } catch (error) {

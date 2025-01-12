@@ -7,12 +7,12 @@ import { postRequest } from '@/api/api'
 
 export default function GestionUsers() {
   interface User {
-    id: string;
-    name: string;
-    last_name: string;
-    email: string;
-    role: string;
-    promotion?: string;
+    id: string
+    name: string
+    last_name: string
+    email: string
+    role: string
+    promotion?: string
   }
 
   const [users, setUsers] = useState<User[]>([])

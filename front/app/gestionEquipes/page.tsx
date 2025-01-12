@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import BaseMultiAjout from '@/components/BaseMultiAjout'
 import { postRequest } from '@/api/api'
 import { ChevronRight, ChevronDown } from 'lucide-react'
-import { AutoComplete, type Option } from "@/components/autoComplete"
+import { AutoComplete, type Option } from '@/components/autoComplete'
 
 export type User = {
   id: string
@@ -51,7 +51,9 @@ const GestionEquipes: React.FC<UsersProps> = ({ usersData }) => {
   useEffect(() => {
     setUsers(usersData)
 
-    const apprentices = usersData.filter((user: User) => user.role === 'apprentices')
+    const apprentices = usersData.filter(
+      (user: User) => user.role === 'apprentices',
+    )
     const apprenticeMasters = usersData.filter(
       (user: User) => user.role === 'apprentice_masters',
     )
@@ -78,11 +80,14 @@ const GestionEquipes: React.FC<UsersProps> = ({ usersData }) => {
 
   const addRow = () => {
     if (rows.length < 4) {
-      setRows([...rows, { alternant: '', tuteur: '', maitre_apprentissage: '' }]);
+      setRows([
+        ...rows,
+        { alternant: '', tuteur: '', maitre_apprentissage: '' },
+      ])
     } else {
-      alert('Vous ne pouvez ajouter que 4 lignes de saisie au maximum.');
+      alert('Vous ne pouvez ajouter que 4 lignes de saisie au maximum.')
     }
-  };
+  }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -137,7 +142,9 @@ const GestionEquipes: React.FC<UsersProps> = ({ usersData }) => {
       </div>
       <div
         className={`transition-all duration-500 ease-in-out ${
-          isMultiAddOpen ? 'max-h-screen opacity-100 overflow-visible' : 'max-h-0 opacity-0'
+          isMultiAddOpen
+            ? 'max-h-screen opacity-100 overflow-visible'
+            : 'max-h-0 opacity-0'
         } overflow-hidden`}
       >
         <BaseMultiAjout
@@ -148,9 +155,18 @@ const GestionEquipes: React.FC<UsersProps> = ({ usersData }) => {
           addRow={addRow}
           onSubmit={handleSubmit}
           options={{
-            alternant: apprentices.map(user => ({ value: user.email, label: `${user.name} ${user.last_name}` })),
-            tuteur: educationalTutors.map(user => ({ value: user.email, label: `${user.name} ${user.last_name}` })),
-            maitre_apprentissage: apprenticeMasters.map(user => ({ value: user.email, label: `${user.name} ${user.last_name}` })),
+            alternant: apprentices.map((user) => ({
+              value: user.email,
+              label: `${user.name} ${user.last_name}`,
+            })),
+            tuteur: educationalTutors.map((user) => ({
+              value: user.email,
+              label: `${user.name} ${user.last_name}`,
+            })),
+            maitre_apprentissage: apprenticeMasters.map((user) => ({
+              value: user.email,
+              label: `${user.name} ${user.last_name}`,
+            })),
           }}
         />
       </div>

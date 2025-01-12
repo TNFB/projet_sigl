@@ -1,6 +1,6 @@
 'use client'
 import React, { useRef, useEffect } from 'react'
-import { AutoComplete, type Option } from "@/components/autoComplete"
+import { AutoComplete, type Option } from '@/components/autoComplete'
 
 interface BaseMultiAjoutProps {
   typeAjout: string
@@ -60,17 +60,19 @@ const BaseMultiAjout: React.FC<BaseMultiAjoutProps> = ({
                 </label>
                 <AutoComplete
                   options={options[fieldName]}
-                  value={options[fieldName].find(option => option.value === row[fieldName])}
+                  value={options[fieldName].find(
+                    (option) => option.value === row[fieldName],
+                  )}
                   onValueChange={(selectedOption) => {
                     const syntheticEvent = {
                       target: {
-                        value: selectedOption.value
-                      }
-                    } as React.ChangeEvent<HTMLInputElement>;
-                    onChange(syntheticEvent, rowIndex, fieldName);
+                        value: selectedOption.value,
+                      },
+                    } as React.ChangeEvent<HTMLInputElement>
+                    onChange(syntheticEvent, rowIndex, fieldName)
                   }}
                   placeholder={`Select ${fieldName}`}
-                  emptyMessage="No results."
+                  emptyMessage='No results.'
                 />
               </div>
             ))}

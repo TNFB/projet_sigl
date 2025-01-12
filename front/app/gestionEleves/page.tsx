@@ -5,7 +5,6 @@ import Home from '@/components/Home'
 import ModifMDP from './modifMDP'
 import NewLivrable from './newLivrable'
 import AddDoc from './addDoc'
-import CreationJF from './creationJF'
 
 function GestionEleves() {
   const router = useRouter()
@@ -43,9 +42,6 @@ function GestionEleves() {
         <div className='flex flex-col space-y-2'>
           <NewLivrable />
           <AddDoc />
-        </div>
-        <div className='flex flex-col space-y-5'>
-          <CreationJF />
         </div>
       </div>
     </Home>

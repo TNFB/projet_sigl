@@ -14,13 +14,14 @@ export type User = {
   role: string
   entreprise?: string
   promotion?: string
+  telephone?: string
 }
 
-type UsersProps = {
-  usersData: User[]
+type PageProps = {
+  usersD: User[]
 }
 
-const GestionEquipes: React.FC<UsersProps> = ({ usersData }) => {
+const GestionEquipes: React.FC<PageProps> = ({ usersD }) => {
   const [users, setUsers] = useState<User[]>([])
   const [apprentices, setApprentices] = useState<User[]>([])
   const [apprenticeMasters, setApprenticeMasters] = useState<User[]>([])
@@ -49,23 +50,20 @@ const GestionEquipes: React.FC<UsersProps> = ({ usersData }) => {
   }, [router])
 
   useEffect(() => {
-    setUsers(usersData)
+    setUsers(usersD)
 
-    const apprentices = usersData.filter(
-      (user: User) => user.role === 'apprentices',
+    const apprentices = usersD.filter((user) => user.role === 'apprentices')
+    const apprenticeMasters = usersD.filter(
+      (user) => user.role === 'apprentice_masters',
     )
-    const apprenticeMasters = usersData.filter(
-      (user: User) => user.role === 'apprentice_masters',
-    )
-    const educationalTutors = usersData.filter(
-      (user: User) => user.role === 'educational_tutors',
+    const educationalTutors = usersD.filter(
+      (user) => user.role === 'educational_tutors',
     )
 
     setApprentices(apprentices)
     setApprenticeMasters(apprenticeMasters)
     setEducationalTutors(educationalTutors)
-    console.log('Users:', users)
-  }, [usersData, users])
+  }, [usersD, users])
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,

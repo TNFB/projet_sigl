@@ -5,16 +5,18 @@ import UserTable from '@/components/table/UserTable'
 import GestionEquipes from '../gestionEquipes/page'
 import { postRequest } from '@/api/api'
 
-export default function GestionUsers() {
-  interface User {
-    id: string
-    name: string
-    last_name: string
-    email: string
-    role: string
-    promotion?: string
-  }
+export type User = {
+  id: string
+  name: string
+  last_name: string
+  email: string
+  role: string
+  entreprise?: string
+  promotion?: string
+  telephone?: string
+}
 
+export default function GestionUsers() {
   const [users, setUsers] = useState<User[]>([])
 
   useEffect(() => {
@@ -31,10 +33,12 @@ export default function GestionUsers() {
         const formattedUsers = response.users.map((user: any) => ({
           id: user.id_user,
           name: `${user.name} ${user.last_name}`,
+          last_name: user.last_name,
           email: user.email,
           role: user.role,
-          promotion: user.promotion_name,
-          telephone: user.telephone,
+          entreprise: user.entreprise_name || '',
+          promotion: user.promotion_name || '',
+          telephone: user.telephone || '',
         }))
         setUsers(formattedUsers)
       } catch (error) {
@@ -50,7 +54,7 @@ export default function GestionUsers() {
   }
   return (
     <Home>
-      <GestionEquipes usersData={users} />
+      <GestionEquipes usersD={users} />
       <UserTable usersData={users} onUserDelete={handleUserDelete} />
     </Home>
   )

@@ -1,9 +1,12 @@
-import EducationalTutor from '#models/educational_tutor'
+import Cursus from '#models/cursus'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 
 export default class extends BaseSeeder {
   async run() {
-    await EducationalTutor.createMany([
+    await Cursus.createMany([
+      {
+        promotion_name: 'PointAuCarre'
+      }
     ])
   }
 }

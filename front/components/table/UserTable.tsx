@@ -44,10 +44,11 @@ export type User = {
 }
 
 type UserTableProps = {
-  typeUser?: string
+  usersData: User[]
+  onUserDelete: (userId: string) => void
 }
 
-const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
+const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
   const [users, setUsers] = useState<User[]>([])
   const [promotions, setPromotions] = useState<string[]>([])
   const [isPopupOpen, setIsPopupOpen] = useState(false)
@@ -57,34 +58,6 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [progressMessage, setProgressMessage] = useState<string>('')
   const [successMessage, setSuccessMessage] = useState<string>('')
-
-  // Récupère les utilisateurs à afficher
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const data = {
-          role: typeUser || null,
-          detailed: 'true',
-        }
-        const response = await postRequest(
-          'user/getUserEmailsByRole',
-          JSON.stringify({ data: data }),
-        )
-        const formattedUsers = response.users.map((user: any) => ({
-          id: user.id_user,
-          name: `${user.name} ${user.last_name}`,
-          email: user.email,
-          role: user.role,
-          promotion: user.promotion_name,
-        }))
-        setUsers(formattedUsers)
-      } catch (error) {
-        console.error('Error fetching emails:', error)
-      }
-    }
-
-    fetchUsers()
-  }, [typeUser])
 
   // Récupère les promotions pour le champ ajout d un apprenti
   useEffect(() => {
@@ -99,8 +72,9 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
         console.error('Error fetching promotions:', error)
       }
     }
+    setUsers(usersData)
     fetchPromotions()
-  }, [])
+  }, [usersData])
 
   //Gestion de la popup
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -170,10 +144,8 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
           entreprise: response.entreprise || '',
           promotion: response.promotion || '',
         }
-
-        setUsers([...users, newUser])
-        setIsDialogOpen(false)
         setTimeout(() => {
+          setIsDialogOpen(false)
           setIsPopupOpen(false)
           setCurrentUser({
             name: '',
@@ -212,6 +184,7 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
             JSON.stringify({ data: data }),
           )
           setSuccessMessage('Utilisateurs supprimés avec succès')
+          onUserDelete(row.email)
           setPopupStatus('success')
         } catch (error) {
           console.error('Error deleting user:', error)
@@ -255,6 +228,7 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
     }
     setTimeout(() => {
       setIsPopupOpen(false)
+      onUserDelete(userEmail)
       setUsers(users.filter((user) => user.email !== userEmail))
     }, 2000)
   }

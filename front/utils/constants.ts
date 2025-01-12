@@ -52,31 +52,6 @@ export const SIDEBAR_ADMIN_ITEMS = [
     icon: 'UsersRound',
   },
   {
-    label: 'Gestion des livrables',
-    href: '/',
-    icon: 'BookOpen',
-  },
-  {
-    label: "Maîtres d'apprentissage",
-    href: '/gestionMaitresApp',
-    icon: 'UsersRound',
-  },
-  {
-    label: 'Tuteurs pédagogiques',
-    href: '/gestionTuteurs',
-    icon: 'UsersRound',
-  },
-  {
-    label: 'Intervenants extérieurs',
-    href: '/gestionIntervenants',
-    icon: 'UsersRound',
-  },
-  {
-    label: 'Entreprises partenaires',
-    href: '/gestionEntreprises',
-    icon: 'UsersRound',
-  },
-  {
     label: 'Équipes tutorales',
     href: '/gestionEquipes',
     icon: 'UsersRound',

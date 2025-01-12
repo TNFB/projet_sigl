@@ -49,7 +49,7 @@ const ProgressPopup: React.FC<ProgressPopupProps> = ({
 
   return (
     <div
-      className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'
+      className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-500'
       onClick={onClose}
     >
       <div

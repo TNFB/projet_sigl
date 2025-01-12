@@ -51,9 +51,4 @@ export const SIDEBAR_ADMIN_ITEMS = [
     href: '/gestionEleves',
     icon: 'UsersRound',
   },
-  {
-    label: 'Équipes tutorales',
-    href: '/gestionEquipes',
-    icon: 'UsersRound',
-  },
 ]

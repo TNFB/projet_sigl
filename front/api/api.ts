@@ -94,12 +94,12 @@ export const postRequestImportUser = async (
 export const postRequestCreateUser = async (
   url: string,
   userData: {
-    email: string
-    password: string
     name: string
     last_name: string
-    telephone: string
+    email: string
     role: string
+    entreprise?: string
+    promotion?: string
   },
 ) => {
   const token = localStorage.getItem('token')

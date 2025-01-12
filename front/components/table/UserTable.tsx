@@ -34,6 +34,7 @@ import { postRequest, postRequestCreateUser } from '@/api/api'
 export type User = {
   id: string
   name: string
+  last_name: string
   email: string
   role: string
   entreprise?: string
@@ -98,8 +99,9 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState<Partial<User>>({
     name: '',
+    last_name: '',
     email: '',
-    role: 'user',
+    role: '',
     entreprise: '',
     promotion: '',
   })
@@ -133,36 +135,44 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
 
   //Gestion de l'ajout et de la modification
   const handleSaveUser = async () => {
-    const { name, email, role, entreprise, promotion } = currentUser
+    const { name, last_name, email, role, entreprise, promotion } = currentUser
 
     if (name && email) {
       try {
-        const response = await postRequestCreateUser('user/createUser', {
-          email,
-          password: 'defaultPassword',
-          name,
-          last_name: '',
-          telephone: '',
+        const data = {
+          email: email || '',
+          name: name || '',
+          last_name: last_name || '',
           role: role || 'user',
-          entreprise,
-          promotion,
-        })
+          company: entreprise || '',
+          promotion: promotion || '',
+        }
+        console.log('data:', data)
+        const response = await postRequestCreateUser('user/createUser', data)
 
         console.log('User created successfully:', response)
         alert('Utilisateur ajouté avec succès')
 
         const newUser: User = {
-          id: response.userId,
-          name,
-          email,
-          role: role || 'user',
-          entreprise,
-          promotion,
+          id: response.id_user,
+          name: response.name,
+          last_name: response.last_name,
+          email: response.email,
+          role: response.role,
+          entreprise: response.entreprise || '',
+          promotion: response.promotion || '',
         }
 
         setUsers([...users, newUser])
         setIsDialogOpen(false)
-        setCurrentUser({ name: '', email: '', role: 'user' })
+        setCurrentUser({
+          name: '',
+          last_name: '',
+          email: '',
+          role: '',
+          entreprise: '',
+          promotion: '',
+        })
       } catch (error) {
         console.error('Error creating user:', error)
         alert("Erreur lors de l'ajout de l'utilisateur")
@@ -305,8 +315,21 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
           </DialogHeader>
           <div className='grid gap-4 py-4'>
             <div className='grid grid-cols-4 items-center gap-4'>
-              <Label htmlFor='name' className='text-right'>
+              <Label htmlFor='last_name' className='text-right'>
                 Nom
+              </Label>
+              <Input
+                id='last_name'
+                value={currentUser.last_name}
+                onChange={(e) =>
+                  setCurrentUser({ ...currentUser, last_name: e.target.value })
+                }
+                className='col-span-3 border border-gray-300 text-black placeholder-gray-500 rounded-sm focus:border-gray-300'
+              />
+            </div>
+            <div className='grid grid-cols-4 items-center gap-4'>
+              <Label htmlFor='name' className='text-right'>
+                Prénom
               </Label>
               <Input
                 id='name'

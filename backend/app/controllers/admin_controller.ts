@@ -86,8 +86,7 @@ export default class AdminController {
 
       // Envoyer un email à l'utilisateur avec le nouveau mot de passe
       const emailContent = `Bonjour ${userDb.name},\n\nVotre mot de passe a été réinitialisé. Voici votre nouveau mot de passe temporaire :\n\nMot de passe : ${newPassword}\n\nVeuillez vous connecter et changer votre mot de passe dès que possible.\n\nCordialement,\nL'équipe`
-
-      await sendEmailToUser(email, 'Réinitialisation de votre mot de passe', emailContent)
+      //a_supprimer await sendEmailToUser(email, 'Réinitialisation de votre mot de passe', emailContent)
 
       return response.status(200).json({
         status: 'success',

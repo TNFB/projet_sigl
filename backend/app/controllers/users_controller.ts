@@ -102,6 +102,15 @@ export default class UsersController {
     }
   }
 
+  private generateRandomPassword(length: number = 8): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    let password = ''
+    for (let i = 0; i < length; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    return password
+  }
+
   /**
    * @brief Crée un nouvel utilisateur.
    *
@@ -121,10 +130,11 @@ export default class UsersController {
     console.log('createUser')
     try {
       const { data } = request.only(['data'])
+      console.log('data:', data)
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, password, name, last_name, telephone, role } = data
+      const { email, name, last_name, role, company, promotion } = data
 
       const emailUser = (request as any).user?.email
       if (!emailUser) {
@@ -138,6 +148,7 @@ export default class UsersController {
         })
       }
 
+      console.log('email:', email)
       //Check if Email Existe
       const emailDB = await db.from('users').where('email', email).count('* as total')
       if (emailDB[0].total > 0) {
@@ -148,28 +159,77 @@ export default class UsersController {
       }
 
       //Create User
+      const password = this.generateRandomPassword()
       const hashedPassword = await bcrypt.hash(password, 10)
       const createUser = await db
         .table('users')
-        .insert({ email, password: hashedPassword, name, last_name, telephone, role })
+        .insert({ email, password: hashedPassword, name, last_name, role })
       console.log(`User created: ${createUser}`)
+
+      switch (role) {
+        case 'admins':
+        case 'educational_tutors':
+        case 'teachers':
+          await db.table(role).insert({ id: createUser })
+          break
+        case 'apprentice_masters':
+        case 'professionals':
+          // Vérifier si la company existe déjà
+          const [existingCompany] = await db
+            .from('companies')
+            .where('name', company)
+            .select('id_company')
+          
+          let companyId
+          if (existingCompany) {
+            companyId = existingCompany.id
+          } else {
+            // Créer la company si elle n'existe pas
+            const [newCompanyId] = await db.table('companies').insert({ name: company }).returning('id_company')
+            companyId = newCompanyId
+          }
+
+          // Insérer l'id de l'utilisateur et l'id de la company dans la table correspondante
+          await db.table(role).insert({ id: createUser, id_company: companyId })
+          break
+        case 'apprentices':
+          // Récupérer l'id de la promotion dans la table cursus
+          const [cursus] = await db
+            .from('cursus')
+            .where('promotion_name', promotion)
+            .select('id_cursus')
+
+          if (!cursus) {
+            return response.status(400).json({
+              status: 'error',
+              message: 'Invalid promotion',
+            })
+          }
+
+          let promotionId = cursus.id_cursus
+          const [newTrainingDiaryId] = await db.table('training_diaries').insert({
+            semester_grades: JSON.stringify({}),
+            document_list: JSON.stringify([]),
+            evaluation: 0,
+            list_interview: JSON.stringify([]),
+            list_report: JSON.stringify([]),
+            list_presentation: JSON.stringify([]),
+            created_at: new Date()
+          }).returning('id_training_diary')
+          // Insérer l'id de l'utilisateur et l'id de la promotion dans la table correspondante
+          await db.table(role).insert({ id: createUser, id_cursus: promotionId, id_training_diary: newTrainingDiaryId })
+          break
+        default:
+          return response.status(400).json({
+            status: 'error',
+            message: 'Invalid role',
+          })
+      }
 
       // Envoyer un email à l'utilisateur avec ses identifiants de connexion
       const emailContent = `Bonjour ${name},\n\nVotre compte a été créé avec succès.\n\nVoici vos identifiants de connexion :\nEmail : ${email}\nMot de passe : ${password}\n\nVeuillez vous connecter et changer votre mot de passe dès que possible.\n\nCordialement,\nL'équipe`
-      await sendEmailToUser(email, 'Bienvenue sur notre plateforme', emailContent)
+      //a_supprimer await sendEmailToUser(email, 'Bienvenue sur notre plateforme', emailContent)
 
-      //assigne Role
-      let id = createUser
-      console.log('role', role)
-      if (role && role !== '') {
-        await db.table(role).insert({ id })
-      } else {
-        return response.status(200).json({
-          status: 'success',
-          message: 'User created without role',
-        })
-      }
-      console.log(`User Role created ${createUser[0].role}`)
       return response.status(200).json({
         status: 'success',
         message: 'users created',

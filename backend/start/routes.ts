@@ -23,8 +23,6 @@ const DepositsController = () => import('../app/controllers/deposits_controller.
 const CompaniesController = () => import('../app/controllers/compagies_controller.js')
 const ProfessionalsController = () => import('../app/controllers/professionals_controller.js')
 const MonthluNotesController = () => import('../app/controllers/monthly_notes_controller.js')
-const ApprenticeshipCoordinatorsController = () =>
-  import('../app/controllers/apprenticeship_coordinators_controller.js')
 const EventsController = () => import('../app/controllers/events_controller.js')
 const ApprenticesController = () => import('../app/controllers/apprentices_controller.js')
 const CursusController = () => import('../app/controllers/cursus_controller.js')
@@ -49,6 +47,7 @@ Route.group(() => {
 Route.group(() => {
   Route.post('/overritePassword', [AdminController, 'overritePassword']).as('overritePassword')
   Route.post('/deleteUser', [AdminController, 'deleteUser']).as('deleteUser')
+  Route.post('/linkApprentice', [AdminController, 'linkApprentice']).as('linkApprentice')
 }).prefix('/admin')
 
 Route.group(() => {
@@ -149,12 +148,6 @@ Route.group(() => {
     'deleteNote'
   )
 }).prefix('monthlyNotes')
-
-Route.group(() => {
-  Route.post('linkApprentice', [ApprenticeshipCoordinatorsController, 'linkApprentice']).as(
-    'linkApprentice'
-  )
-}).prefix('ApprenticeshipCoordinator')
 
 Route.group(() => {
   Route.post('getEvents', [EventsController, 'getEvents']).as(

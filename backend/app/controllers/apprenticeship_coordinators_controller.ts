@@ -1,12 +1,30 @@
 import db from '@adonisjs/lucid/services/db'
-import type { HttpContext } from '@adonisjs/core/http'
+import { isValidRole } from '../utils/api_utils.js'
+import { HttpContext } from '@adonisjs/core/http'
 
 export default class ApprenticeshipCoordinatorsController {
-  async linkApprentice({ request, response }: HttpContext) {
+  public async linkApprentice({ request, response }: HttpContext) {
     try {
       const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
 
-      if (!Array.isArray(data) || data.length === 0) {
+      const { peopleData } = data
+
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      // Vérifier si l'admin existe et si le token est valide
+      if (!(await isValidRole(emailUser, 'admins'))) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role',
+        })
+      }
+
+      if (!Array.isArray(peopleData) || peopleData.length === 0) {
         return response
           .status(400)
           .json({ message: 'Invalid input: data should be a non-empty array' })
@@ -14,7 +32,7 @@ export default class ApprenticeshipCoordinatorsController {
 
       const results = []
 
-      for (const liaison of data) {
+      for (const liaison of peopleData) {
         const { apprenticeEmail, masterEmail, tutorEmail } = liaison
 
         // Vérifier si l'apprenti existe et s'il a le bon rôle
@@ -63,17 +81,17 @@ export default class ApprenticeshipCoordinatorsController {
         }
 
         // Mettre à jour l'enregistrement de l'apprenti pour lier les IDs
-        await db.from('apprentices').where('id', apprentice.idUser).update({
-          idApprenticeMaster: apprenticeMaster.idUser,
-          idEducationalTutor: educationalTutor.idUser,
+        await db.from('apprentices').where('id', apprentice.id_user).update({
+          id_apprentice_master: apprenticeMaster.id_user,
+          id_educational_tutor: educationalTutor.id_user,
         })
 
         results.push({
           status: 'success',
           message: 'Liaison créée avec succès',
-          apprenticeId: apprentice.idUser,
-          masterId: apprenticeMaster.idUser,
-          tutorId: educationalTutor.idUser,
+          apprenticeId: apprentice.id_user,
+          masterId: apprenticeMaster.id_user,
+          tutorId: educationalTutor.id_user,
         })
       }
 

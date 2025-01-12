@@ -5,8 +5,8 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('idJury').primary()
-      table.json('listeIdJury')
+      table.increments('id_jury').primary()
+      table.json('liste_id_jury')
     })
   }
 

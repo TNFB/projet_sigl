@@ -5,5 +5,5 @@ export default class ProgramManager extends BaseModel {
   declare id: number
 
   @column()
-  declare listIdCursus: JSON
+  declare list_id_cursus: JSON
 }

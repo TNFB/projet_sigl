@@ -2,7 +2,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
-  declare idUser: number
+  declare id_user: number
 
   @column()
   declare email: string
@@ -14,7 +14,7 @@ export default class User extends BaseModel {
   declare name: string
 
   @column()
-  declare lastName: string
+  declare last_name: string
 
   @column()
   declare telephone: string

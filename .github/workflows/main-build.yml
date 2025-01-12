@@ -1,0 +1,60 @@
+name: main-build
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  ARTIFACT_VERSION: v3.${{ github.run_number }}
+
+jobs:
+  build_backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Run the Dockerfile
+        run: |
+          cd backend
+          docker build -t ghcr.io/tnfb/${{ github.event.repository.name }}/backend:${{ env.ARTIFACT_VERSION }} -t ghcr.io/tnfb/${{ github.event.repository.name }}/backend:latest .
+
+      # Pousser l'image Docker vers GHCR
+      - name: Push Docker image to GitHub Container Registry
+        run: |
+          docker push ghcr.io/tnfb/${{ github.event.repository.name }}/backend:${{ env.ARTIFACT_VERSION }}
+          docker push ghcr.io/tnfb/${{ github.event.repository.name }}/backend:latest
+ 
+  build_front:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Run the Dockerfile
+        run: |
+          cd front
+          docker build -t ghcr.io/tnfb/${{ github.event.repository.name }}/front:${{ env.ARTIFACT_VERSION }} -t ghcr.io/tnfb/${{ github.event.repository.name }}/front:latest --build-arg ARG_NEXT_PUBLIC_API_URL=https://backend-journal-formation.francecentral.cloudapp.azure.com .
+
+      # Pousser l'image Docker vers GHCR
+      - name: Push Docker image to GitHub Container Registry
+        run: |
+          docker push ghcr.io/tnfb/${{ github.event.repository.name }}/front:${{ env.ARTIFACT_VERSION }}
+          docker push ghcr.io/tnfb/${{ github.event.repository.name }}/front:latest

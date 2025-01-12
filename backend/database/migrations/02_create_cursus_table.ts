@@ -5,10 +5,8 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('idCursus').primary()
-      table.string('promotionName')
-      table.dateTime('startPromotionYear')
-      table.dateTime('endPromotionYear')
+      table.increments('id_cursus').primary()
+      table.string('promotion_name')
     })
   }
 

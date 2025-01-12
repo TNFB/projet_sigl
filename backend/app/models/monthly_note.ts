@@ -1,15 +1,11 @@
-import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 export default class MonthluNote extends BaseModel {
   @column({ isPrimary: true })
-  declare idMonthlyNote: number
+  declare id_monthly_note: number
 
   @column()
-  declare idtraningDiary: number
-
-  @column()
-  declare creationDate: DateTime
+  declare id_traning_diary: number
 
   @column()
   declare title: string

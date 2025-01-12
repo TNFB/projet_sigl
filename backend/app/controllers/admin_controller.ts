@@ -37,7 +37,7 @@ export default class AdminController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, newPassword } = data
+      const { email } = data
 
       if (await isUserTableEmpty()) {
         console.log('User table empty')
@@ -68,6 +68,7 @@ export default class AdminController {
         })
       }
       // Check if same Password
+      const newPassword = this.generateRandomPassword()
       const isPasswordValid = await bcrypt.compare(newPassword, userDb.password)
       if (isPasswordValid) {
         return response.status(422).json({
@@ -99,6 +100,15 @@ export default class AdminController {
         message: 'Error in users overritePassword',
       })
     }
+  }
+
+  private generateRandomPassword(length: number = 8): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    let password = ''
+    for (let i = 0; i < length; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    return password
   }
 
   /**

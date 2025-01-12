@@ -27,7 +27,12 @@ const FileUploadDialog = ({ isOpen, onClose }) => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: '.xlsx, .xls',
+    accept: {
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [
+        '.xlsx',
+      ],
+      'application/vnd.ms-excel': ['.xls'],
+    },
   })
 
   const handleSubmit = async (e) => {

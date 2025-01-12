@@ -89,7 +89,9 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add')
 
   const openEditDialog = (user: User) => {
-    setCurrentUser(user)
+    console.log('user', user)
+    const [firstName, lastName] = user.name.split(' ')
+    setCurrentUser({ ...user, name: firstName, last_name: lastName })
     setDialogMode('edit')
     setIsDialogOpen(true)
   }
@@ -116,7 +118,8 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
 
   //Gestion de l'ajout et de la modification
   const handleSaveUser = async () => {
-    const { name, last_name, email, role, entreprise, promotion } = currentUser
+    const { name, email, role, entreprise, promotion } = currentUser
+    console.log('currentUser', currentUser)
     setIsPopupOpen(true)
     setProgressMessage('Création en cours...')
     setPopupStatus('creating')
@@ -230,6 +233,48 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
       setIsPopupOpen(false)
       onUserDelete(userEmail)
       setUsers(users.filter((user) => user.email !== userEmail))
+    }, 2000)
+  }
+
+  const handleResetPassword = async () => {
+    setIsPopupOpen(true)
+    setProgressMessage('Rénitialisation en cours...')
+    setPopupStatus('creating')
+    console.log('currentUser', currentUser.email)
+    try {
+      const data = {
+        email: currentUser.email,
+      }
+
+      const response = await postRequest(
+        'admin/overritePassword',
+        JSON.stringify({ data: data }),
+      )
+
+      if (response.status === 422) {
+        setErrorMessage('Le mot de passe ne peut pas être le même')
+        setPopupStatus('error')
+      } else {
+        console.log('OverritePassword successful:', response)
+        setSuccessMessage('Mot de passe réinitialisé avec succès')
+        setPopupStatus('success')
+
+        setTimeout(() => {
+          setIsPopupOpen(false)
+        }, 2000)
+      }
+    } catch (error: unknown) {
+      const errorResponse = error as ErrorResponse
+      if (errorResponse.response && errorResponse.response.status === 422) {
+        setErrorMessage('Le mot de passe ne peut pas être le même')
+      } else {
+        setErrorMessage('Erreur lors de la modification du mot de passe')
+      }
+      setPopupStatus('error')
+    }
+
+    setTimeout(() => {
+      setIsPopupOpen(false)
     }, 2000)
   }
 
@@ -470,6 +515,16 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
                 }
                 className='col-span-3 border border-gray-300 text-black placeholder-gray-500 rounded-sm focus:border-gray-300'
               />
+            </div>
+          )}
+          {dialogMode === 'edit' && (
+            <div className='flex justify-center mt-4'>
+              <Button
+                onClick={handleResetPassword}
+                className='bg-red-500 hover:bg-red-600'
+              >
+                Réinitialiser le mot de passe
+              </Button>
             </div>
           )}
           <DialogFooter>

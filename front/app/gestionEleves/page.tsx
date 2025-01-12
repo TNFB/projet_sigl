@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Home from '@/components/Home'
-import ModifMDP from './modifMDP'
 import NewLivrable from './newLivrable'
 import AddDoc from './addDoc'
 
@@ -36,9 +35,6 @@ function GestionEleves() {
   return (
     <Home>
       <div className='flex space-x-4 p-4 w-fit'>
-        <div className='flex flex-col space-y-5'>
-          <ModifMDP />
-        </div>
         <div className='flex flex-col space-y-2'>
           <NewLivrable />
           <AddDoc />

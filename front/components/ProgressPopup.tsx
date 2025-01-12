@@ -13,7 +13,7 @@ const ProgressPopup: React.FC<ProgressPopupProps> = ({
   isOpen,
   status,
   creatingMessage = 'Opération en cours...',
-  successMessage = 'Opération réussite!',
+  successMessage = 'Opération réussie!',
   errorMessage = "Erreur lors de l'opération",
   onClose,
 }) => {

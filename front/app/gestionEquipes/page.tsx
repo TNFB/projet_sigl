@@ -1,14 +1,39 @@
 'use client'
-import Home from '@/components/Home'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import BaseMultiAjout from '@/components/BaseMultiAjout'
 import { postRequest } from '@/api/api'
+import { ChevronRight, ChevronDown } from 'lucide-react'
+import { AutoComplete, type Option } from '@/components/autoComplete'
 
-const GestionEquipes = () => {
+export type User = {
+  id: string
+  name: string
+  last_name: string
+  email: string
+  role: string
+  entreprise?: string
+  promotion?: string
+  telephone?: string
+}
+
+type PageProps = {
+  usersD: User[]
+}
+
+const GestionEquipes: React.FC<PageProps> = ({ usersD }) => {
+  const [users, setUsers] = useState<User[]>([])
+  const [apprentices, setApprentices] = useState<User[]>([])
+  const [apprenticeMasters, setApprenticeMasters] = useState<User[]>([])
+  const [educationalTutors, setEducationalTutors] = useState<User[]>([])
   const [rows, setRows] = useState([
     { alternant: '', tuteur: '', maitre_apprentissage: '' },
   ])
+  const [isMultiAddOpen, setIsMultiAddOpen] = useState(false)
+
+  const toggleMultiAdd = () => {
+    setIsMultiAddOpen(!isMultiAddOpen)
+  }
 
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
@@ -24,6 +49,22 @@ const GestionEquipes = () => {
     }
   }, [router])
 
+  useEffect(() => {
+    setUsers(usersD)
+
+    const apprentices = usersD.filter((user) => user.role === 'apprentices')
+    const apprenticeMasters = usersD.filter(
+      (user) => user.role === 'apprentice_masters',
+    )
+    const educationalTutors = usersD.filter(
+      (user) => user.role === 'educational_tutors',
+    )
+
+    setApprentices(apprentices)
+    setApprenticeMasters(apprenticeMasters)
+    setEducationalTutors(educationalTutors)
+  }, [usersD, users])
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     rowIndex: number,
@@ -36,7 +77,14 @@ const GestionEquipes = () => {
   }
 
   const addRow = () => {
-    setRows([...rows, { alternant: '', tuteur: '', maitre_apprentissage: '' }])
+    if (rows.length < 4) {
+      setRows([
+        ...rows,
+        { alternant: '', tuteur: '', maitre_apprentissage: '' },
+      ])
+    } else {
+      alert('Vous ne pouvez ajouter que 4 lignes de saisie au maximum.')
+    }
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -49,6 +97,7 @@ const GestionEquipes = () => {
           tutorEmail: row.tuteur,
         })),
       }
+      console.log('Data:', data)
 
       postRequest(
         'admin/linkApprentice',
@@ -62,6 +111,7 @@ const GestionEquipes = () => {
       alert("Erreur lors de l'ajout de l'équipe")
     }
   }
+  const [value, setValue] = useState<Option>()
 
   if (isLoading) {
     return (
@@ -76,20 +126,49 @@ const GestionEquipes = () => {
   }
 
   return (
-    <Home>
-      <div className='flex space-x-4 p-4 w-fit'>
+    <div className='p-4 w-full'>
+      <div
+        className='bg-gray-200 p-2 cursor-pointer w-full text-left flex items-center'
+        onClick={toggleMultiAdd}
+      >
+        {isMultiAddOpen ? (
+          <ChevronDown className='mr-2' />
+        ) : (
+          <ChevronRight className='mr-2' />
+        )}
+        Ajout équipe pédagogique
+      </div>
+      <div
+        className={`transition-all duration-500 ease-in-out ${
+          isMultiAddOpen
+            ? 'max-h-screen opacity-100 overflow-visible'
+            : 'max-h-0 opacity-0'
+        } overflow-hidden`}
+      >
         <BaseMultiAjout
-          title='Ajout de tuteur(s) pédagogique(s)'
           typeAjout='Équipe tutorale n°'
           submitLabel='Ajouter'
           rows={rows}
           onChange={handleChange}
           addRow={addRow}
           onSubmit={handleSubmit}
-          className='mx-auto mt-8'
+          options={{
+            alternant: apprentices.map((user) => ({
+              value: user.email,
+              label: `${user.name} ${user.last_name}`,
+            })),
+            tuteur: educationalTutors.map((user) => ({
+              value: user.email,
+              label: `${user.name} ${user.last_name}`,
+            })),
+            maitre_apprentissage: apprenticeMasters.map((user) => ({
+              value: user.email,
+              label: `${user.name} ${user.last_name}`,
+            })),
+          }}
         />
       </div>
-    </Home>
+    </div>
   )
 }
 

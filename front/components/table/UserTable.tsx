@@ -41,13 +41,15 @@ export type User = {
   role: string
   entreprise?: string
   promotion?: string
+  telephone?: string
 }
 
 type UserTableProps = {
-  typeUser?: string
+  usersData: User[]
+  onUserDelete: (userId: string) => void
 }
 
-const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
+const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
   const [users, setUsers] = useState<User[]>([])
   const [promotions, setPromotions] = useState<string[]>([])
   const [isPopupOpen, setIsPopupOpen] = useState(false)
@@ -57,34 +59,6 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [progressMessage, setProgressMessage] = useState<string>('')
   const [successMessage, setSuccessMessage] = useState<string>('')
-
-  // Récupère les utilisateurs à afficher
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const data = {
-          role: typeUser || null,
-          detailed: 'true',
-        }
-        const response = await postRequest(
-          'user/getUserEmailsByRole',
-          JSON.stringify({ data: data }),
-        )
-        const formattedUsers = response.users.map((user: any) => ({
-          id: user.id_user,
-          name: `${user.name} ${user.last_name}`,
-          email: user.email,
-          role: user.role,
-          promotion: user.promotion_name,
-        }))
-        setUsers(formattedUsers)
-      } catch (error) {
-        console.error('Error fetching emails:', error)
-      }
-    }
-
-    fetchUsers()
-  }, [typeUser])
 
   // Récupère les promotions pour le champ ajout d un apprenti
   useEffect(() => {
@@ -99,8 +73,9 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
         console.error('Error fetching promotions:', error)
       }
     }
+    setUsers(usersData)
     fetchPromotions()
-  }, [])
+  }, [usersData])
 
   //Gestion de la popup
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -111,11 +86,15 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
     role: '',
     entreprise: '',
     promotion: '',
+    telephone: '',
   })
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add')
 
   const openEditDialog = (user: User) => {
-    setCurrentUser(user)
+    const [firstName, ...lastNameParts] = user.name.split(' ')
+    const lastName = lastNameParts.join(' ')
+    setCurrentUser({ ...user, name: firstName, last_name: lastName })
+    console.log('currentUser', currentUser.last_name)
     setDialogMode('edit')
     setIsDialogOpen(true)
   }
@@ -142,7 +121,9 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
 
   //Gestion de l'ajout et de la modification
   const handleSaveUser = async () => {
-    const { name, last_name, email, role, entreprise, promotion } = currentUser
+    const { name, last_name, email, role, entreprise, promotion, telephone } =
+      currentUser
+    console.log('currentUser', currentUser)
     setIsPopupOpen(true)
     setProgressMessage('Création en cours...')
     setPopupStatus('creating')
@@ -152,28 +133,29 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
         const data = {
           email: email || '',
           name: name || '',
-          last_name: last_name || '',
+          lastName: last_name || '',
           role: role || 'user',
           company: entreprise || '',
           promotion: promotion || '',
+          telephone: telephone || '',
         }
-        const response = await postRequestCreateUser('user/createUser', data)
-        setSuccessMessage('Utilisateur créé avec succès')
+        console.log('data', data)
+
+        let response
+        if (dialogMode === 'add') {
+          response = await postRequestCreateUser('user/createUser', data)
+          setSuccessMessage('Utilisateur créé avec succès')
+        } else {
+          response = await postRequest(
+            'user/updateUser',
+            JSON.stringify({ data: data }),
+          )
+          setSuccessMessage('Utilisateur modifié avec succès')
+        }
         setPopupStatus('success')
 
-        const newUser: User = {
-          id: response.id_user,
-          name: response.name,
-          last_name: response.last_name,
-          email: response.email,
-          role: response.role,
-          entreprise: response.entreprise || '',
-          promotion: response.promotion || '',
-        }
-
-        setUsers([...users, newUser])
-        setIsDialogOpen(false)
         setTimeout(() => {
+          setIsDialogOpen(false)
           setIsPopupOpen(false)
           setCurrentUser({
             name: '',
@@ -212,6 +194,7 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
             JSON.stringify({ data: data }),
           )
           setSuccessMessage('Utilisateurs supprimés avec succès')
+          onUserDelete(row.email)
           setPopupStatus('success')
         } catch (error) {
           console.error('Error deleting user:', error)
@@ -255,7 +238,50 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
     }
     setTimeout(() => {
       setIsPopupOpen(false)
+      onUserDelete(userEmail)
       setUsers(users.filter((user) => user.email !== userEmail))
+    }, 2000)
+  }
+
+  const handleResetPassword = async () => {
+    setIsPopupOpen(true)
+    setProgressMessage('Rénitialisation en cours...')
+    setPopupStatus('creating')
+    console.log('currentUser', currentUser.email)
+    try {
+      const data = {
+        email: currentUser.email,
+      }
+
+      const response = await postRequest(
+        'admin/overritePassword',
+        JSON.stringify({ data: data }),
+      )
+
+      if (response.status === 422) {
+        setErrorMessage('Le mot de passe ne peut pas être le même')
+        setPopupStatus('error')
+      } else {
+        console.log('OverritePassword successful:', response)
+        setSuccessMessage('Mot de passe réinitialisé avec succès')
+        setPopupStatus('success')
+
+        setTimeout(() => {
+          setIsPopupOpen(false)
+        }, 2000)
+      }
+    } catch (error: unknown) {
+      const errorResponse = error as ErrorResponse
+      if (errorResponse.response && errorResponse.response.status === 422) {
+        setErrorMessage('Le mot de passe ne peut pas être le même')
+      } else {
+        setErrorMessage('Erreur lors de la modification du mot de passe')
+      }
+      setPopupStatus('error')
+    }
+
+    setTimeout(() => {
+      setIsPopupOpen(false)
     }, 2000)
   }
 
@@ -392,7 +418,7 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
                 onChange={(e) =>
                   setCurrentUser({ ...currentUser, last_name: e.target.value })
                 }
-                className='col-span-3 border border-gray-300 text-black placeholder-gray-500 rounded-sm focus:border-gray-300'
+                className='col-span-3 border border-gray-300 text-black placeholder-gray-500 rounded-sm focus:border-gray-300 selection:bg-gray-300 selection:text-black'
               />
             </div>
             <div className='grid grid-cols-4 items-center gap-4'>
@@ -417,6 +443,19 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
                 value={currentUser.email}
                 onChange={(e) =>
                   setCurrentUser({ ...currentUser, email: e.target.value })
+                }
+                className='col-span-3 border border-gray-300 text-black placeholder-gray-500 rounded-sm focus:border-gray-300'
+              />
+            </div>
+            <div className='grid grid-cols-4 items-center gap-4'>
+              <Label htmlFor='email' className='text-right'>
+                Téléphone
+              </Label>
+              <Input
+                id='telephone'
+                value={currentUser.telephone}
+                onChange={(e) =>
+                  setCurrentUser({ ...currentUser, telephone: e.target.value })
                 }
                 className='col-span-3 border border-gray-300 text-black placeholder-gray-500 rounded-sm focus:border-gray-300'
               />
@@ -496,6 +535,16 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
                 }
                 className='col-span-3 border border-gray-300 text-black placeholder-gray-500 rounded-sm focus:border-gray-300'
               />
+            </div>
+          )}
+          {dialogMode === 'edit' && (
+            <div className='flex justify-center mt-4'>
+              <Button
+                onClick={handleResetPassword}
+                className='bg-red-500 hover:bg-red-600'
+              >
+                Réinitialiser le mot de passe
+              </Button>
             </div>
           )}
           <DialogFooter>

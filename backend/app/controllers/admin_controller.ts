@@ -37,7 +37,7 @@ export default class AdminController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, newPassword } = data
+      const { email } = data
 
       if (await isUserTableEmpty()) {
         console.log('User table empty')
@@ -68,6 +68,7 @@ export default class AdminController {
         })
       }
       // Check if same Password
+      const newPassword = this.generateRandomPassword()
       const isPasswordValid = await bcrypt.compare(newPassword, userDb.password)
       if (isPasswordValid) {
         return response.status(422).json({
@@ -85,7 +86,7 @@ export default class AdminController {
       })
 
       // Envoyer un email à l'utilisateur avec le nouveau mot de passe
-      const emailContent = `Bonjour ${userDb.name},\n\nVotre mot de passe a été réinitialisé. Voici votre nouveau mot de passe temporaire :\n\nMot de passe : ${newPassword}\n\nVeuillez vous connecter et changer votre mot de passe dès que possible.\n\nCordialement,\nL'équipe`
+      const emailContent = `Bonjour ${userDb.name} ${userDb.last_name},\n\nVotre mot de passe a été réinitialisé. Voici votre nouveau mot de passe temporaire :\n\nMot de passe : ${newPassword}\n\nVeuillez vous connecter et changer votre mot de passe dès que possible.\n\nCordialement,\nL'équipe`
       await sendEmailToUser(email, 'Réinitialisation de votre mot de passe', emailContent)
 
       return response.status(200).json({
@@ -99,6 +100,15 @@ export default class AdminController {
         message: 'Error in users overritePassword',
       })
     }
+  }
+
+  private generateRandomPassword(length: number = 8): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    let password = ''
+    for (let i = 0; i < length; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    return password
   }
 
   /**

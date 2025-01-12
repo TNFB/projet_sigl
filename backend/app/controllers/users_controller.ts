@@ -73,7 +73,7 @@ export default class UsersController {
         query = query
           .leftJoin('apprentices', 'users.id_user', 'apprentices.id')
           .leftJoin('cursus', 'apprentices.id_cursus', 'cursus.id_cursus')
-          .select('users.id_user', 'users.email', 'users.name', 'users.last_name', 'users.role', 'cursus.promotion_name')
+          .select('users.id_user', 'users.email', 'users.name', 'users.last_name', 'users.role', 'cursus.promotion_name', 'users.telephone')
       } else {
         query = query.select('email')
       }
@@ -225,7 +225,7 @@ export default class UsersController {
       }
 
       // Envoyer un email à l'utilisateur avec ses identifiants de connexion
-      const emailContent = `Bonjour ${name},\n\nVotre compte a été créé avec succès.\n\nVoici vos identifiants de connexion :\nEmail : ${email}\nMot de passe : ${password}\n\nVeuillez vous connecter et changer votre mot de passe dès que possible.\n\nCordialement,\nL'équipe`
+      const emailContent = `Bonjour ${name} ${last_name},\n\nVotre compte alternant ESEO a été créé.\n\nVoici vos identifiants de connexion :\nEmail : ${email}\nMot de passe : ${password}\n\nVeuillez vous connecter et changer votre mot de passe dès que possible :\nhttps://journal-formation.francecentral.cloudapp.azure.com/Login/\n\nCordialement,\nL'équipe`
       await sendEmailToUser(email, 'Bienvenue sur notre plateforme', emailContent)
 
       return response.status(200).json({
@@ -428,7 +428,7 @@ export default class UsersController {
       }
       // Extraire les données de la requête
       const { email, name, lastName, telephone } = data;
-
+      console.log('email', email, 'name', name, 'lastName', lastName, 'telephone', telephone)
       // Vous pouvez ajouter des validations ici si nécessaire
       if (!email || !name || !lastName || !telephone) {
         return response.status(400).json({ error: 'Tous les champs sont requis.' });
@@ -441,7 +441,7 @@ export default class UsersController {
       }
 
       await db.from('users')
-      .where('id_user', userDb.id_user)
+      .where('email', email)
       .update({ 
         email: email,
         name: name,

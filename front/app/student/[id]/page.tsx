@@ -400,12 +400,6 @@ export default function StudentInfo() {
               }
             }
 
-            console.log(
-              'list_missions:',
-              JSON.stringify(parsedMissions, null, 2),
-            )
-            console.log('list_skills:', JSON.stringify(parsedSkills, null, 2))
-
             setStudent({
               email: studentResponse.email,
               nom: studentResponse.name,

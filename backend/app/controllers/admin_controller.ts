@@ -2,6 +2,7 @@ import db from '@adonisjs/lucid/services/db'
 import bcrypt from 'bcrypt'
 import { findUserByEmail, isUserTableEmpty, isValidRole } from '../utils/api_utils.js'
 import { HttpContext } from '@adonisjs/core/http'
+import { sendEmailToUser } from '../utils/email_utils.js'
 
 /**
  * @class AdminController
@@ -82,6 +83,10 @@ export default class AdminController {
       await db.from('users').where('id_user', userDb.id_user).update({
         password: hashedPassword,
       })
+
+      // Envoyer un email à l'utilisateur avec le nouveau mot de passe
+      const emailContent = `Bonjour ${userDb.name},\n\nVotre mot de passe a été réinitialisé. Voici votre nouveau mot de passe temporaire :\n\nMot de passe : ${newPassword}\n\nVeuillez vous connecter et changer votre mot de passe dès que possible.\n\nCordialement,\nL'équipe`
+      await sendEmailToUser(email, 'Réinitialisation de votre mot de passe', emailContent)
 
       return response.status(200).json({
         status: 'success',

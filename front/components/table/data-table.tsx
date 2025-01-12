@@ -13,7 +13,7 @@ import {
 } from '@tanstack/react-table'
 import { ChevronDown, Plus, Trash2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
-
+import { postRequest } from '@/api/api'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -48,7 +48,7 @@ export function DataTable<TData extends { promotion?: string }, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
-  const [promotionOptions, setPromotionOptions] = useState<string[]>([])
+  const [promotions, setPromotions] = useState<string[]>([])
 
   const table = useReactTable({
     data,
@@ -69,27 +69,21 @@ export function DataTable<TData extends { promotion?: string }, TValue>({
     },
   })
 
+  // Récupère les promotions pour le champ ajout d un apprenti
   useEffect(() => {
-    // Vérifiez que les données de la table sont correctement chargées
-    const rows = table.getCoreRowModel().rows
-    console.log('Table rows:', rows)
-
-    if (rows.length > 0) {
-      // Extract unique promotion values from the table data
-      const promotions = Array.from(
-        new Set(
-          rows
-            .map((row) => row.original.promotion)
-            .filter(
-              (promotion): promotion is string =>
-                promotion !== null && promotion !== undefined,
-            ),
-        ),
-      )
-      setPromotionOptions(promotions)
+    const fetchPromotions = async () => {
+      try {
+        const response = await postRequest('cursus/promotions')
+        const promotions = response.promotions.map(
+          (promotion: any) => promotion.promotion_name,
+        )
+        setPromotions(promotions)
+      } catch (error) {
+        console.error('Error fetching promotions:', error)
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [table.getRowModel().rows])
+    fetchPromotions()
+  }, [])
 
   const handleDeleteUsers = () => {
     if (onDelete) {
@@ -148,7 +142,7 @@ export function DataTable<TData extends { promotion?: string }, TValue>({
             className='bg-[#f3f4f6] max-w-sm text-center border h-10 w-80 border-gray-300 text-black rounded-lg focus:outline-none'
           >
             <option value=''>Promotions</option>
-            {promotionOptions.map((promotion) => (
+            {promotions.map((promotion) => (
               <option key={promotion} value={promotion}>
                 {promotion}
               </option>

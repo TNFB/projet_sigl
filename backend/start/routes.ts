@@ -27,6 +27,8 @@ const ApprenticeshipCoordinatorsController = () =>
   import('../app/controllers/apprenticeship_coordinators_controller.js')
 const EventsController = () => import('../app/controllers/events_controller.js')
 const ApprenticesController = () => import('../app/controllers/apprentices_controller.js')
+const CursusController = () => import('../app/controllers/cursus_controller.js')
+
 
 // Définir les routes
 
@@ -167,6 +169,10 @@ Route.group(() => {
 }).prefix('events')
 
 Route.group(() => {
+  Route.post('promotions', [CursusController, 'getAllPromotions']).as('getAllPromotions')
+}).prefix('cursus')
+
+Route.group(() => {
   Route.post('getInfoApprentice', [ApprenticesController, 'getInfoApprentice']).as('getInfoApprentice')
   Route.post('addMission', [ApprenticesController, 'addMission']).as('addMission')
   Route.post('updateMission', [ApprenticesController, 'updateMission']).as('updateMission')
@@ -174,4 +180,5 @@ Route.group(() => {
   Route.post('addSkill', [ApprenticesController, 'addSkill']).as('addSkill')
   Route.post('updateSkill', [ApprenticesController, 'updateSkill']).as('updateSkill')
   Route.post('deleteSkill', [ApprenticesController, 'deleteSkill']).as('deleteSkill')
+  Route.post('getMissionAndSkillApprenticeByEmail', [ApprenticesController, 'getMissionAndSkillApprenticeByEmail']).as('getMissionAndSkillApprenticeByEmail')
 }).prefix('apprentice')

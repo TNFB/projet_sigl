@@ -17,9 +17,6 @@
 
 export const postRequest = async (url: string, body?: string) => {
   const token = localStorage.getItem('token')
-  console.log('token:', token)
-  console.log('body:', body)
-  console.log(`URL: ${url}`)
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {
     method: 'POST',
     headers: {
@@ -95,12 +92,12 @@ export const postRequestImportUser = async (
 export const postRequestCreateUser = async (
   url: string,
   userData: {
-    email: string
-    password: string
     name: string
     last_name: string
-    telephone: string
+    email: string
     role: string
+    entreprise?: string
+    promotion?: string
   },
 ) => {
   const token = localStorage.getItem('token')

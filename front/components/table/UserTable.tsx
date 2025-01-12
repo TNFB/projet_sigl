@@ -152,7 +152,6 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
           )
           setSuccessMessage('Utilisateur modifié avec succès')
         }
-        setSuccessMessage('Utilisateur créé avec succès')
         setPopupStatus('success')
 
         setTimeout(() => {

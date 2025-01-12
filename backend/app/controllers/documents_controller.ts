@@ -261,8 +261,8 @@ export default class DocumentsController {
         });
       }
 
-      // Supprimer le fichier temporaire
-      fs.unlinkSync(`tmp/${filePath}`)
+      console.log(`full Path: ${fullPath}`)
+      fs.unlinkSync(fullPath)
 
       return response.ok({
         message: 'Users imported successfully',
@@ -347,4 +347,50 @@ export default class DocumentsController {
       })
     }
   }
+
+  async deleteDocument({ request, response }: HttpContext) {
+    try {
+      const { data } = request.only(['data'])
+      const { id } = data
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      console.log(`id: ${id}`)
+  
+      const document = await db
+        .from('documents')
+        .where('id_document', id)
+        .first()
+  
+      if (!document) {
+        return response.notFound({ message: 'Document not found' })
+      }
+  
+      const storagePath = process.env.STORAGE_PATH
+      if (!storagePath) {
+        return response.internalServerError({ message: 'Storage path not configured' })
+      }
+  
+      const filePath = path.join(storagePath, document.document_path)
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath)
+      } else {
+        console.log(`Error in delete file: ${filePath} `)
+      }
+  
+      await db.from('documents')
+        .where('id_document', id)
+        .delete()
+  
+      return response.ok({ message: 'Document deleted successfully' })
+    } catch (error) {
+      console.error('Error in deleteDocument:', error)
+      return response.status(500).json({
+        status: 'error',
+        message: 'Error deleting document'
+      })
+    }
+  }
+  
 }

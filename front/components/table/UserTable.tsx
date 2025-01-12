@@ -78,7 +78,6 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
           promotion: user.promotion_name,
         }))
         setUsers(formattedUsers)
-        console.log('get USers Emal by Roles successfull:', response)
       } catch (error) {
         console.error('Error fetching emails:', error)
       }
@@ -92,7 +91,6 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
     const fetchPromotions = async () => {
       try {
         const response = await postRequest('cursus/promotions')
-        console.log('response:', response)
         const promotions = response.promotions.map(
           (promotion: any) => promotion.promotion_name,
         )
@@ -160,8 +158,6 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
           promotion: promotion || '',
         }
         const response = await postRequestCreateUser('user/createUser', data)
-
-        console.log('User created successfully:', response)
         setSuccessMessage('Utilisateur créé avec succès')
         setPopupStatus('success')
 
@@ -205,24 +201,28 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
     setIsPopupOpen(true)
     setProgressMessage('Suppression en cours...')
     setPopupStatus('creating')
-    await Promise.all(rowsToDelete.map(async (row) => {
-      try {
-        const data = {
-          email: row.email,
+    await Promise.all(
+      rowsToDelete.map(async (row) => {
+        try {
+          const data = {
+            email: row.email,
+          }
+          const response = await postRequest(
+            'admin/deleteUser',
+            JSON.stringify({ data: data }),
+          )
+          setSuccessMessage('Utilisateurs supprimés avec succès')
+          setPopupStatus('success')
+        } catch (error) {
+          console.error('Error deleting user:', error)
+          setErrorMessage('Erreur lors de suppression des utilisateurs')
+          setPopupStatus('error')
+          setTimeout(() => {
+            setIsPopupOpen(false)
+          }, 2000)
         }
-        const response = await postRequest('admin/deleteUser', JSON.stringify({ data: data }))
-        console.log('User deleted successfully:', response)
-        setSuccessMessage('Utilisateurs supprimés avec succès')
-        setPopupStatus('success')
-      } catch (error) {
-        console.error('Error deleting user:', error)
-        setErrorMessage("Erreur lors de suppression des utilisateurs")
-        setPopupStatus('error')
-        setTimeout(() => {
-          setIsPopupOpen(false)
-        }, 2000)
-      }
-    }))
+      }),
+    )
     setTimeout(() => {
       setIsPopupOpen(false)
       setUsers(
@@ -241,7 +241,6 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
       }
       postRequest('admin/deleteUser', JSON.stringify({ data: data })).then(
         (response) => {
-          console.log('User deleted successfully:', response)
           setSuccessMessage('Utilisateur supprimé avec succès')
           setPopupStatus('success')
         },
@@ -249,16 +248,15 @@ const UserTable: React.FC<UserTableProps> = ({ typeUser }) => {
     } catch (error) {
       console.error('Error delete user:', error)
       setErrorMessage("Erreur lors de la suppression de l'utilisateur")
-        setPopupStatus('error')
-        setTimeout(() => {
-          setIsPopupOpen(false)
-        }, 2000)
+      setPopupStatus('error')
+      setTimeout(() => {
+        setIsPopupOpen(false)
+      }, 2000)
     }
     setTimeout(() => {
       setIsPopupOpen(false)
       setUsers(users.filter((user) => user.email !== userEmail))
     }, 2000)
-    
   }
 
   //Gestion des colonnes et actions

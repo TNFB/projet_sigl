@@ -1,7 +1,6 @@
 import db from '@adonisjs/lucid/services/db'
 import { sendEmailToUser } from '../utils/email_utils.js'
 import cron from 'node-cron'
-import { tz } from 'tz'
 
 async function checkEventsAndSendReminders() {
     console.log('Checking events and sending reminders...')

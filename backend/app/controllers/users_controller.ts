@@ -226,7 +226,7 @@ export default class UsersController {
 
       // Envoyer un email à l'utilisateur avec ses identifiants de connexion
       const emailContent = `Bonjour ${name},\n\nVotre compte a été créé avec succès.\n\nVoici vos identifiants de connexion :\nEmail : ${email}\nMot de passe : ${password}\n\nVeuillez vous connecter et changer votre mot de passe dès que possible.\n\nCordialement,\nL'équipe`
-      //a_supprimer await sendEmailToUser(email, 'Bienvenue sur notre plateforme', emailContent)
+      await sendEmailToUser(email, 'Bienvenue sur notre plateforme', emailContent)
 
       return response.status(200).json({
         status: 'success',

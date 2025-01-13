@@ -41,7 +41,7 @@
     "@tiptap/extension-typography": "^2.11.0",
     "@tiptap/extension-underline": "^2.11.0",
     "@tiptap/pm": "^2.11.0",
-    "@tiptap/react": "^2.11.0",
+    "@tiptap/react": "^2.11.2",
     "@tiptap/starter-kit": "^2.11.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.10.5",

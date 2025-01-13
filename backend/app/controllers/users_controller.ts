@@ -427,10 +427,10 @@ export default class UsersController {
         })
       }
       // Extraire les données de la requête
-      const { email, name, lastName, telephone } = data;
-      console.log('email', email, 'name', name, 'lastName', lastName, 'telephone', telephone)
+      const { email, name, last_name, telephone } = data;
+      console.log('email', email, 'name', name, 'last_name', last_name, 'telephone', telephone)
       // Vous pouvez ajouter des validations ici si nécessaire
-      if (!email || !name || !lastName || !telephone) {
+      if (!email || !name || !last_name || !telephone) {
         return response.status(400).json({ error: 'Tous les champs sont requis.' });
       }
 
@@ -445,7 +445,7 @@ export default class UsersController {
       .update({ 
         email: email,
         name: name,
-        last_name: lastName,
+        last_name: last_name,
         telephone: telephone
        });
 

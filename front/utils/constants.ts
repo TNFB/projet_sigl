@@ -37,18 +37,13 @@ export const SIDEBAR_ITEMS = [
 
 export const SIDEBAR_ADMIN_ITEMS = [
   {
-    label: 'Accueil',
-    href: '/',
-    icon: 'Home',
-  },
-  {
     label: 'Gestion des utilisateurs',
     href: '/gestionUsers',
     icon: 'UsersRound',
   },
   {
-    label: 'Gestion des élèves',
+    label: 'Gestion des documents',
     href: '/gestionEleves',
-    icon: 'UsersRound',
+    icon: 'FileText',
   },
 ]

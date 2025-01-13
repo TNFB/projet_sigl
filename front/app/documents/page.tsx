@@ -75,7 +75,8 @@ function Documents() {
   const fetchUserDocuments = async () => {
     try {
       const response = await postRequest('document/getUserDocuments')
-      setUserDocuments(response.documents)
+      const filteredDocuments = response.documents.filter((doc: UserDocument) => doc.type !== 'Grille evaluation')
+      setUserDocuments(filteredDocuments)
     } catch (error) {
       console.error('Error fetching user documents:', error)
     }

@@ -178,7 +178,7 @@ export function EventForm({
           </div>
 
           <div className='space-y-2'>
-            <Label htmlFor='type'>Type d'événement</Label>
+            <Label htmlFor='type'>Type d&apos;événement</Label>
             <Input
               id='type'
               value={formData.type}
@@ -192,7 +192,7 @@ export function EventForm({
           </div>
 
           <div className='space-y-2'>
-            <Label htmlFor='color'>Couleur de l'événement</Label>
+            <Label htmlFor='color'>Couleur de l&apos;événement</Label>
             <Input
               id='color'
               type='color'

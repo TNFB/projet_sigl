@@ -56,7 +56,7 @@ export const downloadDocument = async (
   const blob = await response.blob()
   const contentDisposition = response.headers.get('Content-Disposition')
   let filename = 'document'
-  
+
   if (contentDisposition) {
     const filenameMatch = contentDisposition.match(/filename="?(.+)"?/)
     if (filenameMatch) {

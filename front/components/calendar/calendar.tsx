@@ -43,30 +43,31 @@ export default function Calendar() {
   )
   const [currentDate, setCurrentDate] = useState<Date>(new Date())
   const [currentView, setCurrentView] = useState<View>('month')
-  
 
   const fetchEvents = async () => {
     try {
       const response = await postRequest('events/getEvents')
       console.log('Fetched events:', response.events)
       if (response.events) {
-        const formattedEvents: MyEvent[] = response.events.map((event: any) => ({
-          id: event.id_event.toString(),
-          title: event.title,
-          start: new Date(event.start_date),
-          end: new Date(event.end_date),
-          type: event.type,
-          color: event.color,
-          location: event.location,
-          description: event.description
-        }))
+        const formattedEvents: MyEvent[] = response.events.map(
+          (event: any) => ({
+            id: event.id_event.toString(),
+            title: event.title,
+            start: new Date(event.start_date),
+            end: new Date(event.end_date),
+            type: event.type,
+            color: event.color,
+            location: event.location,
+            description: event.description,
+          }),
+        )
         setEvents(formattedEvents)
       }
     } catch (error) {
       console.error('Error fetching events:', error)
     }
   }
-  
+
   useEffect(() => {
     fetchEvents()
   }, [])
@@ -80,11 +81,11 @@ export default function Calendar() {
   }
 
   const handleSelectEvent = (event: MyEvent) => {
-    console.log(`event.id: ${event.id}`);
-    console.log(`event.location: ${event.location}`);
-    console.log(`event.description: ${event.description}`);
-    setSelectedEvent(event);
-    setShowEventDialog(true);
+    console.log(`event.id: ${event.id}`)
+    console.log(`event.location: ${event.location}`)
+    console.log(`event.description: ${event.description}`)
+    setSelectedEvent(event)
+    setShowEventDialog(true)
   }
 
   const handleSelectSlot = (slotInfo: SlotInfo) => {
@@ -97,16 +98,19 @@ export default function Calendar() {
   const handleDeleteEvent = async () => {
     if (selectedEvent && selectedEvent.id) {
       try {
-        await postRequest('events/deleteEvent', JSON.stringify({ data: { id_event: parseInt(selectedEvent.id) } }));
-        fetchEvents();
-        setShowEventDialog(false);
+        await postRequest(
+          'events/deleteEvent',
+          JSON.stringify({ data: { id_event: parseInt(selectedEvent.id) } }),
+        )
+        fetchEvents()
+        setShowEventDialog(false)
       } catch (error) {
-        console.error('Error deleting event:', error);
-        alert("Erreur lors de la suppression de l'événement");
+        console.error('Error deleting event:', error)
+        alert("Erreur lors de la suppression de l'événement")
       }
     } else {
-      console.error('No event selected or event ID is missing');
-      alert("Impossible de supprimer l'événement : ID manquant");
+      console.error('No event selected or event ID is missing')
+      alert("Impossible de supprimer l'événement : ID manquant")
     }
   }
 
@@ -130,16 +134,19 @@ export default function Calendar() {
         type: event.type || 'default',
         color: event.color || '#3788d8',
         location: event.location || '',
-        description: event.description || ''
-      };
-  
-      await postRequest('events/createOrUpdateEvent', JSON.stringify({ data: eventData }));
-  
-      fetchEvents();
-      setShowEventForm(false);
+        description: event.description || '',
+      }
+
+      await postRequest(
+        'events/createOrUpdateEvent',
+        JSON.stringify({ data: eventData }),
+      )
+
+      fetchEvents()
+      setShowEventForm(false)
     } catch (error) {
-      console.error('Error saving event:', error);
-      alert("Erreur lors de l'enregistrement de l'événement");
+      console.error('Error saving event:', error)
+      alert("Erreur lors de l'enregistrement de l'événement")
     }
   }
 
@@ -224,8 +231,8 @@ export default function Calendar() {
         event={selectedEvent}
         open={showEventForm}
         onClose={() => {
-          setShowEventForm(false);
-          setSelectedEndDate(undefined);
+          setShowEventForm(false)
+          setSelectedEndDate(undefined)
         }}
         onSave={handleSaveEvent}
         selectedDate={selectedSlot ?? undefined}

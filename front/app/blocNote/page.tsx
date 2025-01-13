@@ -20,9 +20,9 @@ const NotePad = () => {
   const [save, setSave] = useState(true)
 
   useEffect(() => {
-      postRequest('monthlyNotes/getAllNotes').then((response) => {
-        setNotes(response.notes)
-      })
+    postRequest('monthlyNotes/getAllNotes').then((response) => {
+      setNotes(response.notes)
+    })
   }, [])
 
   const handleSave = async (title: string, content: Content) => {
@@ -69,7 +69,7 @@ const NotePad = () => {
           data: { id_monthly_note: selectedNoteId },
         }),
       )
-  
+
       // Supprimer la note de l'état local
       setNotes((prevNotes) =>
         prevNotes.filter((note) => note.id_monthly_note !== selectedNoteId),
@@ -114,7 +114,9 @@ const NotePad = () => {
     }
   }
 
-  const selectedNote = notes.find((note) => note.id_monthly_note === selectedNoteId)
+  const selectedNote = notes.find(
+    (note) => note.id_monthly_note === selectedNoteId,
+  )
 
   return (
     <Home>

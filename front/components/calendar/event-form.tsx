@@ -61,7 +61,7 @@ export function EventForm({
     endDate: '',
     endTime: '23:59',
     type: '',
-    color: '#000000' // Couleur par défaut
+    color: '#000000', // Couleur par défaut
   })
 
   useEffect(() => {
@@ -76,18 +76,17 @@ export function EventForm({
         endDate: format(event.end, 'yyyy-MM-dd'),
         endTime: format(event.end, 'HH:mm'),
         type: event.type || '',
-        color: event.color || '#000000'
-      });
+        color: event.color || '#000000',
+      })
     }
-  }, [event]);  
-
+  }, [event])
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-  
-    const start = new Date(`${formData.startDate}T${formData.startTime}`);
-    const end = new Date(`${formData.endDate}T${formData.endTime}`);
-  
+    e.preventDefault()
+
+    const start = new Date(`${formData.startDate}T${formData.startTime}`)
+    const end = new Date(`${formData.endDate}T${formData.endTime}`)
+
     const newEvent: MyEvent = {
       id: event?.id || undefined,
       title: formData.title,
@@ -96,11 +95,11 @@ export function EventForm({
       start,
       end,
       type: formData.type,
-      color: formData.color
-    };
-  
-    onSave(newEvent); // Passez newEvent à onSave
-    onClose();
+      color: formData.color,
+    }
+
+    onSave(newEvent) // Passez newEvent à onSave
+    onClose()
   }
 
   return (
@@ -128,7 +127,7 @@ export function EventForm({
               required
             />
           </div>
-  
+
           <div className='grid grid-cols-2 gap-4'>
             <div className='space-y-2'>
               <Label>Date début</Label>
@@ -177,7 +176,7 @@ export function EventForm({
               </div>
             </div>
           </div>
-  
+
           <div className='space-y-2'>
             <Label htmlFor='type'>Type d'événement</Label>
             <Input
@@ -191,7 +190,7 @@ export function EventForm({
               required
             />
           </div>
-  
+
           <div className='space-y-2'>
             <Label htmlFor='color'>Couleur de l'événement</Label>
             <Input
@@ -205,7 +204,7 @@ export function EventForm({
               required
             />
           </div>
-  
+
           <div className='space-y-2'>
             <Label htmlFor='location'>Emplacement (Optionnel)</Label>
             <Input
@@ -218,7 +217,7 @@ export function EventForm({
               className='w-full bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2 placeholder-gray-500'
             />
           </div>
-  
+
           <div className='space-y-2' id='event-description'>
             <Label htmlFor='description'>Description (Optionnel)</Label>
             <Textarea
@@ -232,7 +231,7 @@ export function EventForm({
               className='w-full bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2 placeholder-gray-500'
             />
           </div>
-  
+
           <div className='flex justify-end space-x-2'>
             <Button type='button' variant='outline' onClick={onClose}>
               Annuler
@@ -242,5 +241,5 @@ export function EventForm({
         </form>
       </DialogContent>
     </Dialog>
-  )  
+  )
 }

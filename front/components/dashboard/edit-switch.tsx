@@ -23,7 +23,7 @@ export function EditSwitch({
         id='edit-mode'
         onCheckedChange={setEditing}
       />
-      <Label htmlFor='airplane-mode'>Enable Edit Mode</Label>
+      <Label htmlFor='airplane-mode'>Activer modification layout</Label>
     </div>
   )
 }

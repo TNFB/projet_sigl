@@ -1,12 +1,16 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import BaseForm from '@/components/BaseForm'
 import Home from '@/components/Home'
+import { useDropzone } from 'react-dropzone'
 import {
   downloadDocument,
   postRequest,
   postRequestDropDocument,
+  fetchDocumentBlob,
 } from '@/api/api'
+import ProgressPopup from '@/components/ProgressPopup'
+import DocumentViewerDialog from '@/components/DocumentViewerDialog'
 
 interface FormData {
   documentType: string
@@ -42,20 +46,35 @@ function Documents() {
 
   const [documents] = useState([
     { value: 'doc_0', label: '' },
-    { value: 'doc_1', label: 'Fiche de synthese S5' },
-    { value: 'doc_2', label: 'Fiche de synthese S6' },
-    { value: 'doc_3', label: 'Fiche de synthese S7' },
-    { value: 'doc_4', label: 'Fiche de synthese S8' },
-    { value: 'doc_5', label: 'Fiche de synthese S9' },
-    { value: 'doc_6', label: 'Fiche de synthese S10' },
-    { value: 'doc_7', label: 'Rapport de conduite de projet S6' },
-    { value: 'doc_8', label: 'Rapport de conduite de projet S7' },
-    { value: 'doc_9', label: 'Rapport avant PING' },
-    { value: 'doc_10', label: 'Rapport avancement PING' },
-    { value: 'doc_11', label: 'Rapport final PING' },
+    { value: 'Fiche de synthese S5', label: 'Fiche de synthese S5' },
+    { value: 'Fiche de synthese S6', label: 'Fiche de synthese S6' },
+    { value: 'Fiche de synthese S7', label: 'Fiche de synthese S7' },
+    { value: 'Fiche de synthese S8', label: 'Fiche de synthese S8' },
+    { value: 'Fiche de synthese S9', label: 'Fiche de synthese S9' },
+    { value: 'Fiche de synthese S10', label: 'Fiche de synthese S10' },
+    {
+      value: 'Rapport de conduite de projet S6',
+      label: 'Rapport de conduite de projet S6',
+    },
+    {
+      value: 'Rapport de conduite de projet S7',
+      label: 'Rapport de conduite de projet S7',
+    },
+    { value: 'Rapport de conduite de projet S8', label: 'Rapport avant PING' },
+    { value: 'Rapport avancement PING', label: 'Rapport avancement PING' },
+    { value: 'Rapport final PING', label: 'Rapport final PING' },
   ])
 
   const [userDocuments, setUserDocuments] = useState<UserDocument[]>([])
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [popupStatus, setPopupStatus] = useState<
+    'creating' | 'success' | 'error'
+  >('creating')
+  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [progressMessage, setProgressMessage] = useState<string>('')
+  const [isViewerOpen, setIsViewerOpen] = useState(false)
+  const [currentDocumentUrl, setCurrentDocumentUrl] = useState('')
+  const [currentDocumentName, setCurrentDocumentName] = useState('')
 
   useEffect(() => {
     fetchUserDocuments()
@@ -64,7 +83,10 @@ function Documents() {
   const fetchUserDocuments = async () => {
     try {
       const response = await postRequest('document/getUserDocuments')
-      setUserDocuments(response.documents)
+      const filteredDocuments = response.documents.filter(
+        (doc: UserDocument) => doc.type !== 'Grille evaluation',
+      )
+      setUserDocuments(filteredDocuments)
     } catch (error) {
       console.error('Error fetching user documents:', error)
     }
@@ -77,37 +99,31 @@ function Documents() {
     })
   }
 
-  const handleDownload = async (documentPath: string) => {
-    try {
-      await downloadDocument('document/download', {
-        data: { path: documentPath },
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      setFormData({
+        ...formData,
+        document: acceptedFiles[0],
       })
-    } catch (error) {
-      console.error('Error downloading document:', error)
-      alert('Erreur lors du téléchargement du document')
-    }
-  }
+    },
+    [formData],
+  )
 
-  const cleanDocumentName = (name: string) => {
-    // Si Charach Spécial => envoie BDD Faill
-    const withoutAccents = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    return withoutAccents.replace(/[^a-zA-Z0-9]/g, '_')
-  }
-
-  const handleDocumentTypeChange = (value: string) => {
-    setFormData({
-      ...formData,
-      documentType: value,
-    })
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const document = e.target.files ? e.target.files[0] : null
-    setFormData({
-      ...formData,
-      document,
-    })
-  }
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'application/pdf': ['.pdf'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        ['.docx'],
+      'application/msword': ['.doc'],
+      'application/vnd.oasis.opendocument.text': ['.odt'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [
+        '.xlsx',
+      ],
+      'application/vnd.ms-excel': ['.xls'],
+      'text/plain': ['.txt'],
+    },
+  })
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -128,7 +144,6 @@ function Documents() {
     }
 
     const formDataToSend = new FormData()
-
     const selectedDocument = documents.find(
       (doc) => doc.value === formData.documentType,
     )
@@ -146,9 +161,13 @@ function Documents() {
 
     const url = 'document/dropDocument'
     try {
+      setIsPopupOpen(true)
+      setProgressMessage('Téléchargement en cours...')
+      setPopupStatus('creating')
       const response = await postRequestDropDocument(url, formDataToSend)
       console.log('Success:', response)
-      alert('Document ajouté avec succès')
+      setProgressMessage('Document ajouté avec succès')
+      setPopupStatus('success')
       setFormData({
         documentType: '',
         document: null,
@@ -157,7 +176,12 @@ function Documents() {
       await fetchUserDocuments()
     } catch (error) {
       console.error('Error:', error)
-      alert("Erreur lors de l'ajout du document")
+      setErrorMessage("Erreur lors de l'ajout du document")
+      setPopupStatus('error')
+    } finally {
+      setTimeout(() => {
+        setIsPopupOpen(false)
+      }, 2000)
     }
   }
 
@@ -176,6 +200,39 @@ function Documents() {
       }
     }
   }
+
+  const handleView = async (documentPath: string, documentName: string) => {
+    console.log('Viewing document:', documentPath)
+    try {
+      const blobUrl = await fetchDocumentBlob('document/download', {
+        data: { path: documentPath },
+      })
+      console.log('Document URL:', blobUrl)
+      setCurrentDocumentUrl(blobUrl)
+      setCurrentDocumentName(documentName)
+      setIsViewerOpen(true)
+    } catch (error) {
+      console.error('Error fetching document:', error)
+      alert('Erreur lors de la récupération du document')
+    }
+  }
+
+  const handleDownload = async (documentPath: string) => {
+    try {
+      await downloadDocument('document/download', {
+        data: { path: documentPath },
+      })
+    } catch (error) {
+      console.error('Error downloading document:', error)
+      alert('Erreur lors du téléchargement du document')
+    }
+  }
+
+  const cleanDocumentName = (name: string) => {
+    const withoutAccents = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    return withoutAccents.replace(/[^a-zA-Z0-9]/g, '_')
+  }
+
   const fields: Field[] = [
     {
       type: 'select',
@@ -183,9 +240,14 @@ function Documents() {
       name: 'documentType',
       value: formData.documentType,
       options: documents,
-      onChange: handleDocumentTypeChange,
+      onChange: (value: string) =>
+        setFormData({ ...formData, documentType: value }),
     },
   ]
+
+  const isPdf = (filePath: string) => {
+    return filePath.toLowerCase().endsWith('.pdf')
+  }
 
   const fieldsOrder = ['documentType']
 
@@ -216,55 +278,89 @@ function Documents() {
             className='mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
           />
         </div>
-        <div className='mb-4'>
-          <label
-            htmlFor='document'
-            className='block text-sm font-medium text-gray-700'
-          >
-            Charger un fichier
-          </label>
-          <input
-            type='file'
-            id='document'
-            name='document'
-            accept='.pdf,.docx,.xlsx,.xls,.odt,.txt'
-            onChange={handleFileChange}
-            className='mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-          />
+        <div
+          {...getRootProps()}
+          className='border-2 border-dashed border-gray-300 p-4 rounded-lg cursor-pointer focus:outline-none mb-2'
+        >
+          <input {...getInputProps()} />
+          {isDragActive ? (
+            <p className='text-center text-gray-500'>
+              Déposez le fichier ici...
+            </p>
+          ) : (
+            <p className='text-center text-gray-500'>
+              Faites glisser et déposez un fichier ici, ou cliquez pour
+              sélectionner un fichier
+            </p>
+          )}
+          {formData.document && (
+            <div className='mt-2 text-center text-gray-700'>
+              <p>Fichier sélectionné : {formData.document.name}</p>
+            </div>
+          )}
         </div>
       </BaseForm>
       <div className='mt-8'>
         <h2 className='text-2xl font-bold mb-4'>Vos documents</h2>
         {userDocuments.length > 0 ? (
-          <ul className='space-y-2'>
-            {userDocuments.map((doc) => (
-              <li
-                key={doc.id_document}
-                className='flex justify-between items-center bg-white p-4 rounded shadow'
-              >
-                <span>{doc.name}</span>
-                <span className='ml-2 text-sm text-gray-500'>({doc.type})</span>
-                <div>
-                  <button
-                    onClick={() => handleDownload(doc.document_path)}
-                    className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2'
-                  >
-                    Télécharger
-                  </button>
-                  <button
-                    onClick={() => handleDelete(doc.id_document)}
-                    className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded'
-                  >
-                    Supprimer
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <>
+            <div className='grid grid-cols-3 gap-4 mb-2 font-bold'>
+              <span className='col-span-1'>Nom</span>
+              <span className='col-span-1'>Type</span>
+              <span className='col-span-1 text-right pr-28'>Actions</span>
+            </div>
+            <ul className='space-y-2'>
+              {userDocuments.map((doc) => (
+                <li
+                  key={doc.id_document}
+                  className='grid grid-cols-3 gap-4 items-center bg-white p-4 rounded shadow'
+                >
+                  <span>{doc.name}</span>
+                  <span className='ml-2 text-sm text-gray-500'>{doc.type}</span>
+                  <div className='col-span-1 text-right'>
+                    {isPdf(doc.document_path) && (
+                      <button
+                        onClick={() => handleView(doc.document_path, doc.name)}
+                        className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2'
+                      >
+                        Visualiser
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDownload(doc.document_path)}
+                      className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2'
+                    >
+                      Télécharger
+                    </button>
+                    <button
+                      onClick={() => handleDelete(doc.id_document)}
+                      className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded'
+                    >
+                      Supprimer
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
         ) : (
           <p>Vous n&apos;avez pas encore de documents.</p>
         )}
       </div>
+      <ProgressPopup
+        isOpen={isPopupOpen}
+        status={popupStatus}
+        creatingMessage={progressMessage}
+        successMessage='Document ajouté avec succès !'
+        errorMessage={errorMessage}
+        onClose={() => setIsPopupOpen(false)}
+      />
+      <DocumentViewerDialog
+        open={isViewerOpen}
+        onClose={() => setIsViewerOpen(false)}
+        documentUrl={currentDocumentUrl}
+        documentName={currentDocumentName}
+      />
     </Home>
   )
 }

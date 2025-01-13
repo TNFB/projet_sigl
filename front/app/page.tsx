@@ -42,10 +42,13 @@ export default function Accueil() {
 
   return (
     <Home>
-      {role === 'apprentice' && <div>En cours de développement</div>}
-      {(role === 'tp' || role === 'ma') && (
-        <div>Bienvenue sur votre espace de gestion de vos apprentis</div>
-      )}
+      <div className='flex items-center justify-center min-h-screen'>
+        <h1 className='text-6xl font-bold text-center text-gray-500'>
+          Bienvenue sur la gestion
+          <br />
+          de vos apprentis
+        </h1>
+      </div>
     </Home>
   )
 }

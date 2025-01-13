@@ -42,6 +42,8 @@ const defaultFormData = {
   startTime: '00:00',
   endDate: '',
   endTime: '23:59',
+  type: '',
+  color: '#000000',
 }
 
 export function EventForm({
@@ -61,7 +63,7 @@ export function EventForm({
     endDate: '',
     endTime: '23:59',
     type: '',
-    color: '#000000', // Couleur par défaut
+    color: '#000000',
   })
 
   useEffect(() => {
@@ -81,6 +83,12 @@ export function EventForm({
     }
   }, [event])
 
+  useEffect(() => {
+    if (!open) {
+      setFormData(defaultFormData)
+    }
+  }, [open])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -98,7 +106,7 @@ export function EventForm({
       color: formData.color,
     }
 
-    onSave(newEvent) // Passez newEvent à onSave
+    onSave(newEvent)
     onClose()
   }
 
@@ -179,16 +187,25 @@ export function EventForm({
 
           <div className='space-y-2'>
             <Label htmlFor='type'>Type d&apos;événement</Label>
-            <Input
+            <select
               id='type'
               value={formData.type}
               onChange={(e) =>
                 setFormData({ ...formData, type: e.target.value })
               }
-              className='w-full bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2 placeholder-gray-500'
-              placeholder="Entrer le type d'événement"
+              className='w-full bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2'
               required
-            />
+            >
+              <option value=''>Sélectionner un type</option>
+              <option value='Entretien Semestre 5'>Entretien Semestre 5</option>
+              <option value='Entretien Semestre 6'>Entretien Semestre 6</option>
+              <option value='Entretien Semestre 7'>Entretien Semestre 7</option>
+              <option value='Entretien Semestre 8'>Entretien Semestre 8</option>
+              <option value='Entretien Semestre 9'>Entretien Semestre 9</option>
+              <option value='Entretien Semestre 10'>
+                Entretien Semestre 10
+              </option>
+            </select>
           </div>
 
           <div className='space-y-2'>

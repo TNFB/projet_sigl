@@ -24,6 +24,7 @@ const Profile = () => {
     const getUserInfo = async () => {
       try {
         const response = await postRequest('user/getUserInfoByEmail')
+        console.log('response:', response.userInfo)
         if (response.redirect) {
           window.location.href = '/Login'
         } else {
@@ -248,7 +249,7 @@ const Profile = () => {
               <input
                 type='text'
                 name='name'
-                value={formData.name}
+                value={formData.lastName}
                 onChange={handleChange}
                 className='border p-2 rounded mb-2 w-full'
               />
@@ -257,8 +258,8 @@ const Profile = () => {
               <label>Prénom :</label>
               <input
                 type='text'
-                name='last_name'
-                value={formData.last_name}
+                name='lastName'
+                value={formData.name}
                 onChange={handleChange}
                 className='border p-2 rounded mb-2 w-full'
               />
@@ -295,10 +296,10 @@ const Profile = () => {
                   <strong>Email :</strong> {userInfo.email}
                 </p>
                 <p>
-                  <strong>Nom :</strong> {userInfo.name}
+                  <strong>Nom :</strong> {userInfo.lastName}
                 </p>
                 <p>
-                  <strong>Prénom :</strong> {userInfo.last_name}
+                  <strong>Prénom :</strong> {userInfo.name}
                 </p>
                 <p>
                   <strong>Téléphone :</strong> {userInfo.telephone}
@@ -403,32 +404,6 @@ const Profile = () => {
         </div>
         {userInfo.role === 'apprentices' && (
           <>
-            <h2 className='text-xl font-bold mt-4'>Compétences</h2>
-            {competences.length > 0 ? (
-              <table className='min-w-full border-collapse border border-gray-300'>
-                <thead>
-                  <tr>
-                    <th className='border border-gray-300 p-2'>Compétence</th>
-                    <th className='border border-gray-300 p-2'>Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {competences.map((skill) => (
-                    <tr key={skill.id}>
-                      <td className='border border-gray-300 p-2'>
-                        {skill.skill}
-                      </td>
-                      <td className='border border-gray-300 p-2'>
-                        {skill.description}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p>Aucune compétence trouvée.</p>
-            )}
-
             <h2 className='text-xl font-bold mt-4'>Missions</h2>
             {missions.length > 0 ? (
               <table className='min-w-full border-collapse border border-gray-300'>

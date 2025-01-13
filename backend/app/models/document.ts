@@ -6,8 +6,14 @@ export default class Document extends BaseModel {
   declare id_document: number
 
   @column()
-  declare document_link: string
+  declare name: string
 
   @column()
-  declare drop_date: DateTime
+  declare type: string
+
+  @column()
+  declare document_path: string
+
+  @column()
+  declare uploaded_at: DateTime
 }

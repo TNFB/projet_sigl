@@ -45,7 +45,8 @@ export default class DocumentsController {
         return response.status(400).json({ error: 'Invalid JSON data' })
       }
 
-      const { documentName } = data
+      const { documentName, documentType } = data
+      console.log(`Type: ${documentType}`)
 
       // Found User by Email
       const emailUser = (request as any).user?.email
@@ -105,6 +106,7 @@ export default class DocumentsController {
         // Nouveau document, insérer dans la DB
         await db.table('documents').insert({
           name: documentName,
+          type: documentType,
           document_path: fileUrl,
           uploaded_at: new Date(),
         })
@@ -124,6 +126,7 @@ export default class DocumentsController {
         message: existingDocument ? 'Document updated successfully' : 'Document uploaded successfully',
         document: {
           name: documentName,
+          type: documentType,
           document_path: fileUrl,
         },
       })
@@ -292,7 +295,7 @@ export default class DocumentsController {
   
       const userDocuments = await db
         .from('documents')
-        .select('id_document', 'name', 'document_path', 'uploaded_at')
+        .select('id_document', 'name', 'type', 'document_path', 'uploaded_at')
         .where('document_path', 'like', `/${userDb.id_user}/%`)
         .orderBy('uploaded_at', 'desc')
   

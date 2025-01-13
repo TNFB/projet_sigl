@@ -3,16 +3,8 @@ import React, { useEffect, useState } from 'react'
 import Home from '@/components/Home'
 import { postRequest } from '@/api/api'
 
-type User = {
-  email: string
-  last_name: string
-  name: string
-  telephone: string
-  role: string
-}
-
 const Profile = () => {
-  const [userInfo, setUserInfo] = useState<User>(null)
+  const [userInfo, setUserInfo] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)

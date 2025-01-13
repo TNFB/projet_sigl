@@ -25,11 +25,12 @@ export const postRequest = async (url: string, body?: string) => {
     },
     body: body,
   })
-
   if (!response.ok) {
     throw new Error(`Failed to post to ${url}`)
   }
-  return await response.json()
+  const responseData = await response.json()
+  console.log(`responseData: ${JSON.stringify(responseData, null, 2)}`)
+  return responseData
 }
 
 export const downloadDocument = async (

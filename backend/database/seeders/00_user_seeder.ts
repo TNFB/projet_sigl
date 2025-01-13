@@ -6,7 +6,7 @@ export default class UserSeeder extends BaseSeeder {
   public async run() {
     await User.createMany([
       {
-        email: 'corentin.avril@reseau.eseo.fr',
+        email: 'avril.corentin@gmail.com',
         password: await bcrypt.hash('MdpPourCorentinAvrilReseauEseo', 10),
         name: 'Avril',
         last_name: 'Corentin',
@@ -14,7 +14,7 @@ export default class UserSeeder extends BaseSeeder {
         role: 'admins',
       },
       {
-        email: 'tom.herault@reseau.eseo.fr',
+        email: 'tom.herault4986@gmail.com',
         password: await bcrypt.hash('MdpPourTomHeraultReseauEseo', 10),
         name: 'Herault',
         last_name: 'Tom',
@@ -22,7 +22,7 @@ export default class UserSeeder extends BaseSeeder {
         role: 'apprentice_masters',
       },
       {
-        email: 'maxime.gonnord@reseau.eseo.fr',
+        email: 'maximegonnord2002@gmail.com',
         password: await bcrypt.hash('MdpPourMaximeGonnordReseauEseo', 10),
         name: 'Gonnord',
         last_name: 'Maxime',

@@ -153,14 +153,11 @@ Route.group(() => {
   Route.post('getEvents', [EventsController, 'getEvents']).as(
     'getEvents'
   )
-  Route.post('createEvent', [EventsController, 'createEvent']).as(
-    'createEvent'
-  )
-  Route.post('updateEvent', [EventsController, 'updateEvent']).as(
-    'updateEvent'
-  )
-  Route.delete('deleteEvent', [EventsController, 'deleteEvent']).as(
+  Route.post('deleteEvent', [EventsController, 'deleteEvent']).as(
     'deleteEvent'
+  )
+  Route.post('createOrUpdateEvent', [EventsController, 'createOrUpdateEvent']).as(
+    'createOrUpdateEvent'
   )
 }).prefix('events')
 

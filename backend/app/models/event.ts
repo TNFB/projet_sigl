@@ -22,4 +22,10 @@ export default class Calendar extends BaseModel {
 
   @column()
   declare color: string
+
+  @column()
+  declare location: string
+
+  @column()
+  declare description: string
 }

@@ -5,7 +5,7 @@ import { MyEvent } from '@/types/calendar'
 import { format, getDay, parse, startOfWeek } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { Plus } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Calendar as BigCalendar,
   dateFnsLocalizer,
@@ -18,6 +18,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'
 import './calendar-styles.css'
 import { EventDialog } from './event-dialog'
 import { EventForm } from './event-form'
+import { postRequest } from '@/api/api'
 
 const locales = {
   fr: fr,
@@ -42,6 +43,33 @@ export default function Calendar() {
   )
   const [currentDate, setCurrentDate] = useState<Date>(new Date())
   const [currentView, setCurrentView] = useState<View>('month')
+  
+
+  const fetchEvents = async () => {
+    try {
+      const response = await postRequest('events/getEvents')
+      console.log('Fetched events:', response.events)
+      if (response.events) {
+        const formattedEvents: MyEvent[] = response.events.map((event: any) => ({
+          id: event.id_event.toString(),
+          title: event.title,
+          start: new Date(event.start_date),
+          end: new Date(event.end_date),
+          type: event.type,
+          color: event.color,
+          location: event.location,
+          description: event.description
+        }))
+        setEvents(formattedEvents)
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error)
+    }
+  }
+  
+  useEffect(() => {
+    fetchEvents()
+  }, [])
 
   const handleNavigate = (date: Date, view: View, action: NavigateAction) => {
     setCurrentDate(date)
@@ -52,20 +80,33 @@ export default function Calendar() {
   }
 
   const handleSelectEvent = (event: MyEvent) => {
-    setSelectedEvent(event)
-    setShowEventDialog(true)
+    console.log(`event.id: ${event.id}`);
+    console.log(`event.location: ${event.location}`);
+    console.log(`event.description: ${event.description}`);
+    setSelectedEvent(event);
+    setShowEventDialog(true);
   }
 
   const handleSelectSlot = (slotInfo: SlotInfo) => {
     setSelectedSlot(slotInfo.start)
     setSelectedEndDate(slotInfo.end)
+    setSelectedEvent(null)
     setShowEventForm(true)
   }
 
-  const handleDeleteEvent = () => {
-    if (selectedEvent) {
-      setEvents(events.filter((event) => event.id !== selectedEvent.id))
-      setShowEventDialog(false)
+  const handleDeleteEvent = async () => {
+    if (selectedEvent && selectedEvent.id) {
+      try {
+        await postRequest('events/deleteEvent', JSON.stringify({ data: { id_event: parseInt(selectedEvent.id) } }));
+        fetchEvents();
+        setShowEventDialog(false);
+      } catch (error) {
+        console.error('Error deleting event:', error);
+        alert("Erreur lors de la suppression de l'événement");
+      }
+    } else {
+      console.error('No event selected or event ID is missing');
+      alert("Impossible de supprimer l'événement : ID manquant");
     }
   }
 
@@ -79,20 +120,27 @@ export default function Calendar() {
     setShowEventForm(true)
   }
 
-  const handleSaveEvent = (event: MyEvent) => {
-    setEvents((prevEvents) => {
-      const eventIndex = prevEvents.findIndex((e) => e.id === event.id)
-      if (eventIndex !== -1) {
-        console.log('updating event')
-        const updatedEvents = [...prevEvents]
-        updatedEvents[eventIndex] = event
-        return updatedEvents
-      } else {
-        const newEvent: MyEvent = { ...event, id: String(Date.now()) }
-        return [...prevEvents, newEvent]
-      }
-    })
-    setShowEventForm(false)
+  const handleSaveEvent = async (event: MyEvent) => {
+    try {
+      const eventData = {
+        id_event: event.id || undefined,
+        start_date: event.start.toISOString(),
+        end_date: event.end.toISOString(),
+        title: event.title,
+        type: event.type || 'default',
+        color: event.color || '#3788d8',
+        location: event.location || '',
+        description: event.description || ''
+      };
+  
+      await postRequest('events/createOrUpdateEvent', JSON.stringify({ data: eventData }));
+  
+      fetchEvents();
+      setShowEventForm(false);
+    } catch (error) {
+      console.error('Error saving event:', error);
+      alert("Erreur lors de l'enregistrement de l'événement");
+    }
   }
 
   const CustomToolbar: React.FC<ToolbarProps<MyEvent>> = (props) => {
@@ -176,8 +224,8 @@ export default function Calendar() {
         event={selectedEvent}
         open={showEventForm}
         onClose={() => {
-          setShowEventForm(false)
-          setSelectedEndDate(undefined)
+          setShowEventForm(false);
+          setSelectedEndDate(undefined);
         }}
         onSave={handleSaveEvent}
         selectedDate={selectedSlot ?? undefined}

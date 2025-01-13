@@ -43,7 +43,7 @@ const defaultFormData = {
   endDate: '',
   endTime: '23:59',
   type: '',
-  color: '#000000', // Couleur par défaut
+  color: '#000000',
 }
 
 export function EventForm({
@@ -63,7 +63,7 @@ export function EventForm({
     endDate: '',
     endTime: '23:59',
     type: '',
-    color: '#000000', // Couleur par défaut
+    color: '#000000',
   })
 
   useEffect(() => {
@@ -106,7 +106,7 @@ export function EventForm({
       color: formData.color,
     }
 
-    onSave(newEvent) // Passez newEvent à onSave
+    onSave(newEvent)
     onClose()
   }
 

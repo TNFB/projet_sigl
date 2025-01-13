@@ -221,7 +221,7 @@ function Evaluations() {
   return (
     <Home>
       <BaseForm
-        title="Ajout d'un document"
+        title="Ajout d'une grille d'évaluation"
         submitLabel='Ajouter'
         onSubmit={handleSubmit}
         fields={fields}
@@ -265,7 +265,7 @@ function Evaluations() {
         </div>
       </BaseForm>
       <div className='mt-8'>
-        <h2 className='text-2xl font-bold mb-4'>Vos documents</h2>
+        <h2 className='text-2xl font-bold mb-4'>Vos évaluations</h2>
         {userDocuments.length > 0 ? (
           <>
             <div className='grid grid-cols-3 gap-4 mb-2 font-bold'>

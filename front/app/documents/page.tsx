@@ -52,8 +52,14 @@ function Documents() {
     { value: 'Fiche de synthese S8', label: 'Fiche de synthese S8' },
     { value: 'Fiche de synthese S9', label: 'Fiche de synthese S9' },
     { value: 'Fiche de synthese S10', label: 'Fiche de synthese S10' },
-    { value: 'Rapport de conduite de projet S6', label: 'Rapport de conduite de projet S6' },
-    { value: 'Rapport de conduite de projet S7', label: 'Rapport de conduite de projet S7' },
+    {
+      value: 'Rapport de conduite de projet S6',
+      label: 'Rapport de conduite de projet S6',
+    },
+    {
+      value: 'Rapport de conduite de projet S7',
+      label: 'Rapport de conduite de projet S7',
+    },
     { value: 'Rapport de conduite de projet S8', label: 'Rapport avant PING' },
     { value: 'Rapport avancement PING', label: 'Rapport avancement PING' },
     { value: 'Rapport final PING', label: 'Rapport final PING' },
@@ -61,7 +67,9 @@ function Documents() {
 
   const [userDocuments, setUserDocuments] = useState<UserDocument[]>([])
   const [isPopupOpen, setIsPopupOpen] = useState(false)
-  const [popupStatus, setPopupStatus] = useState<'creating' | 'success' | 'error'>('creating')
+  const [popupStatus, setPopupStatus] = useState<
+    'creating' | 'success' | 'error'
+  >('creating')
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [progressMessage, setProgressMessage] = useState<string>('')
   const [isViewerOpen, setIsViewerOpen] = useState(false)
@@ -75,7 +83,9 @@ function Documents() {
   const fetchUserDocuments = async () => {
     try {
       const response = await postRequest('document/getUserDocuments')
-      const filteredDocuments = response.documents.filter((doc: UserDocument) => doc.type !== 'Grille evaluation')
+      const filteredDocuments = response.documents.filter(
+        (doc: UserDocument) => doc.type !== 'Grille evaluation',
+      )
       setUserDocuments(filteredDocuments)
     } catch (error) {
       console.error('Error fetching user documents:', error)
@@ -89,21 +99,27 @@ function Documents() {
     })
   }
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setFormData({
-      ...formData,
-      document: acceptedFiles[0],
-    })
-  }, [formData])
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      setFormData({
+        ...formData,
+        document: acceptedFiles[0],
+      })
+    },
+    [formData],
+  )
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
       'application/pdf': ['.pdf'],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        ['.docx'],
       'application/msword': ['.doc'],
       'application/vnd.oasis.opendocument.text': ['.odt'],
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [
+        '.xlsx',
+      ],
       'application/vnd.ms-excel': ['.xls'],
       'text/plain': ['.txt'],
     },
@@ -224,7 +240,8 @@ function Documents() {
       name: 'documentType',
       value: formData.documentType,
       options: documents,
-      onChange: (value: string) => setFormData({ ...formData, documentType: value }),
+      onChange: (value: string) =>
+        setFormData({ ...formData, documentType: value }),
     },
   ]
 
@@ -267,10 +284,13 @@ function Documents() {
         >
           <input {...getInputProps()} />
           {isDragActive ? (
-            <p className='text-center text-gray-500'>Déposez le fichier ici...</p>
+            <p className='text-center text-gray-500'>
+              Déposez le fichier ici...
+            </p>
           ) : (
             <p className='text-center text-gray-500'>
-              Faites glisser et déposez un fichier ici, ou cliquez pour sélectionner un fichier
+              Faites glisser et déposez un fichier ici, ou cliquez pour
+              sélectionner un fichier
             </p>
           )}
           {formData.document && (
@@ -307,7 +327,9 @@ function Documents() {
                       </button>
                     )}
                     <button
-                      onClick={() => handleDownload(doc.document_path, doc.name)}
+                      onClick={() =>
+                        handleDownload(doc.document_path, doc.name)
+                      }
                       className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2'
                     >
                       Télécharger

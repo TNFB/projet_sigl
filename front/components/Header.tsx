@@ -30,7 +30,7 @@ const Header = () => {
       const storedEmail = localStorage.getItem('email')
       setEmail(storedEmail)
     }
-    
+
     let path = window.location.pathname
     if (path.endsWith('/')) {
       path = path.slice(0, -1)

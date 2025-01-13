@@ -78,7 +78,11 @@ export const downloadDocument = async (
   window.URL.revokeObjectURL(blobUrl)
 }
 
-export const fetchDocumentBlob = async (url: string, body: any, options?: RequestInit,) => {
+export const fetchDocumentBlob = async (
+  url: string,
+  body: any,
+  options?: RequestInit,
+) => {
   try {
     const token = localStorage.getItem('token')
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {

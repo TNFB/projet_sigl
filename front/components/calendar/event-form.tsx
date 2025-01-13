@@ -202,7 +202,9 @@ export function EventForm({
               <option value='Entretien Semestre 7'>Entretien Semestre 7</option>
               <option value='Entretien Semestre 8'>Entretien Semestre 8</option>
               <option value='Entretien Semestre 9'>Entretien Semestre 9</option>
-              <option value='Entretien Semestre 10'>Entretien Semestre 10</option>
+              <option value='Entretien Semestre 10'>
+                Entretien Semestre 10
+              </option>
             </select>
           </div>
 

@@ -1,5 +1,11 @@
 import React, { useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 
 interface DocumentViewerDialogProps {
@@ -19,7 +25,10 @@ const DocumentViewerDialog: React.FC<DocumentViewerDialogProps> = ({
     console.log('Document URL:', documentUrl)
   }, [documentUrl])
 
-  const isOfficeDocument = documentUrl.endsWith('.docx') || documentUrl.endsWith('.xlsx') || documentUrl.endsWith('.pptx')
+  const isOfficeDocument =
+    documentUrl.endsWith('.docx') ||
+    documentUrl.endsWith('.xlsx') ||
+    documentUrl.endsWith('.pptx')
   const viewerUrl = isOfficeDocument
     ? `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(documentUrl)}`
     : documentUrl

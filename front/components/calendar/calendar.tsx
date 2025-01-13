@@ -173,10 +173,10 @@ export default function Calendar() {
     } catch (error) {
       console.error('Error saving event:', error)
       setErrorMessage("Erreur lors de la création de l'événement")
-        setPopupStatus('error')
-        setTimeout(() => {
-          setIsPopupOpen(false)
-        }, 2000)
+      setPopupStatus('error')
+      setTimeout(() => {
+        setIsPopupOpen(false)
+      }, 2000)
     }
   }
 

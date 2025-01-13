@@ -124,7 +124,9 @@ docker build -t ghcr.io/tnfb/projet_sigl/front:latest --build-arg ARG_NEXT_PUBLI
    2. `DB_PORT` : le port du serveur de base de données.
    3. `DB_USER` : l'utilisateur de la base de données.
    4. `DB_PASSWORD` : le mot de passe de l'utilisateur de la base de données.
-   5. `LOG_LEVEL` : le niveau de log du backend
+   5. `GMAIL_USER` : l'adresse GMAIL pour le mailer (envoi de mails de réinitialisation de mot de passe / rappels de rendez-vous).
+   6. `GMAIL_PASS` : le token SMTP de l'adresse GMAIL.
+   7. `LOG_LEVEL` : le niveau de log du backend
 4. Éditer le volume du stockage des fichiers utilisateurs :
    1. Remplacer `~chemin de stockage machine hôte~` par le chemin de stockage sur la machine hôte. (Exemple pour Debian : `/home/user/storage`)
 5. Éditer les variables d'environnements dans le fichier pour PHPMyAdmin :

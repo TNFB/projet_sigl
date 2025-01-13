@@ -10,6 +10,8 @@ services:
       DB_PORT:
       DB_USER:
       DB_PASSWORD:
+      GMAIL_USER:
+      GMAIL_PASS:
       LOG_LEVEL: info
     volumes:
       - ~chemin de stockage machine hôte~/storage:/app/build/storage:rw

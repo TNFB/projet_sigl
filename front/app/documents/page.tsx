@@ -2,7 +2,11 @@
 import React, { useEffect, useState } from 'react'
 import BaseForm from '@/components/BaseForm'
 import Home from '@/components/Home'
-import { downloadDocument, postRequest, postRequestDropDocument } from '@/api/api'
+import {
+  downloadDocument,
+  postRequest,
+  postRequestDropDocument,
+} from '@/api/api'
 
 interface FormData {
   documentType: string
@@ -65,10 +69,12 @@ function Documents() {
 
   const handleDownload = async (documentPath: string) => {
     try {
-      await downloadDocument('document/download', { data: { path: documentPath } })
+      await downloadDocument('document/download', {
+        data: { path: documentPath },
+      })
     } catch (error) {
       console.error('Error downloading document:', error)
-      alert("Erreur lors du téléchargement du document")
+      alert('Erreur lors du téléchargement du document')
     }
   }
 
@@ -141,12 +147,15 @@ function Documents() {
   const handleDelete = async (documentId: number) => {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
       try {
-        await postRequest('document/deleteDocument', JSON.stringify({ data: {id: documentId} }))
+        await postRequest(
+          'document/deleteDocument',
+          JSON.stringify({ data: { id: documentId } }),
+        )
         alert('Document supprimé avec succès')
         await fetchUserDocuments()
       } catch (error) {
         console.error('Error deleting document:', error)
-        alert("Erreur lors de la suppression du document")
+        alert('Erreur lors de la suppression du document')
       }
     }
   }
@@ -190,32 +199,35 @@ function Documents() {
           />
         </div>
       </BaseForm>
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Vos documents</h2>
+      <div className='mt-8'>
+        <h2 className='text-2xl font-bold mb-4'>Vos documents</h2>
         {userDocuments.length > 0 ? (
-          <ul className="space-y-2">
+          <ul className='space-y-2'>
             {userDocuments.map((doc) => (
-              <li key={doc.id_document} className="flex justify-between items-center bg-white p-4 rounded shadow">
-              <span>{doc.name}</span>
-              <div>
-                <button
-                  onClick={() => handleDownload(doc.document_path)}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
-                >
-                  Télécharger
-                </button>
-                <button
-                  onClick={() => handleDelete(doc.id_document)}
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Supprimer
-                </button>
-              </div>
-            </li>
+              <li
+                key={doc.id_document}
+                className='flex justify-between items-center bg-white p-4 rounded shadow'
+              >
+                <span>{doc.name}</span>
+                <div>
+                  <button
+                    onClick={() => handleDownload(doc.document_path)}
+                    className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2'
+                  >
+                    Télécharger
+                  </button>
+                  <button
+                    onClick={() => handleDelete(doc.id_document)}
+                    className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded'
+                  >
+                    Supprimer
+                  </button>
+                </div>
+              </li>
             ))}
           </ul>
         ) : (
-          <p>Vous n'avez pas encore de documents.</p>
+          <p>Vous n&apos;avez pas encore de documents.</p>
         )}
       </div>
     </Home>

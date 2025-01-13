@@ -44,6 +44,14 @@ export type User = {
   telephone?: string
 }
 
+type ErrorResponse = {
+  response?: {
+    status: number
+    data?: any
+  }
+  message?: string
+}
+
 type UserTableProps = {
   usersData: User[]
   onUserDelete: (userId: string) => void
@@ -92,8 +100,8 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
 
   const openEditDialog = (user: User) => {
     const [firstName, ...lastNameParts] = user.name.split(' ')
-    const lastName = lastNameParts.join(' ')
-    setCurrentUser({ ...user, name: firstName, last_name: lastName })
+    const last_name = lastNameParts.join(' ')
+    setCurrentUser({ ...user, name: firstName, last_name: last_name })
     console.log('currentUser', currentUser.last_name)
     setDialogMode('edit')
     setIsDialogOpen(true)
@@ -133,7 +141,7 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
         const data = {
           email: email || '',
           name: name || '',
-          lastName: last_name || '',
+          last_name: last_name || '',
           role: role || 'user',
           company: entreprise || '',
           promotion: promotion || '',

@@ -12,8 +12,16 @@ import { useDropzone } from 'react-dropzone'
 import { postRequestImportUser } from '@/api/api'
 import ProgressPopup from '@/components/ProgressPopup'
 
-const FileUploadDialog = ({ isOpen, onClose }) => {
-  const [file, setFile] = useState(null)
+type FileUploadDialogProps = {
+  isOpen: boolean
+  onClose: () => void
+}
+
+const FileUploadDialog: React.FC<FileUploadDialogProps> = ({
+  isOpen,
+  onClose,
+}) => {
+  const [file, setFile] = useState<File | null>(null)
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const [popupStatus, setPopupStatus] = useState<
     'creating' | 'success' | 'error'
@@ -21,7 +29,7 @@ const FileUploadDialog = ({ isOpen, onClose }) => {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [progressMessage, setProgressMessage] = useState<string>('')
 
-  const onDrop = useCallback((acceptedFiles) => {
+  const onDrop = useCallback((acceptedFiles: File[]) => {
     setFile(acceptedFiles[0])
   }, [])
 
@@ -35,8 +43,17 @@ const FileUploadDialog = ({ isOpen, onClose }) => {
     },
   })
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!file) {
+      setErrorMessage('Aucun fichier sélectionné')
+      setPopupStatus('error')
+      setIsPopupOpen(true)
+      setTimeout(() => {
+        setIsPopupOpen(false)
+      }, 2000)
+      return
+    }
 
     setIsPopupOpen(true)
     setProgressMessage('Importation en cours...')

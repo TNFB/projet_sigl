@@ -32,7 +32,11 @@ export const postRequest = async (url: string, body?: string) => {
   return await response.json()
 }
 
-export const downloadDocument = async (url: string, body: any, options?: RequestInit) => {
+export const downloadDocument = async (
+  url: string,
+  body: any,
+  options?: RequestInit,
+) => {
   const token = localStorage.getItem('token')
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {
     method: 'POST',
@@ -41,7 +45,7 @@ export const downloadDocument = async (url: string, body: any, options?: Request
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(body),
-    ...options
+    ...options,
   })
 
   if (!response.ok) {
@@ -49,7 +53,9 @@ export const downloadDocument = async (url: string, body: any, options?: Request
   }
 
   const blob = await response.blob()
-  const filename = response.headers.get('Content-Disposition')?.split('filename=')[1] || 'document'
+  const filename =
+    response.headers.get('Content-Disposition')?.split('filename=')[1] ||
+    'document'
   const blobUrl = window.URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = blobUrl

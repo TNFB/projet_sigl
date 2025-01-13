@@ -87,7 +87,6 @@ export const fetchDocumentBlob = async (
     const token = localStorage.getItem('token')
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {
       method: 'POST',
-      responseType: 'blob',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,

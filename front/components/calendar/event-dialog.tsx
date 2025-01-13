@@ -49,6 +49,12 @@ export function EventDialog({
               {format(event.end, 'p', { locale: fr })}
             </p>
           </div>
+          {event.type && (
+            <div className='space-y-1'>
+              <p className='text-sm font-medium text-gray-500'>Type</p>
+              <p className='text-sm'>{event.type}</p>
+            </div>
+          )}
           {event.location && (
             <div className='space-y-1'>
               <p className='text-sm font-medium text-gray-500'>Emplacement</p>

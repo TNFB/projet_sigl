@@ -150,6 +150,21 @@ export default function Calendar() {
     }
   }
 
+  const eventStyleGetter = (event: MyEvent) => {
+    const backgroundColor = event.color
+    const style = {
+      backgroundColor,
+      borderRadius: '0.5rem',
+      opacity: 0.8,
+      color: 'white',
+      border: '0px',
+      display: 'block',
+    }
+    return {
+      style,
+    }
+  }
+
   const CustomToolbar: React.FC<ToolbarProps<MyEvent>> = (props) => {
     const { label, onView, onNavigate } = props
 
@@ -211,6 +226,7 @@ export default function Calendar() {
           onView={handleViewChange}
           onSelectEvent={handleSelectEvent}
           onSelectSlot={handleSelectSlot}
+          eventPropGetter={eventStyleGetter}
           selectable
           components={{
             toolbar: CustomToolbar,

@@ -22,6 +22,18 @@ interface EventFormProps {
   selectedEndDate?: Date
 }
 
+interface FormData {
+  title: string
+  description: string
+  location: string
+  startDate: string
+  startTime: string
+  endDate: string
+  endTime: string
+  type: string
+  color: string
+}
+
 const defaultFormData = {
   title: '',
   description: '',
@@ -40,17 +52,21 @@ export function EventForm({
   selectedDate,
   selectedEndDate,
 }: EventFormProps) {
-  const [formData, setFormData] = useState(defaultFormData)
+  const [formData, setFormData] = useState<FormData>({
+    title: '',
+    description: '',
+    location: '',
+    startDate: '',
+    startTime: '00:00',
+    endDate: '',
+    endTime: '23:59',
+    type: '',
+    color: '#000000' // Couleur par défaut
+  })
 
   useEffect(() => {
-    if (!open) {
-      // Reset form when dialog closes
-      setFormData(defaultFormData)
-      return
-    }
-
     if (event) {
-      // Set form data for existing event
+      console.log(`Event Form location: ${event.location}`)
       setFormData({
         title: event.title,
         description: event.description || '',
@@ -59,41 +75,32 @@ export function EventForm({
         startTime: format(event.start, 'HH:mm'),
         endDate: format(event.end, 'yyyy-MM-dd'),
         endTime: format(event.end, 'HH:mm'),
-      })
-    } else if (selectedDate) {
-      // Set form data for new event
-      const startDate = format(selectedDate, 'yyyy-MM-dd')
-      const endDate = selectedEndDate
-        ? format(selectedEndDate, 'yyyy-MM-dd')
-        : startDate
-
-      setFormData({
-        ...defaultFormData,
-        startDate,
-        endDate,
-        startTime: '00:00',
-        endTime: selectedEndDate ? '23:59' : '23:59',
-      })
+        type: event.type || '',
+        color: event.color || '#000000'
+      });
     }
-  }, [event, selectedDate, selectedEndDate, open])
+  }, [event]);  
+
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    const start = new Date(`${formData.startDate}T${formData.startTime}`)
-    const end = new Date(`${formData.endDate}T${formData.endTime}`)
-
+    e.preventDefault();
+  
+    const start = new Date(`${formData.startDate}T${formData.startTime}`);
+    const end = new Date(`${formData.endDate}T${formData.endTime}`);
+  
     const newEvent: MyEvent = {
-      id: event?.id || String(Date.now()),
+      id: event?.id || undefined,
       title: formData.title,
       description: formData.description,
       location: formData.location,
       start,
       end,
-    }
-
-    onSave(newEvent)
-    onClose()
+      type: formData.type,
+      color: formData.color
+    };
+  
+    onSave(newEvent); // Passez newEvent à onSave
+    onClose();
   }
 
   return (
@@ -121,7 +128,7 @@ export function EventForm({
               required
             />
           </div>
-
+  
           <div className='grid grid-cols-2 gap-4'>
             <div className='space-y-2'>
               <Label>Date début</Label>
@@ -170,7 +177,35 @@ export function EventForm({
               </div>
             </div>
           </div>
-
+  
+          <div className='space-y-2'>
+            <Label htmlFor='type'>Type d'événement</Label>
+            <Input
+              id='type'
+              value={formData.type}
+              onChange={(e) =>
+                setFormData({ ...formData, type: e.target.value })
+              }
+              className='w-full bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2 placeholder-gray-500'
+              placeholder="Entrer le type d'événement"
+              required
+            />
+          </div>
+  
+          <div className='space-y-2'>
+            <Label htmlFor='color'>Couleur de l'événement</Label>
+            <Input
+              id='color'
+              type='color'
+              value={formData.color}
+              onChange={(e) =>
+                setFormData({ ...formData, color: e.target.value })
+              }
+              className='w-full h-10 bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2'
+              required
+            />
+          </div>
+  
           <div className='space-y-2'>
             <Label htmlFor='location'>Emplacement (Optionnel)</Label>
             <Input
@@ -183,7 +218,7 @@ export function EventForm({
               className='w-full bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2 placeholder-gray-500'
             />
           </div>
-
+  
           <div className='space-y-2' id='event-description'>
             <Label htmlFor='description'>Description (Optionnel)</Label>
             <Textarea
@@ -197,7 +232,7 @@ export function EventForm({
               className='w-full bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-2 placeholder-gray-500'
             />
           </div>
-
+  
           <div className='flex justify-end space-x-2'>
             <Button type='button' variant='outline' onClick={onClose}>
               Annuler
@@ -207,5 +242,5 @@ export function EventForm({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  )  
 }

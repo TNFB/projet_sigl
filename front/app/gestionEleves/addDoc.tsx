@@ -6,6 +6,7 @@ import { postRequestDropDocument, postRequestImportUser } from '@/api/api'
 interface FormData {
   documentName: string
   document: File | null
+  documentType: string
 }
 
 interface InputField {
@@ -23,6 +24,7 @@ function AddDoc() {
   const [formData, setFormData] = useState<FormData>({
     documentName: '',
     document: null,
+    documentType: 'Document Administratif',
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +57,7 @@ function AddDoc() {
     // Créer un objet JSON avec email et documentName + Clean Document
     const jsonData = JSON.stringify({
       documentName: cleanDocumentName(formData.documentName),
+      documentType: 'Document Administratif',
     })
 
     // Ajouter le JSON comme un champ 'data' dans le FormData

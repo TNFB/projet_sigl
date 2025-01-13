@@ -23,20 +23,31 @@ const DepositsController = () => import('../app/controllers/deposits_controller.
 const CompaniesController = () => import('../app/controllers/compagies_controller.js')
 const ProfessionalsController = () => import('../app/controllers/professionals_controller.js')
 const MonthluNotesController = () => import('../app/controllers/monthly_notes_controller.js')
-const ApprenticeshipCoordinatorsController = () =>
-  import('../app/controllers/apprenticeship_coordinators_controller.js')
+const EventsController = () => import('../app/controllers/events_controller.js')
+const ApprenticesController = () => import('../app/controllers/apprentices_controller.js')
+const CursusController = () => import('../app/controllers/cursus_controller.js')
+
 
 // Définir les routes
+
+Route.post('connection', [UserController, 'connectionUser']).as('connectionUser')
+
 Route.group(() => {
-  Route.post('/getUserEmails', [UserController, 'getUserEmails']).as('getUserEmails')
-  Route.post('/getUser/:id', [UserController, 'getUserById']).as('getUserById')
+  Route.post('/getUserEmailsByRole', [UserController, 'getUserEmailsByRole']).as(
+    'getUserEmailsByRole'
+  )
   Route.post('/createUser', [UserController, 'createUser']).as('createUser')
   Route.post('/changePassword', [UserController, 'changePassword']).as('changePassword')
+  Route.post('/getUserInfoByEmail', [UserController, 'getUserInfoByEmail']).as('getUserInfoByEmail')
+  Route.post('/updateUser', [UserController, 'updateUser']).as('updateUser')
+  Route.post('/checkEmailExists', [UserController, 'checkEmailExists']).as('checkEmailExists')
+  Route.post('/getRole', [UserController, 'getRole']).as('getRole')
 }).prefix('/user')
 
 Route.group(() => {
   Route.post('/overritePassword', [AdminController, 'overritePassword']).as('overritePassword')
   Route.post('/deleteUser', [AdminController, 'deleteUser']).as('deleteUser')
+  Route.post('/linkApprentice', [AdminController, 'linkApprentice']).as('linkApprentice')
 }).prefix('/admin')
 
 Route.group(() => {
@@ -90,12 +101,13 @@ Route.group(() => {
   ]).as('addMissionToApprentice')
 }).prefix('/CompanyRepresentatives')
 
-Route.post('connection', [UserController, 'connectionUser']).as('connectionUser')
-Route.get('logout', [UserController, 'logoutUser']).as('logoutUser')
 
 Route.group(() => {
   Route.post('dropDocument', [DocumentsController, 'dropDocument']).as('dropDocument')
   Route.post('importUsers', [DocumentsController, 'importUsers']).as('importUsers')
+  Route.post('getUserDocuments', [DocumentsController, 'getUserDocuments']).as('getUserDocuments')
+  Route.post('download', [DocumentsController, 'download']).as('download')
+  Route.post('deleteDocument', [DocumentsController, 'deleteDocument']).as('deleteDocument')
 }).prefix('/document')
 
 Route.group(() => {
@@ -123,13 +135,43 @@ Route.group(() => {
 }).prefix('/professional')
 
 Route.group(() => {
-  Route.post('createMonthlyNote', [MonthluNotesController, 'createMonthlyNote']).as(
-    'createMonthlyNote'
+  Route.post('getAllNotes', [MonthluNotesController, 'getAllNotes']).as(
+    'getAllNotes'
+  )
+  Route.post('createNote', [MonthluNotesController, 'createNote']).as(
+    'createNote'
+  )
+  Route.post('updateNote', [MonthluNotesController, 'updateNote']).as(
+    'updateNote'
+  )
+  Route.post('deleteNote', [MonthluNotesController, 'deleteNote']).as(
+    'deleteNote'
   )
 }).prefix('monthlyNotes')
 
 Route.group(() => {
-  Route.post('linkApprentice', [ApprenticeshipCoordinatorsController, 'linkApprentice']).as(
-    'linkApprentice'
+  Route.post('getEvents', [EventsController, 'getEvents']).as(
+    'getEvents'
   )
-}).prefix('ApprenticeshipCoordinator')
+  Route.post('deleteEvent', [EventsController, 'deleteEvent']).as(
+    'deleteEvent'
+  )
+  Route.post('createOrUpdateEvent', [EventsController, 'createOrUpdateEvent']).as(
+    'createOrUpdateEvent'
+  )
+}).prefix('events')
+
+Route.group(() => {
+  Route.post('promotions', [CursusController, 'getAllPromotions']).as('getAllPromotions')
+}).prefix('cursus')
+
+Route.group(() => {
+  Route.post('getInfoApprentice', [ApprenticesController, 'getInfoApprentice']).as('getInfoApprentice')
+  Route.post('addMission', [ApprenticesController, 'addMission']).as('addMission')
+  Route.post('updateMission', [ApprenticesController, 'updateMission']).as('updateMission')
+  Route.post('deleteMission', [ApprenticesController, 'deleteMission']).as('deleteMission')
+  Route.post('addSkill', [ApprenticesController, 'addSkill']).as('addSkill')
+  Route.post('updateSkill', [ApprenticesController, 'updateSkill']).as('updateSkill')
+  Route.post('deleteSkill', [ApprenticesController, 'deleteSkill']).as('deleteSkill')
+  Route.post('getMissionAndSkillApprenticeByEmail', [ApprenticesController, 'getMissionAndSkillApprenticeByEmail']).as('getMissionAndSkillApprenticeByEmail')
+}).prefix('apprentice')

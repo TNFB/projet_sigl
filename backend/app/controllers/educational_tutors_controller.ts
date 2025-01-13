@@ -1,6 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
-import type { HttpContext } from '@adonisjs/core/http'
+import { HttpContext } from '@adonisjs/core/http'
 import bcrypt from 'bcrypt'
+import { isValidRole } from '../utils/api_utils.js'
 
 export default class EducationalTutorsController {
   /**
@@ -50,12 +51,28 @@ export default class EducationalTutorsController {
   async addApprentices({ request, response }: HttpContext) {
     console.log('addApprentices')
     try {
-      const { tutorId, apprenticeIds } = request.only(['tutorId', 'apprenticeIds'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { tutorId, apprenticeIds } = data
+
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      // Vérifier si l'admin existe et si le token est valide
+      if (!(await isValidRole(emailUser, 'admins'))) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role',
+        })
+      }
 
       // master existe ?
       const master = await db.from('educational_tutors').where('id', tutorId).first()
       if (!master) {
-        return response.status(400).json({ message: 'educational tutors not found' })
+        return response.notFound({ message: 'educational tutors not found' })
       }
 
       // get apprentice list (if existe)
@@ -65,7 +82,7 @@ export default class EducationalTutorsController {
       const newApprentices = [...new Set([...currentApprentices, ...apprenticeIds])]
 
       // Start Transaction
-      await db.transaction(async (trx) => {
+      await db.transaction(async (trx: any) => {
         // Update educational_tutors
         await trx
           .from('educational_tutors')
@@ -77,7 +94,7 @@ export default class EducationalTutorsController {
           await trx
             .from('apprentices')
             .where('id', apprenticeId)
-            .update({ idEducationalTutor: tutorId })
+            .update({ id_educational_tutor: tutorId })
         }
       })
 
@@ -104,7 +121,23 @@ export default class EducationalTutorsController {
    */
   public async assignEducationalTutorRole({ request, response }: HttpContext) {
     try {
-      const { email } = request.only(['email'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { email } = data
+
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      // Vérifier si l'admin existe et si le token est valide
+      if (!(await isValidRole(emailUser, 'admins'))) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role',
+        })
+      }
 
       if (!email) {
         return response.status(400).json({ message: 'Email is required' })
@@ -114,21 +147,21 @@ export default class EducationalTutorsController {
       const user = await db.from('users').where('email', email).first()
 
       if (!user) {
-        return response.status(400).json({ message: 'User not found' })
+        return response.notFound({ message: 'User not found' })
       }
 
       // Commencer une transaction
-      await db.transaction(async (trx) => {
+      await db.transaction(async (trx: any) => {
         // Mettre à jour le rôle de l'utilisateur
-        await trx.from('users').where('idUser', user.idUser).update({ role: 'educational_tutor' })
+        await trx.from('users').where('id_user', user.id_user).update({ role: 'educational_tutor' })
 
         // Insérer l'ID de l'utilisateur dans la table educational_tutors
-        await trx.table('educational_tutors').insert({ id: user.idUser })
+        await trx.table('educational_tutors').insert({ id: user.id_user })
       })
 
       return response.status(200).json({
         message: 'User successfully assigned as educational tutor',
-        userId: user.idUser,
+        userId: user.id_user,
       })
     } catch (error) {
       console.error(error)
@@ -153,36 +186,49 @@ export default class EducationalTutorsController {
    */
   public async getTrainingDiaryByEmail({ request, response }: HttpContext) {
     try {
-      const { email } = request.only(['email'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { email } = data
+
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      // Vérifier si l'admin existe et si le token est valide
+      if (!(await isValidRole(emailUser, 'admins'))) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role',
+        })
+      }
 
       const existingUser = await db.from('users').where('email', email).first()
 
       if (existingUser) {
-        const apprentice = await db.from('apprentices').where('id', existingUser.idUser).first()
+        const apprentice = await db.from('apprentices').where('id', existingUser.id_user).first()
 
-        if (!apprentice || !apprentice.idTrainingDiary) {
-          return response.status(404).json({
-            status: 'not found',
+        if (!apprentice || !apprentice.id_training_diary) {
+          return response.notFound({
             message: 'Training diary not found for this user',
           })
         }
 
         const trainingDiary = await db
           .from('training_diaries')
-          .where('idTrainingDiary', apprentice.idTrainingDiary)
+          .where('id_training_diary', apprentice.id_training_diary)
           .first()
 
         if (!trainingDiary) {
-          return response.status(404).json({
-            status: 'not found',
+          return response.notFound({
             message: 'Training diary not found',
           })
         }
 
         return response.status(200).json({ trainingDiary })
       } else {
-        return response.status(404).json({
-          status: 'not found',
+        return response.notFound({
           message: 'User not found',
         })
       }
@@ -194,9 +240,25 @@ export default class EducationalTutorsController {
     }
   }
 
-  async createOrUpdateEducationalTutor({ request, response }: HttpContext) {
+  public async createOrUpdateEducationalTutor({ request, response }: HttpContext) {
     try {
-      const peopleData = request.input('data')
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { peopleData } = data
+
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      // Vérifier si l'admin existe et si le token est valide
+      if (!(await isValidRole(emailUser, 'admins'))) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role',
+        })
+      }
 
       if (!Array.isArray(peopleData)) {
         return response.status(400).json({ error: 'Input should be an array of people' })
@@ -205,32 +267,32 @@ export default class EducationalTutorsController {
       const results = []
 
       for (const person of peopleData) {
-        const { name, lastName, email } = person
+        const { name, last_name, email } = person
 
         // Vérifier si l'utilisateur existe déjà
         const existingUser = await db.from('users').where('email', email).first()
 
         if (existingUser) {
           // Mettre à jour les informations de l'utilisateur existant
-          await db.from('users').where('email', email).update({ name, lastName })
+          await db.from('users').where('email', email).update({ name, last_name })
 
           // Vérifier si l'entrée existe dans educational_tutors
           const existingTutor = await db
             .from('educational_tutors')
-            .where('id', existingUser.idUser)
+            .where('id', existingUser.id_user)
             .first()
 
           if (!existingTutor) {
             // Créer une nouvelle entrée dans educational_tutors si elle n'existe pas
             await db.table('educational_tutors').insert({
-              id: existingUser.idUser,
+              id: existingUser.id_user,
             })
           }
 
           results.push({
             email,
             status: 'updated',
-            userId: existingUser.idUser,
+            userId: existingUser.id_user,
           })
         } else {
           // Créer un nouvel utilisateur
@@ -242,11 +304,11 @@ export default class EducationalTutorsController {
             .insert({
               email,
               name,
-              lastName,
+              last_name,
               password: hashedPassword,
               role: 'educational_tutors',
             })
-            .returning('idUser')
+            .returning('id_user')
 
           // Créer l'entrée dans la table educational_tutors
           await db.table('educational_tutors').insert({
@@ -272,37 +334,43 @@ export default class EducationalTutorsController {
     }
   }
 
-  async getApprenticesByTutorEmail({ request, response }: HttpContext) {
+  public async getApprenticesByTutorEmail({ request, response }: HttpContext) {
     try {
-      const { email } = request.input('data')
-
-      if (!email) {
-        return response.status(400).json({ error: 'Email is required' })
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
       }
-
+      // Vérifier si l'admin existe et si le token est valide
+      if (!(await isValidRole(emailUser, 'educational_tutors'))) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role',
+        })
+      }
       // Trouver le tuteur pédagogique par son email
       const tutor = await db
         .from('users')
-        .where('email', email)
+        .where('email', emailUser)
         .where('role', 'educational_tutors')
         .first()
 
       if (!tutor) {
-        return response.status(404).json({ error: 'Educational tutor not found' })
+        return response.notFound({ message: 'Educational tutor not found' })
       }
 
       // Trouver les apprentis associés à ce tuteur
       const apprentices = await db
         .from('apprentices')
-        .join('users', 'apprentices.id', 'users.idUser')
-        .where('apprentices.idEducationalTutor', tutor.idUser)
-        .select('users.email', 'users.name', 'users.lastName')
+        .join('users', 'apprentices.id', 'users.id_user')
+        .where('apprentices.id_educational_tutor', tutor.id_user)
+        .select('users.id_user', 'users.email', 'users.name', 'users.last_name')
 
       // Formater les données des apprentis
-      const formattedApprentices = apprentices.map((apprentice) => ({
+      const formattedApprentices = apprentices.map((apprentice: any) => ({
+        id_user: apprentice.id_user,
         email: apprentice.email,
         nom: apprentice.name,
-        prenom: apprentice.lastName,
+        prenom: apprentice.last_name,
       }))
 
       // Créer l'objet JSON de réponse
@@ -310,7 +378,7 @@ export default class EducationalTutorsController {
         tuteur: {
           email: tutor.email,
           nom: tutor.name,
-          prenom: tutor.lastName,
+          prenom: tutor.last_name,
         },
         apprentis: formattedApprentices,
       }

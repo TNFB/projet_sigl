@@ -1,16 +1,11 @@
-import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 export default class Cursus extends BaseModel {
+  static table = 'cursus'
+
   @column({ isPrimary: true })
-  declare idCursus: number
+  declare id_cursus: number
 
   @column()
-  declare promotionName: string
-
-  @column()
-  declare startPromotionYear: DateTime
-
-  @column()
-  declare endPromotionYear: DateTime
+  declare promotion_name: string
 }

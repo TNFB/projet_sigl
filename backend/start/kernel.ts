@@ -11,6 +11,9 @@
 import router from '@adonisjs/core/services/router'
 import server from '@adonisjs/core/services/server'
 
+// Import the jobs to start the cron tasks
+import '../app/jobs/event_reminder.js'
+
 /**
  * The error handler is used to convert an exception
  * to a HTTP response.
@@ -23,6 +26,7 @@ server.errorHandler(() => import('#exceptions/handler'))
  * the request URL.
  */
 server.use([
+  () => import('@adonisjs/core/bodyparser_middleware'),
   () => import('#middleware/container_bindings_middleware'),
   () => import('#middleware/force_json_response_middleware'),
   () => import('@adonisjs/cors/cors_middleware'),
@@ -33,16 +37,6 @@ server.use([
  * requests with a registered route.
  */
 router.use([
-  () => import('@adonisjs/core/bodyparser_middleware'),
-  () => import('@adonisjs/session/session_middleware'),
-  () => import('@adonisjs/auth/initialize_auth_middleware'),
+  // Ajoutez ici les middlewares spécifiques aux routes si nécessaire
+  () => import('#middleware/auth'),
 ])
-
-/**
- * Named middleware collection must be explicitly assigned to
- * the routes or the routes group.
- */
-export const middleware = router.named({
-  guest: () => import('#middleware/guest_middleware'),
-  auth: () => import('#middleware/auth_middleware'),
-})

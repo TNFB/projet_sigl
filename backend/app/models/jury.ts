@@ -2,8 +2,8 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 export default class Jury extends BaseModel {
   @column({ isPrimary: true })
-  declare idJury: number
+  declare id_jury: number
 
   @column()
-  declare listeIdJury: JSON
+  declare liste_id_jury: JSON
 }

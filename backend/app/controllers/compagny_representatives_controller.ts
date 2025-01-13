@@ -1,5 +1,6 @@
-import { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
+import { isValidRole } from '../utils/api_utils.js'
+import { HttpContext } from '@adonisjs/core/http'
 
 export default class CompanyRepresentativesController {
   /**
@@ -7,7 +8,7 @@ export default class CompanyRepresentativesController {
    * @description Ajoute une nouvelle mission à la liste des missions d'un apprenti.
    *
    * Cette méthode prend les détails de la mission et l'ID de l'apprenti,
-   * puis ajoute la mission à la liste existante dans le champ JSON 'listMissions'.
+   * puis ajoute la mission à la liste existante dans le champ JSON 'list_missions'.
    *
    * @param {HttpContext} context - Le contexte HTTP de la requête.
    * @param {Object} context.request - L'objet de requête contenant les données.
@@ -45,12 +46,32 @@ export default class CompanyRepresentativesController {
   public async addMissionToApprentice({ request, response }: HttpContext) {
     console.log('addMissionToApprentice')
     try {
-      const { apprenticeId, mission } = request.only(['apprenticeId', 'mission'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { apprentiEmail, mission } = data
+
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      // Vérifier si l'admin existe et si le token est valide
+      if (!(await isValidRole(emailUser, 'admins'))) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role',
+        })
+      }
 
       // check apprentice exist
-      const apprentice = await db.from('apprentices').where('id', apprenticeId).first()
+      const apprentice = await db
+        .from('apprentices')
+        .where('email', apprentiEmail)
+        .select('id', 'list_mission')
+        .first()
       if (!apprentice) {
-        return response.status(400).json({ message: 'Apprentice not found' })
+        return response.notFound({ message: 'Apprentice not found' })
       }
 
       // check all mission field
@@ -59,10 +80,10 @@ export default class CompanyRepresentativesController {
       }
 
       // get current mission
-      let listMissions = apprentice.listMissions ? JSON.parse(apprentice.listMissions) : []
+      let list_missions = apprentice.list_missions ? JSON.parse(apprentice.list_missions) : []
 
       // add new mission
-      listMissions.push({
+      list_missions.push({
         'Titre mission': mission.titreMission,
         'Description Mission': mission.descriptionMission,
         'competances': mission.competences,
@@ -71,8 +92,8 @@ export default class CompanyRepresentativesController {
       // update DB
       await db
         .from('apprentices')
-        .where('id', apprenticeId)
-        .update({ listMissions: JSON.stringify(listMissions) })
+        .where('id', apprentice.id)
+        .update({ list_missions: JSON.stringify(list_missions) })
 
       return response
         .status(200)

@@ -3,16 +3,16 @@ import { DateTime } from 'luxon'
 
 export default class Report extends BaseModel {
   @column({ isPrimary: true })
-  declare idReport: number
+  declare id_report: number
 
   @column()
-  declare linkReport: string
+  declare link_report: string
 
   @column()
   declare deadline: DateTime
 
   @column()
-  declare idJury: number
+  declare id_jury: number
 
   @column()
   declare grade: number

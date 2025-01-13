@@ -1,7 +1,10 @@
 import db from '@adonisjs/lucid/services/db'
 import type { HttpContext } from '@adonisjs/core/http'
-import xlsx from 'xlsx'
+import * as XLSX from 'xlsx'
 import fs from 'node:fs'
+import path from 'node:path'
+import { createApprenticeWithTrainingDiary, findOrCreateApprenticeMaster, findOrCreateCursus, findOrCreateEducationalTutor, findUserByEmail, generatePassword, getOrCreateCompanyIdByName } from '../utils/api_utils.js'
+import bcrypt from 'bcrypt'
 
 /**
  * @class DocumentsController
@@ -27,19 +30,32 @@ export default class DocumentsController {
    *                             et les détails du document téléchargé ou une erreur en cas d'échec.
    */
   async dropDocument({ request, response }: HttpContext) {
+    console.log('Drop Document')
     try {
       const file = request.file('document', {
-        extnames: ['docx', 'doc', 'odt', 'xlsx', 'xls', 'pdf', 'txt', 'mdj'], // Extensions autorisées
+        extnames: ['docx', 'doc', 'odt', 'xlsx', 'xls', 'pdf', 'txt'], // Extensions autorisées
         size: '10mb', // Taille maximale autorisée
       })
 
-      const { email, documentName } = request.only(['email', 'documentName'])
+      const jsonData = request.input('data')
+      let data
+      try {
+        data = JSON.parse(jsonData)
+      } catch (error) {
+        return response.status(400).json({ error: 'Invalid JSON data' })
+      }
+
+      const { documentName, documentType } = data
+      console.log(`Type: ${documentType}`)
 
       // Found User by Email
-      const userDb = await db.from('users').where('email', email).select('*').first()
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      const userDb = await findUserByEmail(emailUser)
       if (!userDb) {
-        return response.status(400).json({
-          status: 'error',
+        return response.notFound({
           message: 'Email not found',
         })
       }
@@ -54,25 +70,64 @@ export default class DocumentsController {
         })
       }
       //Path
-      const basePath = `/${userDb.idUser}`
+      const basePath = `/${userDb.id_user}`
       const fileUrl = `${basePath}/${documentName}.${file.extname}`
-      // Save to disk
-      await file.moveToDisk(fileUrl, {
-        name: documentName,
-      })
-      // Save path in DB
-      const savedDocument = await db.table('documents').insert({
-        name: file.clientName,
-        documentPath: fileUrl,
-        uploadedAt: new Date(),
-      })
+
+      // Vérifier si le document existe déjà
+      const existingDocument = await db
+        .from('documents')
+        .where('name', documentName)
+        .first()
+
+      if (existingDocument) {
+        if (existingDocument.document_path !== fileUrl) {
+          //Remove to disk
+          const storagePath = process.env.STORAGE_PATH;
+          const fileToDelete = path.join(storagePath ?? '', existingDocument.document_path);
+          fs.unlink(fileToDelete, (err) => {
+            if (err) {
+              console.error('Erreur lors de la suppression du fichier (vérifier ENV):', err);
+            }
+          });
+          
+          await db.from('documents')
+            .where('id_document', existingDocument.id_document)
+            .update({
+              document_path: fileUrl,
+              uploaded_at: new Date()
+            })
+        } else {
+          return response.ok({
+            message: 'Document already exists (update doc)',
+            document: existingDocument,
+          })
+        }
+      } else {
+        // Nouveau document, insérer dans la DB
+        await db.table('documents').insert({
+          name: documentName,
+          type: documentType,
+          document_path: fileUrl,
+          uploaded_at: new Date(),
+        })
+      }
+      try {
+        // Déplacer le fichier une seule fois, après avoir mis à jour ou inséré dans la DB
+        await file.moveToDisk(fileUrl, {
+          name: documentName,
+        })
+      } catch ( error ) {
+        console.error('Erreur lors du déplacement du fichier:', error)
+      }
+      
+      
       // Retourner une réponse réussie
       return response.created({
-        message: 'Document uploaded successfully',
+        message: existingDocument ? 'Document updated successfully' : 'Document uploaded successfully',
         document: {
-          id: savedDocument[0], // ID du fichier inséré (si disponible)
-          name: file.clientName,
-          documentPath: fileUrl,
+          name: documentName,
+          type: documentType,
+          document_path: fileUrl,
         },
       })
     } catch (error) {
@@ -98,6 +153,7 @@ export default class DocumentsController {
    * @return {Promise<Object>} - Une promesse qui résout un objet JSON contenant le résultat de l'importation.
    */
   async importUsers({ request, response }: HttpContext) {
+    console.log('import user via Excel')
     try {
       const file = request.file('file', {
         extnames: ['xlsx'],
@@ -108,98 +164,108 @@ export default class DocumentsController {
         return response.badRequest({ message: 'Invalid file' })
       }
 
-      const filePath = `${Date.now()}-${file.clientName}`
+      const filePath = `${Date.now()}_${file.clientName}`
+      const fullPath = path.join(process.cwd(), 'tmp', filePath)
+
       await file.move(process.cwd() + '/tmp', { name: filePath })
 
+      // Vérifier si le fichier a été déplacé avec succès
+      if (!fs.existsSync(fullPath)) {
+        console.error('File move failed') // Log the error
+        return response.badRequest({ message: 'File move failed' })
+      }
+      XLSX.set_fs(fs)
       // Lecture du fichier Excel
-      const workbook = xlsx.readFile(`tmp/${filePath}`)
+      const workbook = XLSX.readFile(fullPath)
       const sheetName = workbook.SheetNames[0]
-      let data: any[] = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName])
+      let data: any[] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName])
       const results = []
-
+      console.log(data)
       for (const row of data) {
-        const { email, name, lastName, apprenticeMasters, educationalTutors } = row
+        const { email_apprentice, name_apprentice, last_name_aprentice, telephone_apprentice, cursus, email_educational_tutors, email_apprentice_masters, name_apprentice_masters, last_name_apprentice_masters, telephone_apprentice_masters, company_name } = row
 
-        // Vérifier si l'utilisateur existe déjà
-        let user = await db.from('users').where('email', email).first()
+        //Get or Create Company ID
+        let company_id = await getOrCreateCompanyIdByName(company_name);
+        
+        //Get or Create Cursus ID
+        let cursusId = await findOrCreateCursus(cursus);
 
-        if (!user) {
-          // Créer un nouvel utilisateur
+        // Vérifier si l'aprpenti existe déjà
+        let apprentice = await findUserByEmail(email_apprentice)
+
+        if (!apprentice) { // Aprpenti n'existe pas
+          // Créer un nouvel user => apprenti
           const role = 'apprentices'
-          const result = await db
+          const password = await generatePassword()
+          console.log(`Apprentice Email : ${email_apprentice} & password: ${password}`)
+          const [newUserId] = await db
             .table('users')
             .insert({
-              email,
-              name,
-              lastName,
-              role,
+              email: email_apprentice,
+              password: await bcrypt.hash(password, 10),
+              name: name_apprentice,
+              last_name: last_name_aprentice,
+              telephone: telephone_apprentice,
+              role: role,
             })
-            .returning('*') // Récupérer toutes les colonnes
-
-          user = { idUser: result[0], email, name, lastName }
+            .returning('id_user')
+            apprentice = {
+              id_user: newUserId,
+              email: email_apprentice,
+              role: role,
+              password: password,
+              name: name_apprentice,
+              last_name: last_name_aprentice,
+              telephone: telephone_apprentice
+            };
         }
 
-        // Créer un journal de formation (training diary)
-        const [trainingDiaryId] = await db
-          .table('training_diaries')
-          .insert({
-            semesterGrades: JSON.stringify({}),
-            documentList: JSON.stringify([]),
-            evaluation: 0,
-            listInterview: JSON.stringify([]),
-            listReport: JSON.stringify([]),
-            listPresentation: JSON.stringify([]),
-            createdAt: new Date(),
-          })
-          .returning('idTrainingDiary')
+        const educationalTutor = await findOrCreateEducationalTutor(email_educational_tutors) // Return ID
 
-        const apprenticeMaster = await db
-          .from('users')
-          .where('email', apprenticeMasters)
-          .where('role', 'apprentice_masters')
-          .first()
+        const apprenticeMaster = await findOrCreateApprenticeMaster(
+          email_apprentice_masters,
+          name_apprentice_masters,
+          last_name_apprentice_masters,
+          telephone_apprentice_masters,
+          company_id
+        );
 
-        // Associer le tuteur pédagogique
-        const educationalTutor = await db
-          .from('users')
-          .where('email', educationalTutors)
-          .where('role', 'educational_tutors')
-          .first()
-
-        const alreadyCreated = await db.from('apprentices').where('id', user.idUser).first()
-
-        if (!alreadyCreated) {
-          // Insérer dans la table apprentices
-          console.log(`create new User : ${user.idUser}`)
-          await db.table('apprentices').insert({
-            id: user.idUser,
-            idEducationalTutor: educationalTutor ? educationalTutor.idUser : null,
-            idApprenticeMaster: apprenticeMaster ? apprenticeMaster.idUser : null,
-            idTrainingDiary: trainingDiaryId,
-            listMissions: JSON.stringify([]),
-          })
-        } else {
-          // Mettre à jour l'enregistrement existant
-          console.log(`already existing user : ${user.idUser}`)
-          await db
-            .from('apprentices')
-            .where('id', user.idUser)
-            .update({
-              idEducationalTutor: educationalTutor ? educationalTutor.idUser : null,
-              idApprenticeMaster: apprenticeMaster ? apprenticeMaster.idUser : null,
-              idTrainingDiary: trainingDiaryId,
-            })
-        }
+        // Créer l'apprenti avec son journal de formation
+        await createApprenticeWithTrainingDiary(
+          apprentice.id_user,
+          educationalTutor.id_user,
+          apprenticeMaster.id_user,
+          company_id,
+          cursusId
+        );
 
         results.push({
-          user: user.email,
-          status: 'created/updated',
-          trainingDiaryId,
-        })
+          apprentice: {
+            email: email_apprentice,
+            id: apprentice.id_user
+          },
+          educationalTutor: {
+            email: email_educational_tutors,
+            id: educationalTutor.id_user
+          },
+          apprenticeMaster: {
+            email: email_apprentice_masters,
+            id: apprenticeMaster.id_user
+          },
+          company: {
+            name: company_name,
+            id: company_id
+          },
+          cursus: {
+            name: cursus,
+            id: cursusId
+          },
+          status: 'created/updated'
+        });
       }
 
-      // Supprimer le fichier temporaire
-      fs.unlinkSync(`tmp/${filePath}`)
+      console.log(`full Path: ${fullPath}`)
+      fs.unlinkSync(fullPath)
 
       return response.ok({
         message: 'Users imported successfully',
@@ -213,4 +279,121 @@ export default class DocumentsController {
       })
     }
   }
+
+  async getUserDocuments({ request, response }: HttpContext) {
+    console.log('getUserDocuments')
+    try {
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+  
+      const userDb = await findUserByEmail(emailUser)
+      if (!userDb) {
+        return response.notFound({ message: 'User not found' })
+      }
+  
+      const userDocuments = await db
+        .from('documents')
+        .select('id_document', 'name', 'type', 'document_path', 'uploaded_at')
+        .where('document_path', 'like', `/${userDb.id_user}/%`)
+        .orderBy('uploaded_at', 'desc')
+  
+      return response.ok({
+        message: 'Documents retrieved successfully',
+        documents: userDocuments
+      })
+    } catch (error) {
+      console.error('Error in getUserDocuments:', error)
+      return response.status(500).json({
+        status: 'error',
+        message: 'Error retrieving user documents'
+      })
+    }
+  }
+  
+  async download({ request, response }: HttpContext) {
+    console.log('download')
+    try {
+      const { data } = request.only(['data'])
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+  
+      const { path } = data
+  
+      const document = await db
+        .from('documents')
+        .where('document_path', path)
+        .first()
+  
+      if (!document) {
+        return response.notFound({ message: 'Document not found' })
+      }
+  
+      const storagePath = process.env.STORAGE_PATH
+      if (!storagePath) {
+        return response.internalServerError({ message: 'Storage path not configured' })
+      }
+  
+      const filePath = `${storagePath}/${document.document_path}`
+      if (!fs.existsSync(filePath)) {
+        return response.notFound({ message: 'File not found on server' })
+      }
+      return response.download(filePath, document.name)
+    } catch (error) {
+      console.error('Error in download:', error)
+      return response.status(500).json({
+        status: 'error',
+        message: 'Error downloading document'
+      })
+    }
+  }
+
+  async deleteDocument({ request, response }: HttpContext) {
+    try {
+      const { data } = request.only(['data'])
+      const { id } = data
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      console.log(`id: ${id}`)
+  
+      const document = await db
+        .from('documents')
+        .where('id_document', id)
+        .first()
+  
+      if (!document) {
+        return response.notFound({ message: 'Document not found' })
+      }
+  
+      const storagePath = process.env.STORAGE_PATH
+      if (!storagePath) {
+        return response.internalServerError({ message: 'Storage path not configured' })
+      }
+  
+      const filePath = path.join(storagePath, document.document_path)
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath)
+      } else {
+        console.log(`Error in delete file: ${filePath} `)
+      }
+  
+      await db.from('documents')
+        .where('id_document', id)
+        .delete()
+  
+      return response.ok({ message: 'Document deleted successfully' })
+    } catch (error) {
+      console.error('Error in deleteDocument:', error)
+      return response.status(500).json({
+        status: 'error',
+        message: 'Error deleting document'
+      })
+    }
+  }
+  
 }

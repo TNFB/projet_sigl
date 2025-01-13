@@ -1,5 +1,6 @@
 import { HttpContext } from '@adonisjs/core/http'
 import Database from '@adonisjs/lucid/services/db'
+import { isValidRole } from '../utils/api_utils.js'
 
 /**
  * @class DepositsController
@@ -12,8 +13,19 @@ export default class DepositsController {
    * @param {HttpContext} context - Le contexte HTTP de la requête.
    * @returns {Promise<JSON>} Une réponse JSON contenant tous les dépôts ou une erreur.
    */
-  public async getAllDeposits({ response }: HttpContext) {
+  public async getAllDeposits({ request, response }: HttpContext) {
     try {
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      // Vérifier si l'admin existe et si le token est valide
+      if (!(await isValidRole(emailUser, 'admins'))) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role',
+        })
+      }
       const deposits = await Database.from('deposits').select('*')
       return response.json(deposits)
     } catch (error) {
@@ -29,7 +41,23 @@ export default class DepositsController {
    */
   public async addDeposit({ request, response }: HttpContext) {
     try {
-      const { deposit } = request.only(['deposit'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { deposit } = data
+
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      // Vérifier si l'admin existe et si le token est valide
+      if (!(await isValidRole(emailUser, 'admins'))) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role',
+        })
+      }
       const getDeposit = await Database.from('deposits')
         .where('deposit', deposit)
         .count('* as total')
@@ -57,7 +85,24 @@ export default class DepositsController {
    */
   public async deleteDeposit({ request, response }: HttpContext) {
     try {
-      const { deposit } = request.only(['deposit'])
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { deposit } = data
+
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      // Vérifier si l'admin existe et si le token est valide
+      if (!(await isValidRole(emailUser, 'admins'))) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role',
+        })
+      }
+
       const deletedCount = await Database.from('deposits').where('deposit', deposit).delete()
       if (deletedCount[0] === 0) {
         return response.status(400).json({ message: 'deposit Not found' })

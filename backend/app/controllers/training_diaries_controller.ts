@@ -1,5 +1,6 @@
 import db from '@adonisjs/lucid/services/db'
-import type { HttpContext } from '@adonisjs/core/http'
+import { HttpContext } from '@adonisjs/core/http'
+import { isValidRole } from '../utils/api_utils.js'
 
 /**
  * @class TrainingDiariesController
@@ -28,34 +29,51 @@ export default class TrainingDiariesController {
   async createTraningDiary({ request, response }: HttpContext) {
     console.log('createTraningDiary')
     try {
-      const { idUser } = request.only(['idUser'])
-      const user = await db.from('users').where('idUser', idUser).first()
-      if (user && user.role === 'apprentices') {
-        const apprentice = await db.from('apprentices').where('id', idUser).first()
+      const { data } = request.only(['data'])
+      if (!data) {
+        return response.status(400).json({ error: 'Data is required' })
+      }
+      const { id_user } = data
 
-        if (apprentice && apprentice.idTrainingDiary) {
+      const emailUser = (request as any).user?.email
+      if (!emailUser) {
+        return response.status(401).json({ error: 'Unauthorized' })
+      }
+      // Vérifier si l'admin existe et si le token est valide
+      if (!(await isValidRole(emailUser, 'admins'))) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Invalid role',
+        })
+      }
+
+      const user = await db.from('users').where('id_user', id_user).first()
+      if (user && user.role === 'apprentices') {
+        const apprentice = await db.from('apprentices').where('id', id_user).first()
+
+        if (apprentice && apprentice.id_training_diary) {
           return response.status(400).json({
             message: 'Un journal de formation existe déjà pour cet utilisateur',
-            trainingDiaryId: apprentice.idTrainingDiary,
+            trainingDiaryId: apprentice.id_training_diary,
           })
         }
 
         // Si aucun journal n'existe, en créer un nouveau
         const [newTrainingDiaryId] = await db.table('training_diaries').insert({
-          createdAt: new Date(),
+          created_at: new Date(),
         })
 
         await db
           .from('apprentices')
-          .where('id', idUser)
-          .update({ idTrainingDiary: newTrainingDiaryId })
+          .where('id', id_user)
+          .update({ id_training_diary: newTrainingDiaryId })
 
         return response.status(200).json({
           message: 'Training Diary created',
           trainingDiaryId: newTrainingDiaryId,
         })
       } else {
-        return response.status(403).json({
+        return response.notFound({
           message: 'user not found or not authorised',
         })
       }

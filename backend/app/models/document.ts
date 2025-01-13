@@ -3,11 +3,17 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 export default class Document extends BaseModel {
   @column({ isPrimary: true })
-  declare idDocument: number
+  declare id_document: number
 
   @column()
-  declare documentLink: string
+  declare name: string
 
   @column()
-  declare dropDate: DateTime
+  declare type: string
+
+  @column()
+  declare document_path: string
+
+  @column()
+  declare uploaded_at: DateTime
 }

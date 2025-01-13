@@ -3,7 +3,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 export default class Interview extends BaseModel {
   @column({ isPrimary: true })
-  declare idInterview: number
+  declare id_interview: number
 
   @column()
   declare semester: number
@@ -12,8 +12,8 @@ export default class Interview extends BaseModel {
   declare date: DateTime
 
   @column()
-  declare startPeriod: DateTime
+  declare start_period: DateTime
 
   @column()
-  declare endPeriod: DateTime
+  declare end_period: DateTime
 }

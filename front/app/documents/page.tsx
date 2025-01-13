@@ -11,6 +11,7 @@ import {
 interface FormData {
   documentType: string
   document: File | null
+  documentName: string
 }
 
 interface SelectField {
@@ -25,6 +26,7 @@ interface SelectField {
 interface UserDocument {
   id_document: number
   name: string
+  type: string
   document_path: string
   uploaded_at: string
 }
@@ -35,6 +37,7 @@ function Documents() {
   const [formData, setFormData] = useState<FormData>({
     documentType: '',
     document: null,
+    documentName: '',
   })
 
   const [documents] = useState([
@@ -65,6 +68,13 @@ function Documents() {
     } catch (error) {
       console.error('Error fetching user documents:', error)
     }
+  }
+
+  const handleDocumentNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      documentName: e.target.value,
+    })
   }
 
   const handleDownload = async (documentPath: string) => {
@@ -112,6 +122,11 @@ function Documents() {
       return
     }
 
+    if (!formData.documentName.trim()) {
+      alert('Veuillez entrer un nom pour le document.')
+      return
+    }
+
     const formDataToSend = new FormData()
 
     const selectedDocument = documents.find(
@@ -122,7 +137,8 @@ function Documents() {
       : ''
 
     const jsonData = JSON.stringify({
-      documentName: documentName,
+      documentName: formData.documentName,
+      documentType: formData.documentType,
     })
 
     formDataToSend.append('data', jsonData)
@@ -136,6 +152,7 @@ function Documents() {
       setFormData({
         documentType: '',
         document: null,
+        documentName: '',
       })
       await fetchUserDocuments()
     } catch (error) {
@@ -182,6 +199,23 @@ function Documents() {
         fieldsOrder={fieldsOrder}
         className='h-fit w-fit'
       >
+      <div className='mb-4'>
+        <label
+          htmlFor='documentName'
+          className='block text-sm font-medium text-gray-700'
+        >
+          Nom du document
+        </label>
+        <input
+          type='text'
+          id='documentName'
+          name='documentName'
+          value={formData.documentName}
+          onChange={handleDocumentNameChange}
+          required
+          className='mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+        />
+      </div>
         <div className='mb-4'>
           <label
             htmlFor='document'
@@ -209,6 +243,7 @@ function Documents() {
                 className='flex justify-between items-center bg-white p-4 rounded shadow'
               >
                 <span>{doc.name}</span>
+                <span className="ml-2 text-sm text-gray-500">({doc.type})</span>
                 <div>
                   <button
                     onClick={() => handleDownload(doc.document_path)}

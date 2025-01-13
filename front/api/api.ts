@@ -53,9 +53,20 @@ export const downloadDocument = async (
   }
 
   const blob = await response.blob()
-  const filename =
-    response.headers.get('Content-Disposition')?.split('filename=')[1] ||
-    'document'
+  const contentDisposition = response.headers.get('Content-Disposition')
+  let filename = 'document'
+  
+  if (contentDisposition) {
+    const filenameMatch = contentDisposition.match(/filename="?(.+)"?/)
+    if (filenameMatch) {
+      filename = filenameMatch[1]
+    }
+  }
+
+  if (filename === 'document' && body.data && body.data.path) {
+    filename = body.data.path.split('/').pop() || 'document'
+  }
+
   const blobUrl = window.URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = blobUrl

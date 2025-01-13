@@ -167,6 +167,7 @@ Puis exécuter les commandes suivantes :
 
 ```sh
 cd /app/backend/build
+node ace db:wipe
 node ace migration:refresh --seed
 exit
 ```

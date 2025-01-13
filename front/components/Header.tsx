@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Bell, LogOut, ChevronDown } from 'lucide-react'
+import { Bell, LogOut, ChevronDown, User } from 'lucide-react'
 import { SIDEBAR_ITEMS, SIDEBAR_ADMIN_ITEMS } from '@/utils/constants'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -23,6 +23,7 @@ import {
 
 const Header = () => {
   const [url, setUrl] = useState('Accueil')
+  const email = localStorage.getItem('email')
 
   useEffect(() => {
     let path = window.location.pathname
@@ -56,21 +57,13 @@ const Header = () => {
         </Breadcrumb>
       </div>
       <div className='flex items-center space-x-4'>
-        {/*<button className='p-2 bg-white rounded-full shadow'>
-          <Search className='w-5 h-5 text-gray-600' />
-        </button>
-        <div className='h-6 border-l border-gray-300'></div>*/}
-        <button className='p-2 bg-white rounded-full shadow'>
-          <Bell className='w-5 h-5 text-gray-600' />
-        </button>
         <div className='h-6 border-l border-gray-300'></div>
         <DropdownMenu>
           <DropdownMenuTrigger className='flex items-center'>
-            <Avatar className='mr-2'>
-              <AvatarImage src='https://github.com/shadcn.png' />
-              <AvatarFallback>CN</AvatarFallback>
+            <Avatar className='p-2 bg-white rounded-full shadow mr-2'>
+              <User className='w-6 h-6 text-gray-600' />
             </Avatar>
-            User
+            {email}
             <ChevronDown className='size-4' />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
@@ -81,7 +74,6 @@ const Header = () => {
                 Profile
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>Paramètres</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <Link

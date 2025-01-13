@@ -6,7 +6,7 @@ import { postRequest } from '@/api/api'
 import { ChevronRight, ChevronDown } from 'lucide-react'
 import { AutoComplete, type Option } from '@/components/autoComplete'
 
-export type User = {
+type User = {
   id: string
   name: string
   last_name: string
@@ -17,11 +17,7 @@ export type User = {
   telephone?: string
 }
 
-type PageProps = {
-  usersD: User[]
-}
-
-const GestionEquipes: React.FC<PageProps> = ({ usersD }) => {
+export default function GestionEquipes() {
   const [users, setUsers] = useState<User[]>([])
   const [apprentices, setApprentices] = useState<User[]>([])
   const [apprenticeMasters, setApprenticeMasters] = useState<User[]>([])
@@ -50,20 +46,48 @@ const GestionEquipes: React.FC<PageProps> = ({ usersD }) => {
   }, [router])
 
   useEffect(() => {
-    setUsers(usersD)
+    const fetchUsers = async () => {
+      try {
+        const data = {
+          role: null,
+          detailed: 'true',
+        }
+        const response = await postRequest(
+          'user/getUserEmailsByRole',
+          JSON.stringify({ data: data }),
+        )
+        const formattedUsers = response.users.map((user: any) => ({
+          id: user.id_user,
+          name: `${user.name} ${user.last_name}`,
+          last_name: user.last_name,
+          email: user.email,
+          role: user.role,
+          entreprise: user.entreprise_name || '',
+          promotion: user.promotion_name || '',
+          telephone: user.telephone || '',
+        }))
+        setUsers(formattedUsers)
+      } catch (error) {
+        console.error('Error fetching emails:', error)
+      }
+    }
 
-    const apprentices = usersD.filter((user) => user.role === 'apprentices')
-    const apprenticeMasters = usersD.filter(
+    fetchUsers()
+  }, [])
+
+  useEffect(() => {
+    const apprentices = users.filter((user) => user.role === 'apprentices')
+    const apprenticeMasters = users.filter(
       (user) => user.role === 'apprentice_masters',
     )
-    const educationalTutors = usersD.filter(
+    const educationalTutors = users.filter(
       (user) => user.role === 'educational_tutors',
     )
 
     setApprentices(apprentices)
     setApprenticeMasters(apprenticeMasters)
     setEducationalTutors(educationalTutors)
-  }, [usersD, users])
+  }, [users])
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -99,13 +123,12 @@ const GestionEquipes: React.FC<PageProps> = ({ usersD }) => {
       }
       console.log('Data:', data)
 
-      postRequest(
-        'admin/linkApprentice',
-        JSON.stringify({ data: data }),
-      ).then((response) => {
-        console.log('Success:', response)
-        alert('Équipe(s) ajoutée(s) avec succès')
-      })
+      postRequest('admin/linkApprentice', JSON.stringify({ data: data })).then(
+        (response) => {
+          console.log('Success:', response)
+          alert('Équipe(s) ajoutée(s) avec succès')
+        },
+      )
     } catch (error) {
       console.error('Error:', error)
       alert("Erreur lors de l'ajout de l'équipe")
@@ -171,5 +194,3 @@ const GestionEquipes: React.FC<PageProps> = ({ usersD }) => {
     </div>
   )
 }
-
-export default GestionEquipes

@@ -5,7 +5,7 @@ import UserTable from '@/components/table/UserTable'
 import GestionEquipes from '../gestionEquipes/page'
 import { postRequest } from '@/api/api'
 
-export type User = {
+type User = {
   id: string
   name: string
   last_name: string
@@ -54,7 +54,7 @@ export default function GestionUsers() {
   }
   return (
     <Home>
-      <GestionEquipes usersD={users} />
+      <GestionEquipes />
       <UserTable usersData={users} onUserDelete={handleUserDelete} />
     </Home>
   )

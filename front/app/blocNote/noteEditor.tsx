@@ -6,14 +6,14 @@ import { MinimalTiptapEditor } from '@/components/minimal-tiptap'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 interface Note {
-  id: number
+  id_monthly_note: number
   title: string
   content: Content
 }
 
 interface NoteEditorProps {
   note: Note
-  onSave: (content: Content) => void
+  onSave: (title: string, content: Content) => void
   onClear: () => void
   onTitleChange: (title: string) => void
 }
@@ -33,7 +33,7 @@ const NoteEditor = ({
   }, [note])
 
   const handleSave = () => {
-    onSave(value)
+    onSave(title, value)
   }
 
   const handleClear = () => {
@@ -56,7 +56,7 @@ const NoteEditor = ({
       />
       <TooltipProvider>
         <MinimalTiptapEditor
-          key={note.id}
+          key={note.id_monthly_note}
           value={value}
           onChange={setValue}
           className='w-full'

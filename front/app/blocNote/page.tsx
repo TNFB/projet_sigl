@@ -5,6 +5,7 @@ import { Content } from '@tiptap/react'
 import { Input } from '@/components/ui/input'
 import NoteEditor from './noteEditor'
 import { postRequest } from '@/api/api'
+import ProgressPopup from '@/components/ProgressPopup'
 
 interface Note {
   id_monthly_note: number
@@ -18,6 +19,13 @@ const NotePad = () => {
   const [newNoteTitle, setNewNoteTitle] = useState('')
   const [isAddingNote, setIsAddingNote] = useState(false)
   const [save, setSave] = useState(true)
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [popupStatus, setPopupStatus] = useState<
+    'creating' | 'success' | 'error'
+  >('creating')
+  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [progressMessage, setProgressMessage] = useState<string>('')
+  const [successMessage, setSuccessMessage] = useState<string>('')
 
   useEffect(() => {
     postRequest('monthlyNotes/getAllNotes').then((response) => {
@@ -26,6 +34,9 @@ const NotePad = () => {
   }, [])
 
   const handleSave = async (title: string, content: Content) => {
+    setIsPopupOpen(true)
+    setProgressMessage('Sauvegarde en cours...')
+    setPopupStatus('creating')
     if (save) {
       const updatedNotes = notes.map((note) =>
         note.id_monthly_note === selectedNoteId
@@ -43,7 +54,11 @@ const NotePad = () => {
           },
         }),
       )
-      alert('La note a été sauvegardée')
+      setSuccessMessage('La note a été sauvegardée')
+      setPopupStatus('success')
+      setTimeout(() => {
+        setIsPopupOpen(false)
+      }, 2000)
     } else {
       const response = await postRequest(
         'monthlyNotes/createNote',
@@ -56,11 +71,18 @@ const NotePad = () => {
         response.note,
       ])
       setSave(true)
-      alert('La nouvelle note a été créée')
+      setSuccessMessage('La note a été ajoutée')
+      setPopupStatus('success')
+      setTimeout(() => {
+        setIsPopupOpen(false)
+      }, 2000)
     }
   }
 
   const handleClear = async () => {
+    setIsPopupOpen(true)
+    setProgressMessage('Suppression en cours...')
+    setPopupStatus('creating')
     if (selectedNoteId !== null) {
       // Supprimer la note de la base de données
       const response = await postRequest(
@@ -75,7 +97,11 @@ const NotePad = () => {
         prevNotes.filter((note) => note.id_monthly_note !== selectedNoteId),
       )
       setSelectedNoteId(null)
-      alert('La note a été effacée de la sauvegarde et de la base de données')
+      setSuccessMessage('La note a été supprimée avec succès')
+      setPopupStatus('success')
+      setTimeout(() => {
+        setIsPopupOpen(false)
+      }, 2000)
     }
   }
 
@@ -168,6 +194,14 @@ const NotePad = () => {
           )}
         </div>
       </div>
+      <ProgressPopup
+        isOpen={isPopupOpen}
+        status={popupStatus}
+        creatingMessage={progressMessage}
+        successMessage={successMessage}
+        errorMessage={errorMessage}
+        onClose={() => setIsPopupOpen(false)}
+      />
     </Home>
   )
 }

@@ -42,6 +42,8 @@ const defaultFormData = {
   startTime: '00:00',
   endDate: '',
   endTime: '23:59',
+  type: '',
+  color: '#000000', // Couleur par défaut
 }
 
 export function EventForm({
@@ -80,6 +82,12 @@ export function EventForm({
       })
     }
   }, [event])
+
+  useEffect(() => {
+    if (!open) {
+      setFormData(defaultFormData)
+    }
+  }, [open])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

@@ -227,6 +227,10 @@ function Documents() {
     },
   ]
 
+  const isPdf = (filePath: string) => {
+    return filePath.toLowerCase().endsWith('.pdf')
+  }
+
   const fieldsOrder = ['documentType']
 
   return (
@@ -293,12 +297,14 @@ function Documents() {
                   <span>{doc.name}</span>
                   <span className='ml-2 text-sm text-gray-500'>{doc.type}</span>
                   <div className='col-span-1 text-right'>
-                    <button
-                      onClick={() => handleView(doc.document_path)}
-                      className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2'
-                    >
-                      Visualiser
-                    </button>
+                    {isPdf(doc.document_path) && (
+                      <button
+                        onClick={() => handleView(doc.document_path, doc.name)}
+                        className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2'
+                      >
+                        Visualiser
+                      </button>
+                    )}
                     <button
                       onClick={() => handleDownload(doc.document_path, doc.name)}
                       className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2'

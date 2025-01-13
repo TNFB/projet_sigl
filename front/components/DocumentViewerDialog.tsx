@@ -21,7 +21,7 @@ const DocumentViewerDialog: React.FC<DocumentViewerDialogProps> = ({
 
   const isOfficeDocument = documentUrl.endsWith('.docx') || documentUrl.endsWith('.xlsx') || documentUrl.endsWith('.pptx')
   const viewerUrl = isOfficeDocument
-    ? `https://docs.google.com/gview?url=${documentUrl}&embedded=true`
+    ? `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(documentUrl)}`
     : documentUrl
 
   return (

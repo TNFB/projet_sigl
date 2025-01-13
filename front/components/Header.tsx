@@ -23,9 +23,14 @@ import {
 
 const Header = () => {
   const [url, setUrl] = useState('Accueil')
-  const email = localStorage.getItem('email')
+  const [email, setEmail] = useState<string | null>(null)
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedEmail = localStorage.getItem('email')
+      setEmail(storedEmail)
+    }
+    
     let path = window.location.pathname
     if (path.endsWith('/')) {
       path = path.slice(0, -1)

@@ -99,10 +99,7 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add')
 
   const openEditDialog = (user: User) => {
-    const [firstName, ...lastNameParts] = user.name.split(' ')
-    const last_name = lastNameParts.join(' ')
-    setCurrentUser({ ...user, name: firstName, last_name: last_name })
-    console.log('currentUser', currentUser.last_name)
+    setCurrentUser(user)
     setDialogMode('edit')
     setIsDialogOpen(true)
   }
@@ -131,7 +128,6 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
   const handleSaveUser = async () => {
     const { name, last_name, email, role, entreprise, promotion, telephone } =
       currentUser
-    console.log('currentUser', currentUser)
     setIsPopupOpen(true)
     setProgressMessage('Création en cours...')
     setPopupStatus('creating')
@@ -147,7 +143,6 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
           promotion: promotion || '',
           telephone: telephone || '',
         }
-        console.log('data', data)
 
         let response
         if (dialogMode === 'add') {
@@ -255,7 +250,6 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
     setIsPopupOpen(true)
     setProgressMessage('Rénitialisation en cours...')
     setPopupStatus('creating')
-    console.log('currentUser', currentUser.email)
     try {
       const data = {
         email: currentUser.email,
@@ -319,9 +313,16 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
     },
     {
       accessorKey: 'name',
-      header: 'Nom',
+      header: 'Prénom',
       cell: ({ row }) => (
         <div className='capitalize'>{row.getValue('name')}</div>
+      ),
+    },
+    {
+      accessorKey: 'last_name',
+      header: 'Nom',
+      cell: ({ row }) => (
+        <div className='capitalize'>{row.getValue('last_name')}</div>
       ),
     },
     {
@@ -375,7 +376,8 @@ const UserTable: React.FC<UserTableProps> = ({ usersData, onUserDelete }) => {
                     <DialogTitle>User Details</DialogTitle>
                   </DialogHeader>
                   <div className='grid gap-4 py-4'>
-                    <p>Nom: {user.name}</p>
+                    <p>Nom: {user.last_name}</p>
+                    <p>Prénom: {user.name}</p>
                     <p>Email: {user.email}</p>
                     <p>Role: {user.role}</p>
                   </div>

@@ -32,7 +32,7 @@ export default function GestionUsers() {
         )
         const formattedUsers = response.users.map((user: any) => ({
           id: user.id_user,
-          name: `${user.name} ${user.last_name}`,
+          name: user.name,
           last_name: user.last_name,
           email: user.email,
           role: user.role,
@@ -40,6 +40,7 @@ export default function GestionUsers() {
           promotion: user.promotion_name || '',
           telephone: user.telephone || '',
         }))
+        console.log('formattedUsers', formattedUsers)
         setUsers(formattedUsers)
       } catch (error) {
         console.error('Error fetching emails:', error)

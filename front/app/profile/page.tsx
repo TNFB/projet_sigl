@@ -257,8 +257,8 @@ const Profile = () => {
               <label>Prénom :</label>
               <input
                 type='text'
-                name='lastName'
-                value={formData.lastName}
+                name='last_name'
+                value={formData.last_name}
                 onChange={handleChange}
                 className='border p-2 rounded mb-2 w-full'
               />
@@ -298,7 +298,7 @@ const Profile = () => {
                   <strong>Nom :</strong> {userInfo.name}
                 </p>
                 <p>
-                  <strong>Prénom :</strong> {userInfo.lastName}
+                  <strong>Prénom :</strong> {userInfo.last_name}
                 </p>
                 <p>
                   <strong>Téléphone :</strong> {userInfo.telephone}

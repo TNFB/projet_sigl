@@ -76,7 +76,7 @@ const Header = () => {
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <Link href='/profile' className='w-full'>
-                Profile
+                Profil
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -88,7 +88,7 @@ const Header = () => {
                 href='/Login'
                 className='flex items-center'
               >
-                Logout
+                Déconnexion
                 <LogOut className='ml-2 size-4' />
               </Link>
             </DropdownMenuItem>

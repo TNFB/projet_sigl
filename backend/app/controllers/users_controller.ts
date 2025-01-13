@@ -133,7 +133,7 @@ export default class UsersController {
       if (!data) {
         return response.status(400).json({ error: 'Data is required' })
       }
-      const { email, name, last_name, role, company, promotion } = data
+      const { email, name, last_name, role, company, promotion, telephone } = data
 
       const emailUser = (request as any).user?.email
       if (!emailUser) {
@@ -161,7 +161,7 @@ export default class UsersController {
       const hashedPassword = await bcrypt.hash(password, 10)
       const createUser = await db
         .table('users')
-        .insert({ email, password: hashedPassword, name, last_name, role })
+        .insert({ email, password: hashedPassword, name, last_name, role, telephone })
 
       switch (role) {
         case 'admins':

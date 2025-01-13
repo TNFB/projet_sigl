@@ -3,6 +3,7 @@ import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import Home from '@/components/Home'
 import { postRequest } from '@/api/api'
+import { Button } from '@/components/ui/button'
 
 interface Student {
   email: string
@@ -405,7 +406,7 @@ export default function StudentInfo() {
               nom: studentResponse.name,
               prenom: studentResponse.last_name,
               list_missions: parsedMissions,
-              list_skills: parsedSkills, // Assurez-vous d'ajouter les compétences ici
+              list_skills: parsedSkills,
             })
           }
         } catch (err) {
@@ -606,15 +607,15 @@ export default function StudentInfo() {
         <h1 className='text-2xl font-bold mb-4'>
           Informations de l&apos;étudiant
         </h1>
-        <div className='bg-white shadow-md rounded-lg p-4 mb-4'>
+        <div className='bg-white shadow-md rounded-lg p-4 mb-4 w-fit'>
           <p>
             <strong>Email :</strong> {student.email}
           </p>
           <p>
-            <strong>Nom :</strong> {student.nom}
+            <strong>Nom :</strong> {student.prenom}
           </p>
           <p>
-            <strong>Prénom :</strong> {student.prenom}
+            <strong>Prénom :</strong> {student.nom}
           </p>
         </div>
 
@@ -622,29 +623,32 @@ export default function StudentInfo() {
           <div>
             <h2 className='text-xl font-bold mb-2'>Missions</h2>
             <table className='w-full mb-4'>
-              <thead>
-                <tr>
-                  <th>Titre</th>
-                  <th>Description</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+              <div className='grid grid-cols-3 gap-4 mb-2 font-bold'>
+                <span className='col-span-1'>Titre</span>
+                <span className='col-span-1'>Description</span>
+                <span className='col-span-1 text-right pr-24'>Actions</span>
+              </div>
               <tbody>
                 {student.list_missions.map((mission) => (
-                  <tr key={mission.id}>
+                  <tr
+                    key={mission.id}
+                    className='w-full grid grid-cols-3 gap-4 items-center bg-white p-4 rounded shadow mb-2'
+                  >
                     <td>{mission.titre}</td>
                     <td>{mission.description}</td>
-                    <td>
-                      <button onClick={() => handleEditMission(mission)}>
-                        {' '}
-                        Modifier{' '}
-                      </button>
-                      <button
+                    <td className='text-right'>
+                      <Button
+                        onClick={() => handleEditMission(mission)}
+                        className='mr-2 bg-green-500'
+                      >
+                        Modifier
+                      </Button>
+                      <Button
+                        variant='destructive'
                         onClick={() => handleDeleteMission(mission)}
-                        className='text-red-500'
                       >
                         Supprimer
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -674,60 +678,6 @@ export default function StudentInfo() {
               onClose={() => setIsDeleteModalOpen(false)}
               onConfirm={confirmDeleteMission}
               missionTitle={missionToDeleteTitle}
-            />
-            <h2 className='text-xl font-bold mb-2'>Compétences</h2>
-            <table className='w-full mb-4'>
-              <thead>
-                <tr>
-                  <th>Compétence</th>
-                  <th>Description</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {student?.list_skills?.map((skill) => (
-                  <tr key={skill.id}>
-                    <td>{skill.skill}</td>
-                    <td>{skill.description}</td>
-                    <td>
-                      <button onClick={() => handleEditSkill(skill)}>
-                        Modifier
-                      </button>
-                      <button
-                        onClick={() => handleDeleteSkill(skill)}
-                        className='text-red-500'
-                      >
-                        Supprimer
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <button
-              onClick={() => {
-                setIsSkillModalOpen(true)
-                setSkillToEdit(null)
-              }}
-              className='px-4 py-2 bg-green-500 text-white rounded'
-            >
-              Ajouter une compétence
-            </button>
-            {isSkillModalOpen && (
-              <AddEditSkillModal
-                isOpen={isSkillModalOpen}
-                onClose={() => setIsSkillModalOpen(false)}
-                onAdd={addSkill}
-                onUpdate={handleUpdateSkill}
-                skill={skillToEdit}
-              />
-            )}
-            <ConfirmDeleteSkillModal
-              isOpen={isDeleteSkillModalOpen}
-              onClose={() => setIsDeleteSkillModalOpen(false)}
-              onConfirm={confirmDeleteSkill}
-              skillTitle={skillToDeleteTitle}
             />
           </div>
         )}

@@ -8,5 +8,7 @@ export const dummyEvents: MyEvent[] = [
     end: new Date(2025, 0, 20, 11, 30),
     description: 'Weekly team sync',
     location: 'Conference Room A',
+    type: 'meeting',
+    color: 'blue',
   },
 ]

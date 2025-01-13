@@ -19,6 +19,7 @@ import './calendar-styles.css'
 import { EventDialog } from './event-dialog'
 import { EventForm } from './event-form'
 import { postRequest } from '@/api/api'
+import ProgressPopup from '@/components/ProgressPopup'
 
 const locales = {
   fr: fr,
@@ -44,10 +45,17 @@ export default function Calendar() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date())
   const [currentView, setCurrentView] = useState<View>('month')
 
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [popupStatus, setPopupStatus] = useState<
+    'creating' | 'success' | 'error'
+  >('creating')
+  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [progressMessage, setProgressMessage] = useState<string>('')
+  const [successMessage, setSuccessMessage] = useState<string>('')
+
   const fetchEvents = async () => {
     try {
       const response = await postRequest('events/getEvents')
-      console.log('Fetched events:', response.events)
       if (response.events) {
         const formattedEvents: MyEvent[] = response.events.map(
           (event: any) => ({
@@ -81,9 +89,6 @@ export default function Calendar() {
   }
 
   const handleSelectEvent = (event: MyEvent) => {
-    console.log(`event.id: ${event.id}`)
-    console.log(`event.location: ${event.location}`)
-    console.log(`event.description: ${event.description}`)
     setSelectedEvent(event)
     setShowEventDialog(true)
   }
@@ -96,6 +101,9 @@ export default function Calendar() {
   }
 
   const handleDeleteEvent = async () => {
+    setIsPopupOpen(true)
+    setProgressMessage('Suppression en cours...')
+    setPopupStatus('creating')
     if (selectedEvent && selectedEvent.id) {
       try {
         await postRequest(
@@ -104,13 +112,23 @@ export default function Calendar() {
         )
         fetchEvents()
         setShowEventDialog(false)
+        setSuccessMessage('Evenement supprimé avec succès')
+        setPopupStatus('success')
+        setTimeout(() => {
+          setIsPopupOpen(false)
+        }, 2000)
       } catch (error) {
         console.error('Error deleting event:', error)
-        alert("Erreur lors de la suppression de l'événement")
+        setErrorMessage("Erreur lors de la création de l'événement")
+        setPopupStatus('error')
       }
     } else {
       console.error('No event selected or event ID is missing')
-      alert("Impossible de supprimer l'événement : ID manquant")
+      setErrorMessage("Erreur lors de la création de l'événement")
+      setPopupStatus('error')
+      setTimeout(() => {
+        setIsPopupOpen(false)
+      }, 2000)
     }
   }
 
@@ -125,6 +143,9 @@ export default function Calendar() {
   }
 
   const handleSaveEvent = async (event: MyEvent) => {
+    setIsPopupOpen(true)
+    setProgressMessage('Création en cours...')
+    setPopupStatus('creating')
     try {
       const eventData = {
         id_event: event.id || undefined,
@@ -144,9 +165,18 @@ export default function Calendar() {
 
       fetchEvents()
       setShowEventForm(false)
+      setSuccessMessage('Evenement créé avec succès')
+      setPopupStatus('success')
+      setTimeout(() => {
+        setIsPopupOpen(false)
+      }, 2000)
     } catch (error) {
       console.error('Error saving event:', error)
-      alert("Erreur lors de l'enregistrement de l'événement")
+      setErrorMessage("Erreur lors de la création de l'événement")
+        setPopupStatus('error')
+        setTimeout(() => {
+          setIsPopupOpen(false)
+        }, 2000)
     }
   }
 
@@ -253,6 +283,14 @@ export default function Calendar() {
         onSave={handleSaveEvent}
         selectedDate={selectedSlot ?? undefined}
         selectedEndDate={selectedEndDate}
+      />
+      <ProgressPopup
+        isOpen={isPopupOpen}
+        status={popupStatus}
+        creatingMessage={progressMessage}
+        successMessage={successMessage}
+        errorMessage={errorMessage}
+        onClose={() => setIsPopupOpen(false)}
       />
     </div>
   )

@@ -327,9 +327,7 @@ function Documents() {
                       </button>
                     )}
                     <button
-                      onClick={() =>
-                        handleDownload(doc.document_path)
-                      }
+                      onClick={() => handleDownload(doc.document_path)}
                       className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2'
                     >
                       Télécharger

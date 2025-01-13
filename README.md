@@ -1,6 +1,7 @@
 # Projet SIGL  <!-- omit from toc -->
 
 [![Build develop](https://github.com/TNFB/projet_sigl/actions/workflows/dev-build.yml/badge.svg)](https://github.com/TNFB/projet_sigl/actions/workflows/dev-build.yml)
+[![Build main](https://github.com/TNFB/projet_sigl/actions/workflows/main-build.yml/badge.svg)](https://github.com/TNFB/projet_sigl/actions/workflows/main-build.yml)
 
 Ce projet contient un frontend et un backend qui doivent être installés sur deux machines virtuelles (VM) différentes en utilisant Docker. Les images Docker sont hébergées sur un dépôt privé sur `ghcr.io` et nécessitent une authentification.
 

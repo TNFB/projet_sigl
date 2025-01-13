@@ -22,12 +22,12 @@ export default class UserSeeder extends BaseSeeder {
         role: 'apprentice_masters',
       },
       {
-        email: 'adrien.ameslant@reseau.eseo.fr',
-        password: await bcrypt.hash('MdpPourAdrienAmeslantReseauEseo', 10),
-        name: 'Ameslant',
-        last_name: 'Adrien',
-        telephone: '6666666666',
-        role: 'apprentices',
+        email: 'maxime.gonnord@reseau.eseo.fr',
+        password: await bcrypt.hash('MdpPourMaximeGonnordReseauEseo', 10),
+        name: 'Gonnord',
+        last_name: 'Maxime',
+        telephone: '1928374655',
+        role: 'educational_tutors',
       },
     ])
   }

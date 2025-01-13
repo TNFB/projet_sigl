@@ -5,7 +5,7 @@ export default class extends BaseSeeder {
   async run() {
     await Company.createMany([
       {
-        name: 'Company Tom And Adrien',
+        name: 'Tom Company',
       },
     ])
   }

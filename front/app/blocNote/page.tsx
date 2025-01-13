@@ -2,12 +2,12 @@
 import Home from '@/components/Home'
 import { useEffect, useState, useRef } from 'react'
 import { Content } from '@tiptap/react'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import NoteEditor from './noteEditor'
+import { postRequest } from '@/api/api'
 
 interface Note {
-  id: number
+  id_monthly_note: number
   title: string
   content: Content
 }
@@ -17,57 +17,80 @@ const NotePad = () => {
   const [selectedNoteId, setSelectedNoteId] = useState<number | null>(null)
   const [newNoteTitle, setNewNoteTitle] = useState('')
   const [isAddingNote, setIsAddingNote] = useState(false)
-  const isMounted = useRef(false)
+  const [save, setSave] = useState(true)
 
   useEffect(() => {
-    if (!isMounted.current) {
-      const savedNotes = localStorage.getItem('notes')
-      console.log('savedNotes', savedNotes)
-      if (savedNotes) {
-        setNotes(JSON.parse(savedNotes))
-      }
-      isMounted.current = true
-    }
+      postRequest('monthlyNotes/getAllNotes').then((response) => {
+        setNotes(response.notes)
+      })
   }, [])
 
-  useEffect(() => {
-    if (isMounted.current) {
-      localStorage.setItem('notes', JSON.stringify(notes))
-    }
-  }, [notes])
-
-  const handleSave = (content: Content) => {
-    if (selectedNoteId !== null) {
-      setNotes((prevNotes) =>
-        prevNotes.map((note) =>
-          note.id === selectedNoteId ? { ...note, content } : note,
-        ),
+  const handleSave = async (title: string, content: Content) => {
+    if (save) {
+      const updatedNotes = notes.map((note) =>
+        note.id_monthly_note === selectedNoteId
+          ? { ...note, content, title }
+          : note,
+      )
+      setNotes(updatedNotes)
+      await postRequest(
+        'monthlyNotes/updateNote',
+        JSON.stringify({
+          data: {
+            id_monthly_note: selectedNoteId,
+            content,
+            title,
+          },
+        }),
       )
       alert('La note a été sauvegardée')
+    } else {
+      const response = await postRequest(
+        'monthlyNotes/createNote',
+        JSON.stringify({
+          data: { id_monthly_note: selectedNoteId, title: title, content },
+        }),
+      )
+      setNotes((prevNotes) => [
+        ...prevNotes.filter((note) => note.id_monthly_note !== selectedNoteId),
+        response.note,
+      ])
+      setSave(true)
+      alert('La nouvelle note a été créée')
     }
   }
 
-  const handleClear = () => {
+  const handleClear = async () => {
     if (selectedNoteId !== null) {
+      // Supprimer la note de la base de données
+      const response = await postRequest(
+        'monthlyNotes/deleteNote',
+        JSON.stringify({
+          data: { id_monthly_note: selectedNoteId },
+        }),
+      )
+  
+      // Supprimer la note de l'état local
       setNotes((prevNotes) =>
-        prevNotes.filter((note) => note.id !== selectedNoteId),
+        prevNotes.filter((note) => note.id_monthly_note !== selectedNoteId),
       )
       setSelectedNoteId(null)
-      alert('La note a été effacée de la sauvegarde')
+      alert('La note a été effacée de la sauvegarde et de la base de données')
     }
   }
 
   const handleAddNote = () => {
     if (newNoteTitle.trim() !== '') {
       const newNote: Note = {
-        id: Date.now(),
+        id_monthly_note: Date.now(),
         title: newNoteTitle,
         content: '',
       }
       setNotes((prevNotes) => [...prevNotes, newNote])
+      setSave(false)
       setNewNoteTitle('')
       setIsAddingNote(false)
-      setSelectedNoteId(newNote.id)
+      setSelectedNoteId(newNote.id_monthly_note)
     }
   }
 
@@ -79,7 +102,7 @@ const NotePad = () => {
     if (selectedNoteId !== null) {
       setNotes((prevNotes) =>
         prevNotes.map((note) =>
-          note.id === selectedNoteId ? { ...note, title } : note,
+          note.id_monthly_note === selectedNoteId ? { ...note, title } : note,
         ),
       )
     }
@@ -91,7 +114,7 @@ const NotePad = () => {
     }
   }
 
-  const selectedNote = notes.find((note) => note.id === selectedNoteId)
+  const selectedNote = notes.find((note) => note.id_monthly_note === selectedNoteId)
 
   return (
     <Home>
@@ -101,11 +124,11 @@ const NotePad = () => {
           <ul>
             {notes.map((note) => (
               <li
-                key={note.id}
+                key={note.id_monthly_note}
                 className={`cursor-pointer p-2 ${
-                  note.id === selectedNoteId ? 'bg-gray-200' : ''
+                  note.id_monthly_note === selectedNoteId ? 'bg-gray-200' : ''
                 }`}
-                onClick={() => handleSelectNote(note.id)}
+                onClick={() => handleSelectNote(note.id_monthly_note)}
               >
                 {note.title}
               </li>

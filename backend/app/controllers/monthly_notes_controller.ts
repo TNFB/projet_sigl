@@ -1,4 +1,4 @@
-import { findUserByEmail } from '#utils/api_utils.js'
+import { findUserByEmail } from '../utils/api_utils.js'
 import { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
 
@@ -34,49 +34,51 @@ export default class MonthlyNotesController {
 
   public async createNote({ request, response }: HttpContext) {
     try {
-      const { data } = request.only(['data']);
+      const { data } = request.only(['data'])
       if (!data) {
-        return response.status(400).json({ error: 'Data is required' });
+        return response.status(400).json({ error: 'Data is required' })
       }
-      const { id_training_diary, title, content } = data;
-
+      const { title, content } = data
+  
       // Récupérer l'email de l'utilisateur
-      const emailUser = (request as any).user?.email;
+      const emailUser = (request as any).user?.email
       if (!emailUser) {
-        return response.status(401).json({ error: 'Unauthorized' });
+        return response.status(401).json({ error: 'Unauthorized' })
       }
-
+  
       // Trouver l'utilisateur par email
-      const user = await findUserByEmail(emailUser);
+      const user = await findUserByEmail(emailUser)
       if (!user) {
-        return response.notFound({ message: 'Error User Not found' });
+        return response.status(404).json({ message: 'User not found' })
       }
-
-      // Vérifier si le training diary appartient à l'apprenti de l'utilisateur
-      const trainingDiary = await db.from('training_diaries')
-          .join('apprentices', 'training_diaries.id_training_diary', 'apprentices.id_training_diary')
-          .where('apprentices.id', user.id_user) // Assurez-vous que l'ID de l'apprenti correspond à l'utilisateur
-          .where('training_diaries.id_training_diary', id_training_diary)
-          .first();
-
-      // Si le training diary n'est pas trouvé ou n'appartient pas à l'apprenti, renvoyer une erreur
+  
+      // Récupérer l'ID du journal de formation associé à l'utilisateur
+      const trainingDiary = await db
+        .from('training_diaries')
+        .join('apprentices', 'training_diaries.id_training_diary', 'apprentices.id_training_diary')
+        .where('apprentices.id', user.id_user)
+        .select('training_diaries.id_training_diary')
+        .first()
+  
       if (!trainingDiary) {
-        return response.notFound({ message: 'Training diary not found or does not belong to the user' });
+        return response.status(404).json({ message: 'Training diary not found for the user' })
       }
-
-      // Créer la note si toutes les vérifications sont passées
+  
+      const { id_training_diary } = trainingDiary
+  
+      // Créer la note
       const [newNoteId] = await db.table('monthly_notes').insert({
-          id_training_diary,
-          title,
-          content
-      }).returning('id_monthly_note');
-
-      const newNote = await db.from('monthly_notes').where('id_monthly_note', newNoteId).first();
-
-      return response.created({ message: 'Note created successfully', note: newNote });
+        id_training_diary,
+        title,
+        content,
+      }).returning('id_monthly_note')
+  
+      const newNote = await db.from('monthly_notes').where('id_monthly_note', newNoteId).first()
+  
+      return response.status(201).json({ message: 'Note created successfully', note: newNote })
     } catch (error) {
-        console.error('Error creating note:', error);
-        return response.internalServerError({ message: 'An error occurred while creating the note' });
+      console.error('Error creating note:', error)
+      return response.status(500).json({ message: 'An error occurred while creating the note' })
     }
   }
 

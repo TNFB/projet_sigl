@@ -144,7 +144,7 @@ Route.group(() => {
   Route.post('updateNote', [MonthluNotesController, 'updateNote']).as(
     'updateNote'
   )
-  Route.delete('deleteNote', [MonthluNotesController, 'deleteNote']).as(
+  Route.post('deleteNote', [MonthluNotesController, 'deleteNote']).as(
     'deleteNote'
   )
 }).prefix('monthlyNotes')

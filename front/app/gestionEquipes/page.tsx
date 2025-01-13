@@ -58,7 +58,7 @@ export default function GestionEquipes() {
         )
         const formattedUsers = response.users.map((user: any) => ({
           id: user.id_user,
-          name: `${user.name} ${user.last_name}`,
+          name: user.name,
           last_name: user.last_name,
           email: user.email,
           role: user.role,

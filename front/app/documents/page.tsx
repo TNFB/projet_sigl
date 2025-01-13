@@ -7,7 +7,10 @@ import {
   downloadDocument,
   postRequest,
   postRequestDropDocument,
+  fetchDocumentBlob,
 } from '@/api/api'
+import ProgressPopup from '@/components/ProgressPopup'
+import DocumentViewerDialog from '@/components/DocumentViewerDialog'
 
 interface FormData {
   documentType: string
@@ -57,6 +60,13 @@ function Documents() {
   ])
 
   const [userDocuments, setUserDocuments] = useState<UserDocument[]>([])
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [popupStatus, setPopupStatus] = useState<'creating' | 'success' | 'error'>('creating')
+  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [progressMessage, setProgressMessage] = useState<string>('')
+  const [isViewerOpen, setIsViewerOpen] = useState(false)
+  const [currentDocumentUrl, setCurrentDocumentUrl] = useState('')
+  const [currentDocumentName, setCurrentDocumentName] = useState('')
 
   useEffect(() => {
     fetchUserDocuments()
@@ -98,38 +108,6 @@ function Documents() {
     },
   })
 
-  const handleDownload = async (documentPath: string) => {
-    try {
-      await downloadDocument('document/download', {
-        data: { path: documentPath },
-      })
-    } catch (error) {
-      console.error('Error downloading document:', error)
-      alert('Erreur lors du téléchargement du document')
-    }
-  }
-
-  const cleanDocumentName = (name: string) => {
-    // Si Charach Spécial => envoie BDD Faill
-    const withoutAccents = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    return withoutAccents.replace(/[^a-zA-Z0-9]/g, '_')
-  }
-
-  const handleDocumentTypeChange = (value: string) => {
-    setFormData({
-      ...formData,
-      documentType: value,
-    })
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const document = e.target.files ? e.target.files[0] : null
-    setFormData({
-      ...formData,
-      document,
-    })
-  }
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
@@ -149,7 +127,6 @@ function Documents() {
     }
 
     const formDataToSend = new FormData()
-
     const selectedDocument = documents.find(
       (doc) => doc.value === formData.documentType,
     )
@@ -167,9 +144,13 @@ function Documents() {
 
     const url = 'document/dropDocument'
     try {
+      setIsPopupOpen(true)
+      setProgressMessage('Téléchargement en cours...')
+      setPopupStatus('creating')
       const response = await postRequestDropDocument(url, formDataToSend)
       console.log('Success:', response)
-      alert('Document ajouté avec succès')
+      setProgressMessage('Document ajouté avec succès')
+      setPopupStatus('success')
       setFormData({
         documentType: '',
         document: null,
@@ -178,7 +159,12 @@ function Documents() {
       await fetchUserDocuments()
     } catch (error) {
       console.error('Error:', error)
-      alert("Erreur lors de l'ajout du document")
+      setErrorMessage("Erreur lors de l'ajout du document")
+      setPopupStatus('error')
+    } finally {
+      setTimeout(() => {
+        setIsPopupOpen(false)
+      }, 2000)
     }
   }
 
@@ -197,6 +183,39 @@ function Documents() {
       }
     }
   }
+
+  const handleView = async (documentPath: string, documentName: string) => {
+    console.log('Viewing document:', documentPath)
+    try {
+      const blobUrl = await fetchDocumentBlob('document/download', {
+        data: { path: documentPath },
+      })
+      console.log('Document URL:', blobUrl)
+      setCurrentDocumentUrl(blobUrl)
+      setCurrentDocumentName(documentName)
+      setIsViewerOpen(true)
+    } catch (error) {
+      console.error('Error fetching document:', error)
+      alert('Erreur lors de la récupération du document')
+    }
+  }
+
+  const handleDownload = async (documentPath: string) => {
+    try {
+      await downloadDocument('document/download', {
+        data: { path: documentPath },
+      })
+    } catch (error) {
+      console.error('Error downloading document:', error)
+      alert('Erreur lors du téléchargement du document')
+    }
+  }
+
+  const cleanDocumentName = (name: string) => {
+    const withoutAccents = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    return withoutAccents.replace(/[^a-zA-Z0-9]/g, '_')
+  }
+
   const fields: Field[] = [
     {
       type: 'select',
@@ -204,7 +223,7 @@ function Documents() {
       name: 'documentType',
       value: formData.documentType,
       options: documents,
-      onChange: handleDocumentTypeChange,
+      onChange: (value: string) => setFormData({ ...formData, documentType: value }),
     },
   ]
 
@@ -275,7 +294,13 @@ function Documents() {
                   <span className='ml-2 text-sm text-gray-500'>{doc.type}</span>
                   <div className='col-span-1 text-right'>
                     <button
-                      onClick={() => handleDownload(doc.document_path)}
+                      onClick={() => handleView(doc.document_path)}
+                      className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2'
+                    >
+                      Visualiser
+                    </button>
+                    <button
+                      onClick={() => handleDownload(doc.document_path, doc.name)}
                       className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2'
                     >
                       Télécharger
@@ -295,6 +320,20 @@ function Documents() {
           <p>Vous n&apos;avez pas encore de documents.</p>
         )}
       </div>
+      <ProgressPopup
+        isOpen={isPopupOpen}
+        status={popupStatus}
+        creatingMessage={progressMessage}
+        successMessage='Document ajouté avec succès !'
+        errorMessage={errorMessage}
+        onClose={() => setIsPopupOpen(false)}
+      />
+      <DocumentViewerDialog
+        open={isViewerOpen}
+        onClose={() => setIsViewerOpen(false)}
+        documentUrl={currentDocumentUrl}
+        documentName={currentDocumentName}
+      />
     </Home>
   )
 }

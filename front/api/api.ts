@@ -78,6 +78,42 @@ export const downloadDocument = async (
   window.URL.revokeObjectURL(blobUrl)
 }
 
+export const fetchDocumentBlob = async (url: string, body: any, options?: RequestInit,) => {
+  try {
+    const token = localStorage.getItem('token')
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {
+      method: 'POST',
+      responseType: 'blob',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+      ...options,
+    })
+    const blob = await response.blob()
+    const contentDisposition = response.headers.get('Content-Disposition')
+    let filename = 'document'
+
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename="?(.+)"?/)
+      if (filenameMatch) {
+        filename = filenameMatch[1]
+      }
+    }
+
+    if (filename === 'document' && body.data && body.data.path) {
+      filename = body.data.path.split('/').pop() || 'document'
+    }
+
+    const blobUrl = window.URL.createObjectURL(blob)
+    return blobUrl
+  } catch (error) {
+    console.error('Error fetching document blob:', error)
+    throw error
+  }
+}
+
 export const postRequestDropDocument = async (
   url: string,
   data: FormData | { [key: string]: string | Blob },

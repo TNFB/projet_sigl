@@ -1,3 +1,7 @@
+# ⚠️ Disclaimer ⚠️  <!-- omit from toc -->
+
+**Ce dépôt est un projet pédagogique dont l'objectif premier est d'illustrer nos savoir-faire techniques dans le cadre d'une formation de l'ESEO. Ceci n'est en aucun cas un produit développé et/ou maintenu par l'ESEO.**
+
 # Projet SIGL  <!-- omit from toc -->
 
 [![Build develop](https://github.com/TNFB/projet_sigl/actions/workflows/dev-build.yml/badge.svg)](https://github.com/TNFB/projet_sigl/actions/workflows/dev-build.yml)
